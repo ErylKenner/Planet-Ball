@@ -7,10 +7,17 @@ public class Player : MonoBehaviour
 {
     Planet[] planets;
 
-    Rigidbody2D body;
+    public Rigidbody2D Body {
+        get {
+            return body;
+        }
+    }
+
+    public float speed;
+
+    private Rigidbody2D body;
     Planet planet;
     float radius;
-    float speed;
     float minSpeed;
     float maxSpeed;
 
@@ -22,13 +29,21 @@ public class Player : MonoBehaviour
         planets = FindObjectsOfType<Planet>();
 
         body = GetComponent<Rigidbody2D>();
+
         planet = getClosestPlanet();
-        radius = RotationalPhysics.GetRadius(body, planet.transform.position);
-        minSpeed = 20;
+        minSpeed = 0;
         maxSpeed = 500;
 
         body.velocity = new Vector2(0, 300);
-        body.velocity = RotationalPhysics.OnlyTangentialVelocity(body, planet.transform.position);
+        if (planet != null)
+        {
+            radius = RotationalPhysics.GetRadius(body, planet.transform.position);
+            body.velocity = RotationalPhysics.OnlyTangentialVelocity(body, planet.transform.position);
+        }
+        else
+        {
+            radius = 0;
+        }
         speed = Mathf.Clamp(body.velocity.magnitude, minSpeed, maxSpeed);
     }
 
