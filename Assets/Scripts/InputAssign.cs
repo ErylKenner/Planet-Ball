@@ -15,7 +15,14 @@ public class InputAssign : MonoBehaviour {
         }
     }
 
-    private static Player[] players;
+    public static Player[] players;
+
+    private List<int> connectedControllerNumbers = new List<int>();
+
+    public static Player GetPlayer(int playerNumber)
+    {
+        return System.Array.Find(players, x => x.PlayerNumber == playerNumber);
+    }
 
     private void Awake()
     {
@@ -32,13 +39,19 @@ public class InputAssign : MonoBehaviour {
             int controllerCount = Mathf.Min(currentControllerMax, Input.GetJoystickNames().Length);
             for (int currentController = 1; currentController <= controllerCount; currentController++)
             {
+                if(connectedControllerNumbers.Contains(currentController))
+                {
+                    continue;
+                }
+
                 if (Input.GetButtonDown(PlayerInput.Button("Start", currentController)))
                 {
-                    Player player = System.Array.Find(players, x => x.PlayerNumber == currentPlayer);
+                    Player player = GetPlayer(currentPlayer);
 
                     if (player != null)
                     {
                         player.ControllerInput = new PlayerInput(currentController);
+                        connectedControllerNumbers.Add(currentController);
                         currentPlayer++;
                         Debug.Log("Assigned " + player.name + " to controller " + currentController);
                     } else

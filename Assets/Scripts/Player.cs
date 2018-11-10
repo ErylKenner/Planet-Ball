@@ -7,7 +7,15 @@ public class Player : MonoBehaviour
 {
     Planet[] planets;
 
-    Rigidbody2D body;
+    public Rigidbody2D Body
+    {
+        get
+        {
+            return body;
+        }
+    }
+
+    private Rigidbody2D body;
     Planet planet;
     float radius;
 
@@ -19,11 +27,17 @@ public class Player : MonoBehaviour
         planets = FindObjectsOfType<Planet>();
 
         body = GetComponent<Rigidbody2D>();
-        planet = getClosestPlanet();
-        radius = RotationalPhysics.GetRadius(body, planet.transform.position);
-
         body.velocity = new Vector2(0, 20);
-        body.velocity = RotationalPhysics.OnlyTangentialVelocity(body, planet.transform.position);
+
+        planet = getClosestPlanet();
+        if(planet != null)
+        {
+            radius = RotationalPhysics.GetRadius(body, planet.transform.position);
+            body.velocity = RotationalPhysics.OnlyTangentialVelocity(body, planet.transform.position);
+        }
+
+        
+        
         //Debug.Log("pos: " + body.position + " vel: " + body.velocity + " planet: " + planet.transform.position + " radius: " + radius);
         //Debug.Break();
     }
