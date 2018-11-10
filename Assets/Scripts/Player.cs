@@ -10,6 +10,9 @@ public class Player : MonoBehaviour
     Rigidbody2D body;
     Planet planet;
     float radius;
+    float speed;
+    float minSpeed;
+    float maxSpeed;
 
     public int PlayerNumber;
     public PlayerInput ControllerInput = null;
@@ -21,11 +24,12 @@ public class Player : MonoBehaviour
         body = GetComponent<Rigidbody2D>();
         planet = getClosestPlanet();
         radius = RotationalPhysics.GetRadius(body, planet.transform.position);
+        minSpeed = 20;
+        maxSpeed = 500;
 
-        body.velocity = new Vector2(0, 20);
+        body.velocity = new Vector2(0, 300);
         body.velocity = RotationalPhysics.OnlyTangentialVelocity(body, planet.transform.position);
-        //Debug.Log("pos: " + body.position + " vel: " + body.velocity + " planet: " + planet.transform.position + " radius: " + radius);
-        //Debug.Break();
+        speed = Mathf.Clamp(body.velocity.magnitude, minSpeed, maxSpeed);
     }
 
     void Update()
@@ -40,6 +44,19 @@ public class Player : MonoBehaviour
             planet = getClosestPlanet();
             radius = RotationalPhysics.GetRadius(body, planet.transform.position);
             body.velocity = RotationalPhysics.OnlyTangentialVelocity(body, planet.transform.position);
+            speed = Mathf.Clamp(body.velocity.magnitude, minSpeed, maxSpeed);
+        }
+        if (Input.GetKey(KeyCode.RightArrow))
+        {
+            speed += 50 * Time.deltaTime;
+            speed = Mathf.Clamp(speed, minSpeed, maxSpeed);
+        }
+        if (Input.GetKey(KeyCode.DownArrow))
+        {
+            if (planet != null)
+            {
+                radius -= 25 * Time.deltaTime;
+            }
         }
         if (ControllerInput != null)
         {
@@ -55,7 +72,11 @@ public class Player : MonoBehaviour
     {
         if (planet != null)
         {
-            RotationalPhysics.RotateAroundPoint(body, planet.transform.position, radius);
+            RotationalPhysics.RotateAroundPoint(body, planet.transform.position, radius, speed);
+        }
+        else
+        {
+            body.velocity = body.velocity.normalized * speed;
         }
     }
 

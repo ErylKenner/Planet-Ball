@@ -5,15 +5,17 @@ using UnityEngine;
 public static class RotationalPhysics
 {
 
-    public static void RotateAroundPoint(Rigidbody2D body, Vector2 centerPoint, float radius)
+    public static void RotateAroundPoint(Rigidbody2D body, Vector2 centerPoint, float radius, float speed)
     {
         Vector2 distance = body.position - centerPoint;
+
         float currentAngle = Mathf.Atan2(distance.y, distance.x);
         float rotationDirection = -Mathf.Sign(Vector2.Dot(new Vector2(distance.y, -distance.x), body.velocity));
-        float newAngle = currentAngle + (body.velocity.magnitude / radius) * rotationDirection * Time.fixedDeltaTime;
+        float deltaAngle = Mathf.Acos((distance.magnitude * distance.magnitude + radius * radius - Mathf.Pow(speed * Time.fixedDeltaTime, 2)) / (2 * distance.magnitude * radius));
+        float newAngle = currentAngle + deltaAngle * rotationDirection;
 
         Vector2 newPosition = centerPoint + radius * new Vector2(Mathf.Cos(newAngle), Mathf.Sin(newAngle));
-        body.velocity = body.velocity.magnitude * (newPosition - (Vector2)body.transform.position).normalized;
+        body.velocity = speed * (newPosition - (Vector2)body.transform.position).normalized;
     }
 
     public static Vector2 OnlyTangentialVelocity(Rigidbody2D body, Vector2 centerPoint)
