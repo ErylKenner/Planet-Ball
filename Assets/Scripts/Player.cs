@@ -15,6 +15,8 @@ public class Player : MonoBehaviour
         }
     }
 
+    public float speed;
+
     private Rigidbody2D body;
     Planet planet;
     float radius;
