@@ -20,6 +20,7 @@ public class Player : MonoBehaviour
     float radius;
     float minSpeed;
     float maxSpeed;
+    bool tetherDisabled;
 
     public int PlayerNumber;
     public PlayerInput ControllerInput = null;
@@ -27,12 +28,12 @@ public class Player : MonoBehaviour
     void Start()
     {
         planets = FindObjectsOfType<Planet>();
-
         body = GetComponent<Rigidbody2D>();
 
         planet = getClosestPlanet();
         minSpeed = 0;
-        maxSpeed = 500;
+        maxSpeed = 300;
+        tetherDisabled = false;
 
         body.velocity = new Vector2(0, 300);
         if (planet != null)
@@ -49,7 +50,7 @@ public class Player : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKey(KeyCode.Space) || tetherDisabled)
         {
             planet = null;
             radius = 0;
@@ -85,7 +86,7 @@ public class Player : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (planet != null)
+        if (planet != null && !tetherDisabled)
         {
             RotationalPhysics.RotateAroundPoint(body, planet.transform.position, radius, speed);
         }
@@ -113,5 +114,18 @@ public class Player : MonoBehaviour
             }
         }
         return closest;
+    }
+
+    IEnumerator DisableTether(float time)
+    {
+        tetherDisabled = true;
+        Debug.Log("disabling tether");
+        yield return new WaitForSeconds(time);
+        Debug.Log("Enabling tether");
+        tetherDisabled = false;
+        planet = getClosestPlanet();
+        radius = RotationalPhysics.GetRadius(body, planet.transform.position);
+        body.velocity = RotationalPhysics.OnlyTangentialVelocity(body, planet.transform.position);
+        speed = Mathf.Clamp(body.velocity.magnitude, minSpeed, maxSpeed);
     }
 }
