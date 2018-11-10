@@ -7,10 +7,12 @@ public class Player : MonoBehaviour
 {
     Planet[] planets;
 
-
     Rigidbody2D body;
     Planet planet;
     float radius;
+
+    public int PlayerNumber;
+    public PlayerInput ControllerInput = null;
 
     void Start()
     {
@@ -28,7 +30,6 @@ public class Player : MonoBehaviour
 
     void Update()
     {
-
         if (Input.GetKeyDown(KeyCode.Space))
         {
             planet = null;
@@ -39,6 +40,14 @@ public class Player : MonoBehaviour
             planet = getClosestPlanet();
             radius = RotationalPhysics.GetRadius(body, planet.transform.position);
             body.velocity = RotationalPhysics.OnlyTangentialVelocity(body, planet.transform.position);
+        }
+        if (ControllerInput != null)
+        {
+            //add controls here
+            if (Input.GetButtonDown(ControllerInput.Button("A")))
+            {
+                Debug.Log(name);
+            }
         }
     }
 
