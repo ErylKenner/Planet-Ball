@@ -14,13 +14,14 @@ public class Player : MonoBehaviour
     }
 
     public float speed;
+    public float reelSpeed = 100;
 
     private Rigidbody2D body;
     Planet planet;
     float radius;
     float minSpeed;
-    float maxSpeed;
     bool tetherDisabled;
+    public float maxSpeed;
 
     public int PlayerNumber;
     public PlayerInput ControllerInput = null;
@@ -50,36 +51,36 @@ public class Player : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKey(KeyCode.Space) || tetherDisabled)
+        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKey(KeyCode.Space) || (ControllerInput != null && Input.GetButtonDown(ControllerInput.Button("R"))))
         {
             planet = null;
             radius = 0;
         }
-        if (Input.GetKeyUp(KeyCode.Space))
+        else if ((Input.GetKeyUp(KeyCode.Space) || (ControllerInput != null && Input.GetButtonUp(ControllerInput.Button("R")))) && !tetherDisabled)
         {
             planet = getClosestPlanet();
             radius = RotationalPhysics.GetRadius(body, planet.transform.position);
             body.velocity = RotationalPhysics.OnlyTangentialVelocity(body, planet.transform.position);
             speed = Mathf.Clamp(body.velocity.magnitude, minSpeed, maxSpeed);
         }
-        if (Input.GetKey(KeyCode.RightArrow))
+        if (Input.GetKey(KeyCode.RightArrow) || (ControllerInput != null && Input.GetButton(ControllerInput.Button("A"))))
         {
             speed += 50 * Time.deltaTime;
             speed = Mathf.Clamp(speed, minSpeed, maxSpeed);
         }
-        if (Input.GetKey(KeyCode.DownArrow))
+
+        float reelAmount = 0; ;
+
+        if(ControllerInput != null)
+        {
+            reelAmount = Input.GetAxis(ControllerInput.Axis("Vertical"));
+        }
+
+        if (Input.GetKey(KeyCode.DownArrow) || reelAmount > 0)
         {
             if (planet != null)
             {
-                radius -= 25 * Time.deltaTime;
-            }
-        }
-        if (ControllerInput != null)
-        {
-            //add controls here
-            if (Input.GetButtonDown(ControllerInput.Button("A")))
-            {
-                Debug.Log(name);
+                radius -= reelSpeed * reelAmount * Time.deltaTime;
             }
         }
     }
@@ -119,9 +120,11 @@ public class Player : MonoBehaviour
     IEnumerator DisableTether(float time)
     {
         tetherDisabled = true;
-        Debug.Log("disabling tether");
+        planet = null;
+        radius = 0;
+
         yield return new WaitForSeconds(time);
-        Debug.Log("Enabling tether");
+
         tetherDisabled = false;
         planet = getClosestPlanet();
         radius = RotationalPhysics.GetRadius(body, planet.transform.position);
