@@ -448,17 +448,17 @@ Prefab:
     - target: {fileID: 114471381938495910, guid: ed805df712c157d4ea2f420465a9c874,
         type: 2}
       propertyPath: IronColor.r
-      value: 0.41911763
+      value: 0.6544118
       objectReference: {fileID: 0}
     - target: {fileID: 114471381938495910, guid: ed805df712c157d4ea2f420465a9c874,
         type: 2}
       propertyPath: IronColor.g
-      value: 0.41911763
+      value: 0.6544118
       objectReference: {fileID: 0}
     - target: {fileID: 114471381938495910, guid: ed805df712c157d4ea2f420465a9c874,
         type: 2}
       propertyPath: IronColor.b
-      value: 0.41911763
+      value: 0.6544118
       objectReference: {fileID: 0}
     - target: {fileID: 114471381938495910, guid: ed805df712c157d4ea2f420465a9c874,
         type: 2}
@@ -485,6 +485,12 @@ Prefab:
       propertyPath: m_Type
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 114471381938495910, guid: ed805df712c157d4ea2f420465a9c874,
+        type: 2}
+      propertyPath: IronSprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 677a088524c9fe642b29a55fe8092f92,
+        type: 3}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: ed805df712c157d4ea2f420465a9c874, type: 2}
   m_IsPrefabParent: 0
@@ -789,17 +795,17 @@ Prefab:
     - target: {fileID: 114471381938495910, guid: ed805df712c157d4ea2f420465a9c874,
         type: 2}
       propertyPath: IronColor.r
-      value: 0.41911763
+      value: 0.6544118
       objectReference: {fileID: 0}
     - target: {fileID: 114471381938495910, guid: ed805df712c157d4ea2f420465a9c874,
         type: 2}
       propertyPath: IronColor.g
-      value: 0.41911763
+      value: 0.6544118
       objectReference: {fileID: 0}
     - target: {fileID: 114471381938495910, guid: ed805df712c157d4ea2f420465a9c874,
         type: 2}
       propertyPath: IronColor.b
-      value: 0.41911763
+      value: 0.6544118
       objectReference: {fileID: 0}
     - target: {fileID: 114471381938495910, guid: ed805df712c157d4ea2f420465a9c874,
         type: 2}
@@ -826,6 +832,12 @@ Prefab:
       propertyPath: m_Type
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 114471381938495910, guid: ed805df712c157d4ea2f420465a9c874,
+        type: 2}
+      propertyPath: IronSprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 677a088524c9fe642b29a55fe8092f92,
+        type: 3}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: ed805df712c157d4ea2f420465a9c874, type: 2}
   m_IsPrefabParent: 0
@@ -4296,7 +4308,7 @@ SpriteRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: 8c9be7a808f426249ae36f8bd0492726, type: 2}
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -4316,8 +4328,8 @@ SpriteRenderer:
   m_SortingLayerID: 332075105
   m_SortingLayer: 1
   m_SortingOrder: 0
-  m_Sprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
-  m_Color: {r: 0.09948123, g: 0.037629742, b: 0.85294116, a: 1}
+  m_Sprite: {fileID: 21300000, guid: baa15e7904414b04680bf7d47d2b8c7e, type: 3}
+  m_Color: {r: 0.09803922, g: 0.039215688, b: 0.85490197, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -4561,7 +4573,7 @@ SpriteRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: 8c9be7a808f426249ae36f8bd0492726, type: 2}
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -4581,7 +4593,7 @@ SpriteRenderer:
   m_SortingLayerID: 332075105
   m_SortingLayer: 1
   m_SortingOrder: 0
-  m_Sprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 21300000, guid: baa15e7904414b04680bf7d47d2b8c7e, type: 3}
   m_Color: {r: 0.85294116, g: 0.037629742, b: 0.037629742, a: 1}
   m_FlipX: 0
   m_FlipY: 0
