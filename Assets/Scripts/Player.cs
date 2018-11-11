@@ -33,11 +33,11 @@ public class Player : MonoBehaviour
         body = GetComponent<Rigidbody2D>();
 
         //planet = getClosestPlanet();
-        minSpeed = 50;
+        minSpeed = 150;
         maxSpeed = 300;
         tetherDisabled = false;
 
-        body.velocity = new Vector2(0, 300);
+        body.velocity = new Vector2(0, 200);
         if (planet != null)
         {
             radius = RotationalPhysics.GetRadius(body, planet.transform.position);
@@ -98,6 +98,15 @@ public class Player : MonoBehaviour
         }
     }
 
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.collider.GetComponent<Player>() != null)
+        {
+            //Debug.Log("Collided!");
+            StartCoroutine(DisableTether(0.5f));
+        }
+    }
+
 
     //----------------------------------------------------------------------------------------------
 
@@ -127,7 +136,7 @@ public class Player : MonoBehaviour
         yield return new WaitForSeconds(time);
 
         tetherDisabled = false;
-        AttatchTether();
+        //AttatchTether();
     }
 
     void AttatchTether()
