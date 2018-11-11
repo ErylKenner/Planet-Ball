@@ -5,8 +5,9 @@ using UnityEngine;
 public static class RotationalPhysics
 {
 
-    public static void RotateAroundPoint(Rigidbody2D body, Vector2 centerPoint, float radius, float speed)
+    public static void RotateAroundPoint(Rigidbody2D body, Vector2 centerPoint, float radius, float speed, float minDistance)
     {
+        radius = Mathf.Clamp(radius, minDistance, Mathf.Infinity);
         Vector2 distance = body.position - centerPoint;
 
         float currentAngle = Mathf.Atan2(distance.y, distance.x);

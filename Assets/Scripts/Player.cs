@@ -16,6 +16,7 @@ public class Player : MonoBehaviour
     public float speed;
     public float reelSpeed = 100;
 
+
     private Rigidbody2D body;
     Planet planet;
     float radius;
@@ -69,14 +70,19 @@ public class Player : MonoBehaviour
             speed = Mathf.Clamp(speed, minSpeed, maxSpeed);
         }
 
-        float reelAmount = 0; ;
+        float reelAmount = 0;
 
-        if(ControllerInput != null)
+        if (ControllerInput != null)
         {
             reelAmount = Input.GetAxis(ControllerInput.Axis("Vertical"));
         }
 
-        if (Input.GetKey(KeyCode.DownArrow) || reelAmount > 0)
+        if (Input.GetKey(KeyCode.DownArrow))
+        {
+            reelAmount = 1;
+        }
+
+        if (reelAmount > 0)
         {
             if (planet != null)
             {
@@ -89,7 +95,7 @@ public class Player : MonoBehaviour
     {
         if (planet != null && !tetherDisabled)
         {
-            RotationalPhysics.RotateAroundPoint(body, planet.transform.position, radius, speed);
+            RotationalPhysics.RotateAroundPoint(body, planet.transform.position, radius, speed, planet.minDistance);
         }
         else
         {
