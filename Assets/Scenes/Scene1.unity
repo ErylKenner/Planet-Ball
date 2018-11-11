@@ -518,6 +518,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 0
+  reelSpeed: 100
+  maxSpeed: 0
   PlayerNumber: 0
 --- !u!58 &1913046220
 CircleCollider2D:
@@ -742,6 +744,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba0796bb8c9556149b021047c312c23f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  minDistance: 30
 --- !u!212 &2121196396
 SpriteRenderer:
   m_ObjectHideFlags: 0
