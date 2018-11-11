@@ -32,7 +32,7 @@ public class Player : MonoBehaviour
         body = GetComponent<Rigidbody2D>();
 
         planet = getClosestPlanet();
-        minSpeed = 0;
+        minSpeed = 50;
         maxSpeed = 300;
         tetherDisabled = false;
 
@@ -53,15 +53,11 @@ public class Player : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetKey(KeyCode.Space) || (ControllerInput != null && Input.GetButtonDown(ControllerInput.Button("R"))))
         {
-            planet = null;
-            radius = 0;
+            DetatchTether();
         }
         else if ((Input.GetKeyUp(KeyCode.Space) || (ControllerInput != null && Input.GetButtonUp(ControllerInput.Button("R")))) && !tetherDisabled)
         {
-            planet = getClosestPlanet();
-            radius = RotationalPhysics.GetRadius(body, planet.transform.position);
-            body.velocity = RotationalPhysics.OnlyTangentialVelocity(body, planet.transform.position);
-            speed = Mathf.Clamp(body.velocity.magnitude, minSpeed, maxSpeed);
+            AttatchTether();
         }
         if (Input.GetKey(KeyCode.RightArrow) || (ControllerInput != null && Input.GetButton(ControllerInput.Button("A"))))
         {
@@ -71,7 +67,7 @@ public class Player : MonoBehaviour
 
         float reelAmount = 0; ;
 
-        if(ControllerInput != null)
+        if (ControllerInput != null)
         {
             reelAmount = Input.GetAxis(ControllerInput.Axis("Vertical"));
         }
@@ -126,9 +122,20 @@ public class Player : MonoBehaviour
         yield return new WaitForSeconds(time);
 
         tetherDisabled = false;
+        AttatchTether();
+    }
+
+    void AttatchTether()
+    {
         planet = getClosestPlanet();
         radius = RotationalPhysics.GetRadius(body, planet.transform.position);
         body.velocity = RotationalPhysics.OnlyTangentialVelocity(body, planet.transform.position);
         speed = Mathf.Clamp(body.velocity.magnitude, minSpeed, maxSpeed);
+    }
+
+    void DetatchTether()
+    {
+        planet = null;
+        radius = 0;
     }
 }

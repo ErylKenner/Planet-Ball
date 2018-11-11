@@ -23,7 +23,8 @@ public static class RotationalPhysics
         Vector2 curPosition = (Vector2)body.transform.position;
         Vector2 distanceVector = curPosition - centerPoint;
         Vector2 tangentVector = new Vector2(distanceVector.y, -distanceVector.x).normalized;
-        return Vector2.Dot(body.velocity, tangentVector) * tangentVector;
+        //return Vector2.Dot(body.velocity, tangentVector) * tangentVector;
+        return body.velocity.magnitude * tangentVector;
     }
 
     public static float GetRadius(Rigidbody2D body, Vector2 centerPoint)
