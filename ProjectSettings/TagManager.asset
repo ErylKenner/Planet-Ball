@@ -41,3 +41,9 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Player
+    uniqueID: 332075105
+    locked: 0
+  - name: Line
+    uniqueID: 3695285439
+    locked: 0
