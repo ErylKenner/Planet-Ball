@@ -132,7 +132,7 @@ public class Player : MonoBehaviour
     {
         if (collision.collider.GetComponent<Player>() != null)
         {
-            StartCoroutine(DisableTether(0.5f));
+            StartCoroutine(DisableTether(0.75f));
         }
     }
 
@@ -159,12 +159,14 @@ public class Player : MonoBehaviour
     IEnumerator DisableTether(float time)
     {
         tetherDisabled = true;
+        lineRenderer.enabled = false;
         planet = null;
         radius = 0;
 
         yield return new WaitForSeconds(time);
 
         tetherDisabled = false;
+        lineRenderer.enabled = true;
         //AttatchTether();
     }
 
