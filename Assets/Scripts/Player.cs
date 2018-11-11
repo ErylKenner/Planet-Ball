@@ -39,7 +39,7 @@ public class Player : MonoBehaviour
         maxSpeed = 250;
         tetherDisabled = false;
 
-        body.velocity = new Vector2(0, 120);
+        body.velocity = new Vector2(0, 160);
         radius = 0;
         speed = Mathf.Clamp(body.velocity.magnitude, minSpeed, maxSpeed);
 
@@ -119,6 +119,15 @@ public class Player : MonoBehaviour
         }
     }
 
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.collider.GetComponent<Player>() != null)
+        {
+            //Debug.Log("Collided!");
+            StartCoroutine(DisableTether(0.5f));
+        }
+    }
+
 
     //----------------------------------------------------------------------------------------------
 
@@ -148,7 +157,7 @@ public class Player : MonoBehaviour
         yield return new WaitForSeconds(time);
 
         tetherDisabled = false;
-        AttatchTether();
+        //AttatchTether();
     }
 
     void AttatchTether()
