@@ -32,7 +32,7 @@ public class Player : MonoBehaviour
         planets = FindObjectsOfType<Planet>();
         body = GetComponent<Rigidbody2D>();
 
-        planet = getClosestPlanet();
+        //planet = getClosestPlanet();
         minSpeed = 50;
         maxSpeed = 300;
         tetherDisabled = false;
@@ -52,11 +52,11 @@ public class Player : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKey(KeyCode.Space) || (ControllerInput != null && Input.GetButtonDown(ControllerInput.Button("R"))))
+        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKey(KeyCode.Space) || (ControllerInput != null && Input.GetButtonUp(ControllerInput.Button("R"))))
         {
             DetatchTether();
         }
-        else if ((Input.GetKeyUp(KeyCode.Space) || (ControllerInput != null && Input.GetButtonUp(ControllerInput.Button("R")))) && !tetherDisabled)
+        else if ((Input.GetKeyUp(KeyCode.Space) || (ControllerInput != null && Input.GetButtonDown(ControllerInput.Button("R")))) && !tetherDisabled)
         {
             AttatchTether();
         }
@@ -72,17 +72,15 @@ public class Player : MonoBehaviour
         {
             reelAmount = Input.GetAxis(ControllerInput.Axis("Vertical"));
         }
-
         if (Input.GetKey(KeyCode.DownArrow))
         {
-            reelAmount = 1;
+            reelAmount = -1;
         }
-
-        if (reelAmount > 0)
+        if (reelAmount < 0)
         {
             if (planet != null)
             {
-                radius -= reelSpeed * reelAmount * Time.deltaTime;
+                radius -= reelSpeed * -reelAmount * Time.deltaTime;
             }
         }
     }
