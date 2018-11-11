@@ -102,7 +102,7 @@ public class Player : MonoBehaviour
     {
         if (collision.collider.GetComponent<Player>() != null)
         {
-            Debug.Log("Collided!");
+            //Debug.Log("Collided!");
             StartCoroutine(DisableTether(0.5f));
         }
     }
