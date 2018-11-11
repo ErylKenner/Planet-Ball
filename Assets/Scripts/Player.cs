@@ -41,7 +41,7 @@ public class Player : MonoBehaviour
         if (planet != null)
         {
             radius = RotationalPhysics.GetRadius(body, planet.transform.position);
-            body.velocity = RotationalPhysics.OnlyTangentialVelocity(body, planet.transform.position);
+            body.velocity = RotationalPhysics.ConvertToTangentialVelocity(body, planet.transform.position);
         }
         else
         {
@@ -81,6 +81,7 @@ public class Player : MonoBehaviour
             if (planet != null)
             {
                 radius -= reelSpeed * -reelAmount * Time.deltaTime;
+                radius = Mathf.Clamp(radius, planet.minDistance, Mathf.Infinity);
             }
         }
     }
@@ -133,7 +134,7 @@ public class Player : MonoBehaviour
     {
         planet = getClosestPlanet();
         radius = RotationalPhysics.GetRadius(body, planet.transform.position);
-        body.velocity = RotationalPhysics.OnlyTangentialVelocity(body, planet.transform.position);
+        body.velocity = RotationalPhysics.ConvertToTangentialVelocity(body, planet.transform.position);
         speed = Mathf.Clamp(body.velocity.magnitude, minSpeed, maxSpeed);
     }
 
