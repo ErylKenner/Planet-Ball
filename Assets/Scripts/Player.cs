@@ -28,6 +28,8 @@ public class Player : MonoBehaviour
     float radius;
     float minSpeed;
     bool tetherDisabled;
+    Color disabledTetherColor;
+    Color enabledTetherColor;
 
 
     void Start()
@@ -43,24 +45,30 @@ public class Player : MonoBehaviour
         radius = 0;
         speed = Mathf.Clamp(body.velocity.magnitude, minSpeed, maxSpeed);
 
+        disabledTetherColor = new Color(220, 220, 220);
+        disabledTetherColor.a = 0.1f;
+        enabledTetherColor = Color.black;
+
         lineRenderer = gameObject.GetComponent<LineRenderer>();
         if (lineRenderer == null)
         {
             lineRenderer = gameObject.AddComponent<LineRenderer>();
         }
         lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
-        lineRenderer.startColor = lineRenderer.endColor = new Color(200, 200, 200);
+        lineRenderer.startColor = lineRenderer.endColor = disabledTetherColor;
         lineRenderer.widthMultiplier = 1f;
         lineRenderer.positionCount = 2;
+
+
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKey(KeyCode.Space) || (ControllerInput != null && Input.GetButtonUp(ControllerInput.Button("R"))))
+        if (Input.GetKeyUp(KeyCode.Space) || (ControllerInput != null && Input.GetButtonUp(ControllerInput.Button("R"))))
         {
             DetatchTether();
         }
-        else if ((Input.GetKeyUp(KeyCode.Space) || (ControllerInput != null && Input.GetButtonDown(ControllerInput.Button("R")))) && !tetherDisabled)
+        else if ((Input.GetKeyDown(KeyCode.Space) || (ControllerInput != null && Input.GetButtonDown(ControllerInput.Button("R")))) && !tetherDisabled)
         {
             AttatchTether();
         }
@@ -94,21 +102,22 @@ public class Player : MonoBehaviour
     {
         if (planet != null && !tetherDisabled)
         {
-            lineRenderer.enabled = true;
             RotationalPhysics.RotateAroundPoint(body, planet.transform.position, radius, speed, planet.minDistance);
 
-            Vector2 endPos = body.position + body.velocity * Time.fixedDeltaTime;
-            //float distance = Vector2.Distance(endPos, planet.transform.position);
-            //endPos = (Vector2)planet.transform.position + (endPos - (Vector2)planet.transform.position) * (distance - 0.08f * body.transform.localScale.x) / distance;
-
+            lineRenderer.startColor = lineRenderer.endColor = enabledTetherColor;
             lineRenderer.SetPosition(0, planet.transform.position);
-            lineRenderer.SetPosition(1, endPos);
+            lineRenderer.SetPosition(1, body.position + body.velocity * Time.fixedDeltaTime);
         }
         else
         {
-            lineRenderer.enabled = false;
             body.velocity = body.velocity.normalized * speed;
+
+            lineRenderer.startColor = lineRenderer.endColor = disabledTetherColor;
+            lineRenderer.SetPosition(0, getClosestPlanet().transform.position);
+            lineRenderer.SetPosition(1, body.position + body.velocity * Time.fixedDeltaTime);
         }
+
+        //Fix small or zero velocity
         if (body.velocity.magnitude < minSpeed)
         {
             body.velocity = body.velocity.normalized * minSpeed;
@@ -123,7 +132,6 @@ public class Player : MonoBehaviour
     {
         if (collision.collider.GetComponent<Player>() != null)
         {
-            //Debug.Log("Collided!");
             StartCoroutine(DisableTether(0.5f));
         }
     }
