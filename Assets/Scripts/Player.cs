@@ -45,7 +45,7 @@ public class Player : MonoBehaviour
         radius = 0;
         speed = Mathf.Clamp(body.velocity.magnitude, minSpeed, maxSpeed);
 
-        disabledTetherColor = new Color(220, 220, 220);
+        disabledTetherColor = Color.gray;
         disabledTetherColor.a = 0.1f;
         enabledTetherColor = Color.black;
 

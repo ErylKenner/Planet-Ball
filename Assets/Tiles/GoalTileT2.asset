@@ -9,10 +9,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 1
   m_Script: {fileID: 13312, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: Brick
+  m_Name: GoalTileT2
   m_EditorClassIdentifier: 
-  m_Sprite: {fileID: 21300000, guid: e5f7a2a04d17ee945a5c3a8824dfc6f4, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Sprite: {fileID: 21300000, guid: 0b7272a2f817bdd429e07bb5793572fc, type: 3}
+  m_Color: {r: 0.85490197, g: 0.039215688, b: 0.039215688, a: 0.5294118}
   m_Transform:
     e00: 1
     e01: 0

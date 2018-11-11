@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 [RequireComponent(typeof(Collider2D))]
 public class Goal : MonoBehaviour {
@@ -15,8 +16,9 @@ public class Goal : MonoBehaviour {
             int scoringTeam = TeamNumber == 1 ? 2 : 1;
             Score.AddToScore(scoringTeam);
 
-            CountDownUI.StartCountdown(ball);
+            CountDownUI.StartCountdown(ball, scoringTeam);
 
         }
+
     }
 }
