@@ -167,7 +167,10 @@ public class Player : MonoBehaviour
 
         tetherDisabled = false;
         lineRenderer.enabled = true;
-        //AttatchTether();
+        if (Input.GetKey(KeyCode.Space) || (ControllerInput != null && Input.GetButton(ControllerInput.Button("R"))))
+        {
+            AttatchTether();
+        }
     }
 
     void AttatchTether()
