@@ -24,7 +24,7 @@ public class Shadow : MonoBehaviour {
         shadow.sprite = sprite.sprite;
         shadow.material = shadowMaterial;
         shadow.color = shadowColor;
-        shadow.sortingOrder = sprite.sortingOrder - 1;
+        shadow.sortingLayerName = "Shadow";
     }
 
     private void LateUpdate()
