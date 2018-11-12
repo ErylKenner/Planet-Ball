@@ -15,7 +15,6 @@ public class Player : MonoBehaviour
     public PlayerInput ControllerInput = null;
     public float speed;
     public float maxSpeed;
-    public float reelSpeed = 0.3f;
     public int PlayerNumber;
 
 
@@ -27,6 +26,7 @@ public class Player : MonoBehaviour
     Planet[] planets;
     float radius;
     float minSpeed;
+    float reelSpeed;
     bool tetherDisabled;
     Color disabledTetherColor;
     Color enabledTetherColor;
@@ -40,6 +40,7 @@ public class Player : MonoBehaviour
         minSpeed = 50;
         maxSpeed = 250;
         tetherDisabled = false;
+        reelSpeed = 0.3f;
 
         body.velocity = new Vector2(0, 160);
         radius = 0;
