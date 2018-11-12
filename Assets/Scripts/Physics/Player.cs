@@ -40,7 +40,7 @@ public class Player : MonoBehaviour
         minSpeed = 50;
         maxSpeed = 250;
         tetherDisabled = false;
-        reelSpeed = 0.3f;
+        reelSpeed = 0.75f;
 
         body.velocity = new Vector2(0, 160);
         radius = 0;
