@@ -7,10 +7,8 @@ public class CountDownUI : MonoBehaviour {
 
     static CountDownUI instance = null;
 
-    public int countDownTime = 3;
+    public int countDownTime = 5;
     public Text countDownText;
-
-    
 
     private float currentCountDown = 0;
     private bool counting = false;
@@ -31,7 +29,20 @@ public class CountDownUI : MonoBehaviour {
     {
         if(counting)
         {
-            countDownText.text = Mathf.CeilToInt(currentCountDown).ToString();
+            int num = Mathf.CeilToInt(currentCountDown);
+
+            if(num <= 3)
+            {
+                countDownText.text = num.ToString();
+            } else
+            {
+                int p1score = Score.GetScore(1);
+                int p2score = Score.GetScore(2);
+                int max = Mathf.Max(p1score, p2score);
+                int min = Mathf.Min(p1score, p2score);
+                countDownText.text = max + " - " + min;
+            }
+            
             currentCountDown -= Time.deltaTime;
 
             if(currentCountDown < 0)

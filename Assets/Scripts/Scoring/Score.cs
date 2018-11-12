@@ -7,7 +7,7 @@ public class Score : MonoBehaviour {
     public static int scoreTeam1 = 0;
     public static int scoreTeam2 = 0;
 
-    private readonly static int scoreGoal = 5;
+    private readonly static int scoreGoal = 3;
 
     private static Score instance;
 
