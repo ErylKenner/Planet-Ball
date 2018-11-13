@@ -24,10 +24,10 @@ public class Player : MonoBehaviour
     LineRenderer lineRenderer;
     Planet planet;
     Planet[] planets;
-    float radius;
-    float minSpeed;
-    float reelSpeed;
-    bool tetherDisabled;
+    float radius = 0f;
+    float minSpeed = 50f;
+    float reelSpeed = 0.75f;
+    bool tetherDisabled = false;
     Color disabledTetherColor;
     Color enabledTetherColor;
 
@@ -37,13 +37,8 @@ public class Player : MonoBehaviour
         planets = FindObjectsOfType<Planet>();
         body = GetComponent<Rigidbody2D>();
 
-        minSpeed = 50;
         maxSpeed = 250;
-        tetherDisabled = false;
-        reelSpeed = 0.75f;
-
         body.velocity = new Vector2(0, 160);
-        radius = 0;
         speed = Mathf.Clamp(body.velocity.magnitude, minSpeed, maxSpeed);
 
         disabledTetherColor = Color.gray;
@@ -59,8 +54,6 @@ public class Player : MonoBehaviour
         lineRenderer.startColor = lineRenderer.endColor = disabledTetherColor;
         lineRenderer.widthMultiplier = 1f;
         lineRenderer.positionCount = 2;
-
-
     }
 
     void Update()
