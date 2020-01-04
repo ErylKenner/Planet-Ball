@@ -17,16 +17,16 @@ public class Boost : Ability
 
     private void FixedUpdate()
     {
-        if (player.speed > player.maxSpeed)
+        if (player.Speed > player.MaxSpeed)
         {
-            float newSpeed = player.speed - overSpeedDeceleration * Time.fixedDeltaTime;
-            newSpeed = Mathf.Clamp(newSpeed, player.maxSpeed, Mathf.Infinity);
-            player.speed = newSpeed;
+            float newSpeed = player.Speed - overSpeedDeceleration * Time.fixedDeltaTime;
+            newSpeed = Mathf.Clamp(newSpeed, player.MaxSpeed, Mathf.Infinity);
+            player.Speed = newSpeed;
         }
     }
 
     protected override void Function()
     {
-        player.speed += speedIncrease;
+        player.Speed += speedIncrease;
     }
 }
