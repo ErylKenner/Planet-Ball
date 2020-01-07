@@ -25,6 +25,7 @@ public class EndScreen : MonoBehaviour {
 
     private void Update()
     {
+        /*
         if(ended)
         {
             Player[] players = InputAssign.players;
@@ -45,5 +46,6 @@ public class EndScreen : MonoBehaviour {
                 }
             }
         }
+        */
     }
 }

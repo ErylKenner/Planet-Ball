@@ -27,15 +27,18 @@ public abstract class Ability : MonoBehaviour
 
     private void Start()
     {
+        /*
         player = InputAssign.GetPlayer(PlayerNumber);
         if(player == null)
         {
             Debug.LogError("Could not find player with given player number!");
         }
+        */
     }
 
     private void Update()
     {
+        /*
         if (!onCoolDown)
         {
             if (player != null)
@@ -57,7 +60,7 @@ public abstract class Ability : MonoBehaviour
             currentCoolDown += Time.deltaTime;
             coolDownSlider.value = coolDownSlider.maxValue - currentCoolDown / CoolDown;
         }
-
+        */
         DerivedUpdate();
     }
 

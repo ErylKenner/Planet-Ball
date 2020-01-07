@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(PlayerInput))]
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(LineRenderer))]
 public class Player : MonoBehaviour
@@ -58,14 +60,20 @@ public class Player : MonoBehaviour
 
     float reelRate = 0;
     int speedChangeDir = 0;
-    bool detachTether = false;
     bool attachTether = false;
+
+    // TODO: change to shortened name after deleting other script
+    private UnityEngine.InputSystem.PlayerInput playerInput;
 
     void Start()
     {
         planets = FindObjectsOfType<Planet>();
         rb = GetComponent<Rigidbody2D>();
-        lineRenderer = gameObject.GetComponent<LineRenderer>();
+        lineRenderer = GetComponent<LineRenderer>();
+        // TODO: change to shortened name after deleting other script
+        playerInput = GetComponent<UnityEngine.InputSystem.PlayerInput>();
+
+        //playerInput.actions.FindActionMap("Gameplay").Enable();
 
         rb.velocity = initialSpeed * Vector2.up;
         Speed = initialSpeed;
@@ -80,6 +88,7 @@ public class Player : MonoBehaviour
 
     void Update()
     {
+        /*
         if (ControllerInput != null)
         {
             reelRate = ReelSpeed * -Input.GetAxis(ControllerInput.Axis("Vertical"));
@@ -117,21 +126,20 @@ public class Player : MonoBehaviour
         {
             speedChangeDir = 0;
         }
+        */
     }
 
     void FixedUpdate()
     {
         //Atach tether
-        if (attachTether)
+        if (!tetherDisabled && attachTether && attachedPlanet == null)
         {
-            attachTether = false;
             AttachTether();
         }
 
         //Detach tether
-        if (detachTether)
+        if (!attachTether && attachedPlanet != null)
         {
-            detachTether = false;
             DetachTether();
         }
 
@@ -229,5 +237,26 @@ public class Player : MonoBehaviour
     {
         attachedPlanet = null;
         Radius = 0;
+    }
+
+    public void OnTether(InputValue input)
+    {
+        bool atttach = (int)(float)input.Get() == 1 ? true : false;
+        attachTether = atttach;
+    }
+
+    public void OnShortenTether(InputValue input)
+    {
+        reelRate = ReelSpeed * (float)input.Get();
+    }
+
+    public void OnBoost(InputValue input)
+    {
+
+    }
+
+    public void OnIron(InputValue input)
+    {
+
     }
 }
