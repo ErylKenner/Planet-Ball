@@ -2,7 +2,7 @@ sudo: required
 language: bash
 env:
   global:
-    - IMAGE_NAME=gableroux/unity3d:latest
+    - IMAGE_NAME=gableroux/unity3d:2019.3.11f1-windows
     - BUILD_NAME=planet-ball
 services:
   - docker
