@@ -1,5 +1,6 @@
-sudo: required
-language: bash
+language: shell
+dist: xenial
+os: linux
 env:
   global:
     - IMAGE_NAME=gableroux/unity3d:2019.3.11f1-windows
@@ -23,8 +24,7 @@ jobs:
         - "zip -r StandaloneWindows64.zip ./StandaloneWindows64/"
       deploy:
         provider: releases
-        api_key: $GITHUB_API_KEY
+        token: $GITHUB_API_KEY
         file: StandaloneWindows64.zip
-        skip_cleanup: true
         on:
           tags: true
