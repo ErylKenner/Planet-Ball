@@ -1,6 +1,6 @@
 sudo: required
 language: bash
-ebv:
+env:
   global:
     - IMAGE_NAME=gableroux/unity3d:latest
     - BUILD_NAME=planet-ball
