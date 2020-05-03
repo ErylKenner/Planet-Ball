@@ -2,15 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class InputAssign : MonoBehaviour {
+public class InputAssign : MonoBehaviour
+{
 
     public static int playerCount;
     public static int currentPlayer = 1;
 
-    public static bool AreRemainingPlayers
-    {
-        get
-        {
+    public static bool AreRemainingPlayers {
+        get {
             return currentPlayer <= playerCount;
         }
     }
@@ -32,14 +31,14 @@ public class InputAssign : MonoBehaviour {
 
     private void Update()
     {
-        if(AreRemainingPlayers)
+        if (AreRemainingPlayers)
         {
             //increase this value as we add more controllers to the InputManager
             const int currentControllerMax = 2;
             int controllerCount = Mathf.Min(currentControllerMax, Input.GetJoystickNames().Length);
             for (int currentController = 1; currentController <= controllerCount; currentController++)
             {
-                if(connectedControllerNumbers.Contains(currentController))
+                if (connectedControllerNumbers.Contains(currentController))
                 {
                     continue;
                 }
@@ -54,7 +53,8 @@ public class InputAssign : MonoBehaviour {
                         connectedControllerNumbers.Add(currentController);
                         currentPlayer++;
                         Debug.Log("Assigned " + player.name + " to controller " + currentController);
-                    } else
+                    }
+                    else
                     {
                         Debug.LogError("Controllers are not set up correctly!");
                         return;
@@ -62,6 +62,6 @@ public class InputAssign : MonoBehaviour {
                 }
             }
         }
-        
+
     }
 }

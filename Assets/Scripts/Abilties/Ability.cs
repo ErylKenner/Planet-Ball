@@ -15,10 +15,8 @@ public abstract class Ability : MonoBehaviour
 
     protected Player player;
 
-    public bool OnCoolDown
-    {
-        get
-        {
+    public bool OnCoolDown {
+        get {
             return onCoolDown;
         }
     }
@@ -28,7 +26,7 @@ public abstract class Ability : MonoBehaviour
     private void Start()
     {
         player = InputAssign.GetPlayer(PlayerNumber);
-        if(player == null)
+        if (player == null)
         {
             Debug.LogError("Could not find player with given player number!");
         }
@@ -52,7 +50,7 @@ public abstract class Ability : MonoBehaviour
             }
         }
 
-        if(onCoolDown)
+        if (onCoolDown)
         {
             currentCoolDown += Time.deltaTime;
             coolDownSlider.value = coolDownSlider.maxValue - currentCoolDown / CoolDown;

@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerInput {
+public class PlayerInput
+{
 
     public int ControllerIndex;
 
@@ -11,7 +12,7 @@ public class PlayerInput {
 
     public PlayerInput(int controller)
     {
-        if(controller < 1)
+        if (controller < 1)
         {
             throw new System.ArgumentException("Not given a valid controller!");
         }
@@ -20,7 +21,7 @@ public class PlayerInput {
 
     public static string Button(int index, int controller)
     {
-        if(index >= ButtonNames.Length || index < 0)
+        if (index >= ButtonNames.Length || index < 0)
         {
             throw new System.IndexOutOfRangeException("Not a valid button index!");
         }
@@ -30,7 +31,7 @@ public class PlayerInput {
 
     public static string Button(string button, int controller)
     {
-        if(!System.Array.Exists(ButtonNames, x => x == button))
+        if (!System.Array.Exists(ButtonNames, x => x == button))
         {
             throw new System.ArgumentException("Not a valid button string!");
         }

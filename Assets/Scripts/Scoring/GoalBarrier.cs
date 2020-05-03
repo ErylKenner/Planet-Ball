@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Collider2D))]
-public class GoalBarrier : MonoBehaviour {
+public class GoalBarrier : MonoBehaviour
+{
 
     public void IgnoreCollision(Collider2D collider)
     {

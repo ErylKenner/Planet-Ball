@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(SpriteRenderer))]
-public class Shadow : MonoBehaviour {
+public class Shadow : MonoBehaviour
+{
 
     public Vector2 offset = new Vector2(-50, -50);
     public Color shadowColor;

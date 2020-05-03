@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CountDownUI : MonoBehaviour {
+public class CountDownUI : MonoBehaviour
+{
 
     static CountDownUI instance = null;
 
@@ -16,10 +17,11 @@ public class CountDownUI : MonoBehaviour {
 
     private void Awake()
     {
-        if(instance == null)
+        if (instance == null)
         {
             instance = this;
-        } else
+        }
+        else
         {
             Destroy(gameObject);
         }
@@ -27,14 +29,15 @@ public class CountDownUI : MonoBehaviour {
 
     private void Update()
     {
-        if(counting)
+        if (counting)
         {
             int num = Mathf.CeilToInt(currentCountDown);
 
-            if(num <= 3)
+            if (num <= 3)
             {
                 countDownText.text = num.ToString();
-            } else
+            }
+            else
             {
                 int p1score = Score.GetScore(1);
                 int p2score = Score.GetScore(2);
@@ -42,10 +45,10 @@ public class CountDownUI : MonoBehaviour {
                 int min = Mathf.Min(p1score, p2score);
                 countDownText.text = max + " - " + min;
             }
-            
+
             currentCountDown -= Time.deltaTime;
 
-            if(currentCountDown < 0)
+            if (currentCountDown < 0)
             {
                 currentBall.ResetBall();
                 counting = false;
@@ -66,5 +69,5 @@ public class CountDownUI : MonoBehaviour {
         instance.countDownText.gameObject.SetActive(true);
     }
 
-    
+
 }

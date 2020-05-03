@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Iron : Ability {
+public class Iron : Ability
+{
 
     public float Duration = 2f;
     public float IncreasedMass = 10f;
@@ -16,7 +17,7 @@ public class Iron : Ability {
 
     private float orignalMass;
 
-    protected override void DerivedUpdate() {}
+    protected override void DerivedUpdate() { }
 
     protected override void Function()
     {

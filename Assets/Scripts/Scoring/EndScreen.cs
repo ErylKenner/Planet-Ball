@@ -4,7 +4,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class EndScreen : MonoBehaviour {
+public class EndScreen : MonoBehaviour
+{
 
     public Image screen;
     public Text text;
@@ -12,7 +13,7 @@ public class EndScreen : MonoBehaviour {
 
     private bool ended = false;
 
-	public void EndGame(int teamNumber)
+    public void EndGame(int teamNumber)
     {
         Time.timeScale = 0;
         ended = true;
@@ -25,17 +26,17 @@ public class EndScreen : MonoBehaviour {
 
     private void Update()
     {
-        if(ended)
+        if (ended)
         {
             Player[] players = InputAssign.players;
-            for(int i = 0; i < players.Length; i++)
+            for (int i = 0; i < players.Length; i++)
             {
-                if(players[i].ControllerInput == null)
+                if (players[i].ControllerInput == null)
                 {
                     continue;
                 }
 
-                if(Input.GetButtonDown(players[i].ControllerInput.Button("Start")))
+                if (Input.GetButtonDown(players[i].ControllerInput.Button("Start")))
                 {
                     Time.timeScale = 1;
                     InputAssign.currentPlayer = 1;

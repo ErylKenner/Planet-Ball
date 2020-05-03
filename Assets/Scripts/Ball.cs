@@ -4,15 +4,14 @@ using UnityEngine;
 
 [RequireComponent(typeof(Collider2D))]
 [RequireComponent(typeof(Rigidbody2D))]
-public class Ball : MonoBehaviour {
+public class Ball : MonoBehaviour
+{
 
     public Transform spawnPoint;
     public GoalBarrier barrier;
 
-    public bool Scored
-    {
-        get
-        {
+    public bool Scored {
+        get {
             return scored;
         }
     }

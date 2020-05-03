@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Score : MonoBehaviour {
+public class Score : MonoBehaviour
+{
 
     public static int scoreTeam1 = 0;
     public static int scoreTeam2 = 0;
@@ -18,10 +19,11 @@ public class Score : MonoBehaviour {
 
     private void Awake()
     {
-        if(instance == null)
+        if (instance == null)
         {
             instance = this;
-        } else
+        }
+        else
         {
             Destroy(gameObject);
         }
@@ -29,19 +31,21 @@ public class Score : MonoBehaviour {
 
     public static void AddToScore(int teamNumber, int amount = 1)
     {
-        if(teamNumber == 1)
+        if (teamNumber == 1)
         {
             scoreTeam1 += amount;
-        } else if(teamNumber == 2)
+        }
+        else if (teamNumber == 2)
         {
             scoreTeam2 += amount;
-        } else
+        }
+        else
         {
             Debug.LogError("Invalid team number!");
             return;
         }
 
-        if(scoreTeam1 >= scoreGoal || scoreTeam2 >= scoreGoal)
+        if (scoreTeam1 >= scoreGoal || scoreTeam2 >= scoreGoal)
         {
             GameEnd(teamNumber);
         }

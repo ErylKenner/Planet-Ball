@@ -12,7 +12,7 @@ public class Boost : Ability
     public float overSpeedDeceleration;
 
     protected override void DerivedUpdate()
-    {  
+    {
     }
 
     private void FixedUpdate()
