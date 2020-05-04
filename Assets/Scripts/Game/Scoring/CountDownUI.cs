@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class CountDownUI : MonoBehaviour
 {
 
-    static CountDownUI instance = null;
+    public static CountDownUI Instance = null;
 
     public int countDownTime = 5;
     public Text countDownText;
@@ -17,9 +17,9 @@ public class CountDownUI : MonoBehaviour
 
     private void Awake()
     {
-        if (instance == null)
+        if (Instance == null)
         {
-            instance = this;
+            Instance = this;
         }
         else
         {
@@ -62,11 +62,11 @@ public class CountDownUI : MonoBehaviour
 
 
         ball.Score();
-        instance.currentBall = ball;
-        instance.currentCountDown = instance.countDownTime;
-        instance.counting = true;
-        instance.countDownText.color = Score.GetColor(playerNumber);
-        instance.countDownText.gameObject.SetActive(true);
+        Instance.currentBall = ball;
+        Instance.currentCountDown = Instance.countDownTime;
+        Instance.counting = true;
+        Instance.countDownText.color = Score.GetColor(playerNumber);
+        Instance.countDownText.gameObject.SetActive(true);
     }
 
 

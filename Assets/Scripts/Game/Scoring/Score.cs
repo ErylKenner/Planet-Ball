@@ -10,8 +10,8 @@ public class Score : MonoBehaviour
 
     public static Score Instance;
 
-    public Color team1Color;
-    public Color team2Color;
+    public Color team1Color = new Color32(25, 10, 218, 255);
+    public Color team2Color = new Color32(218, 10, 10, 255);
 
     public EndScreen EndScreen;
 

@@ -10,13 +10,7 @@ public class Ball : MonoBehaviour
     public Transform spawnPoint;
     public GoalBarrier barrier;
 
-    public bool Scored {
-        get {
-            return scored;
-        }
-    }
-
-    private bool scored = false;
+    public bool Scored { get; private set; } = false;
 
     private void Start()
     {
@@ -25,13 +19,13 @@ public class Ball : MonoBehaviour
 
     public void Score()
     {
-        scored = true;
+        Scored = true;
         //GetComponent<Collider2D>().enabled = false;
     }
 
     public void ResetBall()
     {
-        scored = false;
+        Scored = false;
         GetComponent<Rigidbody2D>().velocity = Vector2.zero;
         transform.position = spawnPoint.position;
         //GetComponent<Collider2D>().enabled = true;
