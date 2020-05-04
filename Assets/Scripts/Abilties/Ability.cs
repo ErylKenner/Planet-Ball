@@ -1,27 +1,17 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public abstract class Ability : MonoBehaviour
 {
-    public float CoolDown;
+    public float Cooldown = 0.1f;
     public string Button;
     public int PlayerNumber;
-
-    float currentCoolDown;
-
-    public Slider coolDownSlider;
+    public Slider CooldownSlider;
+    public bool AbilityOnCooldown { get; private set; } = false;
 
     protected Player player;
-
-    public bool OnCoolDown {
-        get {
-            return onCoolDown;
-        }
-    }
-
-    private bool onCoolDown = false;
+    private float timeAccumulator = 0.0f;
 
     private void Start()
     {
@@ -30,67 +20,56 @@ public abstract class Ability : MonoBehaviour
         {
             Debug.LogError("Could not find player with given player number!");
         }
+        DerivedStart();
     }
+
 
     private void Update()
     {
-        if (!onCoolDown)
+        if (!AbilityOnCooldown && player != null && player.ControllerInput != null)
         {
-            if (player != null)
+            string buttonString = player.ControllerInput.Button(Button);
+            if (Input.GetButtonDown(buttonString) || Input.GetButton(buttonString))
             {
-                PlayerInput input = player.ControllerInput;
-                if (input != null)
-                {
-                    string buttonString = input.Button(Button);
-                    if (Input.GetButtonDown(buttonString) || Input.GetButton(buttonString))
-                    {
-                        Use();
-                    }
-                }
+                StartAbility();
             }
         }
 
-        if (onCoolDown)
+        if (AbilityOnCooldown && Cooldown != 0.0f)
         {
-            currentCoolDown += Time.deltaTime;
-            coolDownSlider.value = coolDownSlider.maxValue - currentCoolDown / CoolDown;
+            timeAccumulator += Time.deltaTime;
+            CooldownSlider.value = Mathf.Lerp(CooldownSlider.maxValue, CooldownSlider.minValue, timeAccumulator / Cooldown);
         }
 
         DerivedUpdate();
     }
 
-    protected abstract void DerivedUpdate();
 
-    public void Use()
+    private void StartAbility()
     {
-        Function();
-        EnableCoolDown();
+        UseAbility();
+        StartCoolDown();
     }
 
-    private void EnableCoolDown()
+
+    private void StartCoolDown()
     {
         StartCoroutine(CoolDownTimer());
     }
 
+
     IEnumerator CoolDownTimer()
     {
-        SetCoolDownUI();
-        onCoolDown = true;
-        yield return new WaitForSeconds(CoolDown);
-        onCoolDown = false;
-        SetEnableUI();
+        AbilityOnCooldown = true;
+        timeAccumulator = 0;
+        CooldownSlider.value = CooldownSlider.maxValue;
+        yield return new WaitForSeconds(Cooldown);
+        AbilityOnCooldown = false;
+        CooldownSlider.value = CooldownSlider.minValue;
     }
 
-    private void SetEnableUI()
-    {
-        coolDownSlider.value = 0;
-        currentCoolDown = 0;
-    }
 
-    private void SetCoolDownUI()
-    {
-        coolDownSlider.value = 0;
-    }
-
-    protected abstract void Function();
+    protected abstract void UseAbility();
+    protected abstract void DerivedStart();
+    protected abstract void DerivedUpdate();
 }

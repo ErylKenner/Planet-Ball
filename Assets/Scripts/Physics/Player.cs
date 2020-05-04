@@ -1,59 +1,46 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(LineRenderer))]
 public class Player : MonoBehaviour
 {
-    //------PUBLIC------
-    public Rigidbody2D Body {
-        get {
-            return body;
-        }
-    }
-    public PlayerInput ControllerInput = null;
-    public float speed;
-    public float maxSpeed;
+    public float DefaultSpeed = 200.0f;
+    public float ReelSpeedRatio = 0.75f;
+    public Color DisabledTetherColor = new Color(0.5f, 0.5f, 0.5f, 0.1f);
+    public Color EnabledTetherColor = new Color(0.0f, 0.0f, 0.0f, 1.0f);
+
+    public float Speed;
     public int PlayerNumber;
+    public bool TetherDisabled { get; private set; } = false;
+    public Rigidbody2D Body { get; private set; }
+    public PlayerInput ControllerInput = null;
+
+    private LineRenderer lineRenderer;
+    private Planet[] planets;
+    private Planet attachedPlanet = null;
+    private float attachedPlanetRadius = 0f;
+
+    private bool reelTether = false;
 
 
-
-    //------PRIVATE-----
-    Rigidbody2D body;
-    LineRenderer lineRenderer;
-    Planet planet;
-    Planet[] planets;
-    float radius = 0f;
-    float minSpeed = 50f;
-    float reelSpeed = 0.75f;
-    bool tetherDisabled = false;
-    Color disabledTetherColor;
-    Color enabledTetherColor;
+    void Awake()
+    {
+        Body = GetComponent<Rigidbody2D>();
+    }
 
 
     void Start()
     {
-        planets = FindObjectsOfType<Planet>();
-        body = GetComponent<Rigidbody2D>();
-
-        maxSpeed = 250;
-        body.velocity = new Vector2(0, 160);
-        speed = Mathf.Clamp(body.velocity.magnitude, minSpeed, maxSpeed);
-
-        disabledTetherColor = Color.gray;
-        disabledTetherColor.a = 0.1f;
-        enabledTetherColor = Color.black;
-
         lineRenderer = gameObject.GetComponent<LineRenderer>();
-        if (lineRenderer == null)
-        {
-            lineRenderer = gameObject.AddComponent<LineRenderer>();
-        }
         lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
-        lineRenderer.startColor = lineRenderer.endColor = disabledTetherColor;
+        lineRenderer.startColor = lineRenderer.endColor = DisabledTetherColor;
         lineRenderer.widthMultiplier = 1f;
         lineRenderer.positionCount = 2;
+
+        planets = FindObjectsOfType<Planet>();
+        Body.velocity = new Vector2(0, DefaultSpeed);
+        Speed = DefaultSpeed;
     }
 
     void Update()
@@ -62,64 +49,48 @@ public class Player : MonoBehaviour
         {
             DetatchTether();
         }
-        else if ((Input.GetKeyDown(KeyCode.Space) || (ControllerInput != null && Input.GetButtonDown(ControllerInput.Button("R")))) && !tetherDisabled)
+        else if ((Input.GetKeyDown(KeyCode.Space) || (ControllerInput != null && Input.GetButtonDown(ControllerInput.Button("R")))) && !TetherDisabled)
         {
             AttatchTether();
         }
-        if (Input.GetKey(KeyCode.RightArrow) || (ControllerInput != null && Input.GetButton(ControllerInput.Button("A"))))
+        if (Input.GetKey(KeyCode.DownArrow) || (ControllerInput != null && Input.GetButton(ControllerInput.Button("A"))))
         {
-            speed += 50 * Time.deltaTime;
-            speed = Mathf.Clamp(speed, minSpeed, maxSpeed);
+            reelTether = true;
         }
-
-        float reelPercent = 0;
-
-        if (ControllerInput != null)
+        if (Input.GetKeyUp(KeyCode.DownArrow) || (ControllerInput != null && Input.GetButtonUp(ControllerInput.Button("A"))))
         {
-            reelPercent = -Input.GetAxis(ControllerInput.Axis("Vertical"));
-        }
-        if (Input.GetKey(KeyCode.DownArrow))
-        {
-            reelPercent = 1;
-        }
-        if (reelPercent > 0)
-        {
-            if (planet != null)
-            {
-                radius -= reelPercent * reelSpeed * speed * Time.deltaTime;
-                radius = Mathf.Clamp(radius, planet.minDistance, Mathf.Infinity);
-            }
+            reelTether = false;
         }
     }
 
     void FixedUpdate()
     {
-        if (planet != null && !tetherDisabled)
+        if (attachedPlanet == null || TetherDisabled)
         {
-            RotationalPhysics.RotateAroundPoint(body, planet.transform.position, radius, speed, planet.minDistance);
+            Body.velocity = Body.velocity.normalized * Speed;
+        }
+        else if (attachedPlanet != null)
+        {
+            if (reelTether)
+            {
+                attachedPlanetRadius -= ReelSpeedRatio * Speed * Time.deltaTime;
+                attachedPlanetRadius = Mathf.Clamp(attachedPlanetRadius, attachedPlanet.minDistance, attachedPlanet.maxDistance);
+            }
+            RotationalPhysics.RotateAroundPoint(Body, attachedPlanet.transform.position, attachedPlanetRadius, Speed, attachedPlanet.minDistance);
+        }
 
-            lineRenderer.startColor = lineRenderer.endColor = enabledTetherColor;
-            lineRenderer.SetPosition(0, planet.transform.position);
-            lineRenderer.SetPosition(1, body.position + body.velocity * Time.fixedDeltaTime);
+        //Display tether
+        if (attachedPlanet == null)
+        {
+            lineRenderer.startColor = lineRenderer.endColor = DisabledTetherColor;
+            lineRenderer.SetPosition(0, getClosestPlanet().transform.position);
         }
         else
         {
-            body.velocity = body.velocity.normalized * speed;
-
-            lineRenderer.startColor = lineRenderer.endColor = disabledTetherColor;
-            lineRenderer.SetPosition(0, getClosestPlanet().transform.position);
-            lineRenderer.SetPosition(1, body.position + body.velocity * Time.fixedDeltaTime);
+            lineRenderer.startColor = lineRenderer.endColor = EnabledTetherColor;
+            lineRenderer.SetPosition(0, attachedPlanet.transform.position);
         }
-
-        //Fix small or zero velocity
-        if (body.velocity.magnitude < minSpeed)
-        {
-            body.velocity = body.velocity.normalized * minSpeed;
-            if (Mathf.Approximately(body.velocity.magnitude, 0))
-            {
-                body.velocity = new Vector2(1, 1).normalized * minSpeed;
-            }
-        }
+        lineRenderer.SetPosition(1, Body.position + Body.velocity * Time.deltaTime);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -137,10 +108,9 @@ public class Player : MonoBehaviour
     {
         float shortestDistance = Mathf.Infinity;
         Planet closest = null;
-
         foreach (Planet cur in planets)
         {
-            float dist = Vector2.Distance(cur.transform.position, body.position);
+            float dist = Vector2.Distance(cur.transform.position, Body.position);
             if (dist < shortestDistance)
             {
                 shortestDistance = dist;
@@ -152,14 +122,11 @@ public class Player : MonoBehaviour
 
     IEnumerator DisableTether(float time)
     {
-        tetherDisabled = true;
+        TetherDisabled = true;
         lineRenderer.enabled = false;
-        planet = null;
-        radius = 0;
-
+        DetatchTether();
         yield return new WaitForSeconds(time);
-
-        tetherDisabled = false;
+        TetherDisabled = false;
         lineRenderer.enabled = true;
         if (Input.GetKey(KeyCode.Space) || (ControllerInput != null && Input.GetButton(ControllerInput.Button("R"))))
         {
@@ -169,15 +136,14 @@ public class Player : MonoBehaviour
 
     void AttatchTether()
     {
-        planet = getClosestPlanet();
-        radius = RotationalPhysics.GetRadius(body, planet.transform.position);
-        body.velocity = RotationalPhysics.ConvertToTangentialVelocity(body, planet.transform.position);
-        speed = Mathf.Clamp(body.velocity.magnitude, minSpeed, maxSpeed);
+        attachedPlanet = getClosestPlanet();
+        attachedPlanetRadius = Vector2.Distance(Body.position, attachedPlanet.transform.position);
+        Body.velocity = RotationalPhysics.ConvertToTangentialVelocity(Body, attachedPlanet.transform.position);
     }
 
     void DetatchTether()
     {
-        planet = null;
-        radius = 0;
+        attachedPlanet = null;
+        attachedPlanetRadius = 0;
     }
 }

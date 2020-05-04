@@ -28,7 +28,7 @@ public class Shadow : MonoBehaviour
         shadow.sortingLayerName = "Shadow";
     }
 
-    private void LateUpdate()
+    private void FixedUpdate()
     {
         shadow.transform.position = sprite.transform.position + (Vector3)offset;
     }

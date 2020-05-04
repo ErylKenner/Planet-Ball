@@ -1,32 +1,24 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Boost : Ability
 {
+    public float BooostSpeed;
+    public float BoostDeceleration;
 
-
-
-    public float speedIncrease;
-
-    public float overSpeedDeceleration;
-
-    protected override void DerivedUpdate()
-    {
-    }
+    protected override void DerivedUpdate() { }
 
     private void FixedUpdate()
     {
-        if (player.speed > player.maxSpeed)
+        if (player.Speed > player.DefaultSpeed)
         {
-            float newSpeed = player.speed - overSpeedDeceleration * Time.fixedDeltaTime;
-            newSpeed = Mathf.Clamp(newSpeed, player.maxSpeed, Mathf.Infinity);
-            player.speed = newSpeed;
+            player.Speed -= BoostDeceleration * Time.deltaTime;
         }
     }
 
-    protected override void Function()
+    protected override void DerivedStart() { }
+
+    protected override void UseAbility()
     {
-        player.speed += speedIncrease;
+        player.Speed = BooostSpeed;
     }
 }

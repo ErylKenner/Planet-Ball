@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public static class RotationalPhysics
 {
@@ -9,7 +7,7 @@ public static class RotationalPhysics
     {
         radius = Mathf.Clamp(radius, minDistance, Mathf.Infinity);
         Vector2 distance = body.position - centerPoint;
-        if (Mathf.Abs(distance.magnitude - radius) > speed * Time.fixedDeltaTime)
+        if (Mathf.Abs(distance.magnitude - radius) > speed * Time.deltaTime)
         {
             //Too large a distance to make in one step. Go towards new radius at 45 deg angle
             Vector2 tangentVelocity = ConvertToTangentialVelocity(body, centerPoint);
@@ -25,7 +23,7 @@ public static class RotationalPhysics
             {
                 rotationDirection = 1;
             }
-            float deltaAngle = (distance.magnitude * distance.magnitude + radius * radius - Mathf.Pow(speed * Time.fixedDeltaTime, 2)) / (2 * distance.magnitude * radius);
+            float deltaAngle = (distance.magnitude * distance.magnitude + radius * radius - Mathf.Pow(speed * Time.deltaTime, 2)) / (2 * distance.magnitude * radius);
             deltaAngle = Mathf.Acos(deltaAngle);
             float newAngle = currentAngle + deltaAngle * rotationDirection;
 

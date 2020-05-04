@@ -1,40 +1,41 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class Iron : Ability
 {
-
     public float Duration = 2f;
     public float IncreasedMass = 10f;
-    //public Color IronColor;
     public Sprite IronSprite;
     public Color IronColor;
 
+    private float orignalMass;
     private Sprite originalSprite;
     private Color originalColor;
-
-    private float orignalMass;
+    private SpriteRenderer spriteRenderer;
 
     protected override void DerivedUpdate() { }
 
-    protected override void Function()
+    protected override void UseAbility()
     {
         StartCoroutine(SetIron());
     }
 
+    protected override void DerivedStart()
+    {
+        spriteRenderer = player.GetComponent<SpriteRenderer>();
+        orignalMass = player.Body.mass;
+        originalSprite = spriteRenderer.sprite;
+        originalColor = spriteRenderer.color;
+    }
+
     IEnumerator SetIron()
     {
-        originalSprite = player.GetComponent<SpriteRenderer>().sprite;
-        originalColor = player.GetComponent<SpriteRenderer>().color;
-        player.GetComponent<SpriteRenderer>().sprite = IronSprite;
-        player.GetComponent<SpriteRenderer>().color = IronColor;
-        orignalMass = player.Body.mass;
+        spriteRenderer.sprite = IronSprite;
+        spriteRenderer.color = IronColor;
         player.Body.mass = IncreasedMass;
         yield return new WaitForSeconds(Duration);
         player.Body.mass = orignalMass;
-        player.GetComponent<SpriteRenderer>().sprite = originalSprite;
-        player.GetComponent<SpriteRenderer>().color = originalColor;
+        spriteRenderer.sprite = originalSprite;
+        spriteRenderer.color = originalColor;
     }
 }
