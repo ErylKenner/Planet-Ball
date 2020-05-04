@@ -35,7 +35,7 @@ public class Player : MonoBehaviour
     private LineRenderer lineRenderer;
     private Planet[] planets;
     private float attachedPlanetRadius = 0.0f;
-    private bool reelTether = false;
+    public bool ReelTether = false;
 
 
     void Awake()
@@ -69,11 +69,11 @@ public class Player : MonoBehaviour
         }
         if (Input.GetKey(KeyCode.DownArrow) || (ControllerInput != null && Input.GetButton(ControllerInput.Button("B"))))
         {
-            reelTether = true;
+            ReelTether = true;
         }
         if (Input.GetKeyUp(KeyCode.DownArrow) || (ControllerInput != null && Input.GetButtonUp(ControllerInput.Button("B"))))
         {
-            reelTether = false;
+            ReelTether = false;
         }
     }
 
@@ -85,7 +85,7 @@ public class Player : MonoBehaviour
         }
         else if (AttachedPlanet != null)
         {
-            if (reelTether)
+            if (ReelTether)
             {
                 AttachedPlanetRadius -= ReelSpeed * Time.deltaTime;
             }

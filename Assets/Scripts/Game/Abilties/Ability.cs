@@ -10,7 +10,7 @@ public abstract class Ability : MonoBehaviour
     public Slider CooldownSlider;
     public bool AbilityOnCooldown { get; private set; } = false;
 
-    protected Player player;
+    public Player player;
     private float timeAccumulator = 0.0f;
 
     private void Start()
@@ -45,7 +45,7 @@ public abstract class Ability : MonoBehaviour
     }
 
 
-    private void StartAbility()
+    public void StartAbility()
     {
         UseAbility();
         StartCoolDown();

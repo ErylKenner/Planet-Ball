@@ -19,7 +19,11 @@ public class InputAssign : MonoBehaviour
 
     public static Player GetPlayer(int playerNumber)
     {
-        return System.Array.Find(players, x => x.PlayerNumber == playerNumber);
+        if (players != null)
+        {
+            return System.Array.Find(players, x => x.PlayerNumber == playerNumber);
+        }
+        return null;
     }
 
     private void Awake()

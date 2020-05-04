@@ -415,7 +415,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   team1Color: {r: 0.09803922, g: 0.039215688, b: 0.85490197, a: 1}
   team2Color: {r: 0.85490197, g: 0.039215688, b: 0.039215688, a: 1}
-  endScreen: {fileID: 1680367738}
+  EndScreen: {fileID: 1680367738}
 --- !u!1 &682212088
 GameObject:
   m_ObjectHideFlags: 0
@@ -902,6 +902,7 @@ MonoBehaviour:
   EnabledTetherColor: {r: 0, g: 0, b: 0, a: 1}
   Speed: 0
   PlayerNumber: 1
+  ReelTether: 0
 --- !u!212 &832812909
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -3983,6 +3984,7 @@ MonoBehaviour:
   EnabledTetherColor: {r: 0, g: 0, b: 0, a: 1}
   Speed: 0
   PlayerNumber: 2
+  ReelTether: 0
 --- !u!212 &2000134886
 SpriteRenderer:
   m_ObjectHideFlags: 0

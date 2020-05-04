@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -11,12 +9,12 @@ public class EndScreen : MonoBehaviour
     public Text text;
     public Text scoreText;
 
-    private bool ended = false;
+    public bool Ended = false;
 
     public void EndGame(int teamNumber)
     {
         Time.timeScale = 0;
-        ended = true;
+        Ended = true;
         screen.gameObject.SetActive(true);
         screen.color = Score.GetColor(teamNumber);
         text.text = "Player " + teamNumber + " wins!";
@@ -26,7 +24,7 @@ public class EndScreen : MonoBehaviour
 
     private void Update()
     {
-        if (ended)
+        if (Ended)
         {
             Player[] players = InputAssign.players;
             for (int i = 0; i < players.Length; i++)
@@ -40,8 +38,8 @@ public class EndScreen : MonoBehaviour
                 {
                     Time.timeScale = 1;
                     InputAssign.currentPlayer = 1;
-                    Score.scoreTeam1 = 0;
-                    Score.scoreTeam2 = 0;
+                    Score.ScoreTeam1 = 0;
+                    Score.ScoreTeam2 = 0;
                     SceneManager.LoadScene(SceneManager.GetActiveScene().name);
                 }
             }

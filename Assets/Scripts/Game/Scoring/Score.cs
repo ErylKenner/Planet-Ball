@@ -1,27 +1,25 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Score : MonoBehaviour
 {
 
-    public static int scoreTeam1 = 0;
-    public static int scoreTeam2 = 0;
+    public static int ScoreTeam1 = 0;
+    public static int ScoreTeam2 = 0;
 
-    private readonly static int scoreGoal = 3;
+    public readonly static int ScoreToWin = 3;
 
-    private static Score instance;
+    public static Score Instance;
 
     public Color team1Color;
     public Color team2Color;
 
-    public EndScreen endScreen;
+    public EndScreen EndScreen;
 
     private void Awake()
     {
-        if (instance == null)
+        if (Instance == null)
         {
-            instance = this;
+            Instance = this;
         }
         else
         {
@@ -33,11 +31,11 @@ public class Score : MonoBehaviour
     {
         if (teamNumber == 1)
         {
-            scoreTeam1 += amount;
+            ScoreTeam1 += amount;
         }
         else if (teamNumber == 2)
         {
-            scoreTeam2 += amount;
+            ScoreTeam2 += amount;
         }
         else
         {
@@ -45,7 +43,7 @@ public class Score : MonoBehaviour
             return;
         }
 
-        if (scoreTeam1 >= scoreGoal || scoreTeam2 >= scoreGoal)
+        if (ScoreTeam1 >= ScoreToWin || ScoreTeam2 >= ScoreToWin)
         {
             GameEnd(teamNumber);
         }
@@ -56,11 +54,11 @@ public class Score : MonoBehaviour
     {
         if (teamNumber == 1)
         {
-            return scoreTeam1;
+            return ScoreTeam1;
         }
         else if (teamNumber == 2)
         {
-            return scoreTeam2;
+            return ScoreTeam2;
         }
         else
         {
@@ -73,11 +71,11 @@ public class Score : MonoBehaviour
     {
         if (teamNumber == 1)
         {
-            return instance.team1Color;
+            return Instance.team1Color;
         }
         else if (teamNumber == 2)
         {
-            return instance.team2Color;
+            return Instance.team2Color;
         }
         else
         {
@@ -88,7 +86,7 @@ public class Score : MonoBehaviour
 
     public static void GameEnd(int teamNumber)
     {
-        instance.endScreen.EndGame(teamNumber);
+        Instance.EndScreen.EndGame(teamNumber);
     }
 
 }
