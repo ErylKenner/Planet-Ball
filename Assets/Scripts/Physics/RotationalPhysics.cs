@@ -2,7 +2,6 @@
 
 public static class RotationalPhysics
 {
-
     public static void RotateAroundPoint(Rigidbody2D body, Vector2 centerPoint, float desiredRadius, float speed, float dt)
     {
         Vector2 diff = body.position - centerPoint;
