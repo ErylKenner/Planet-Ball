@@ -17,10 +17,6 @@ public static class RotationalPhysics
             //Can make the radius change. So, solve for the new angle.
             float currentAngle = Mathf.Atan2(diff.y, diff.x);
             float rotationDirection = -Mathf.Sign(Vector2.Dot(new Vector2(diff.y, -diff.x), body.velocity));
-            if (rotationDirection == 0)
-            {
-                rotationDirection = 1;
-            }
             float deltaAngle = (diff.magnitude * diff.magnitude + desiredRadius * desiredRadius - Mathf.Pow(speed * dt, 2)) / (2 * diff.magnitude * desiredRadius);
             deltaAngle = Mathf.Acos(deltaAngle);
             float newAngle = currentAngle + deltaAngle * rotationDirection;
@@ -35,10 +31,6 @@ public static class RotationalPhysics
         Vector2 diff = position - centerPoint;
         Vector2 tangent = new Vector2(diff.y, -diff.x).normalized;
         float rotationDirection = Mathf.Sign(Vector2.Dot(tangent, velocity));
-        if (rotationDirection == 0)
-        {
-            rotationDirection = 1;
-        }
         return tangent * rotationDirection;
     }
 

@@ -1,11 +1,6 @@
-﻿using NUnit.Framework;
-using System.Collections;
-using UnityEngine;
-using UnityEngine.TestTools;
-
-public class Test_IntegrationTests
+﻿public class Test_IntegrationTests
 {
-    [UnityTest]
+    /*[UnityTest]
     public IEnumerator FakeIntegrationTest1()
     {
         //GameObject gameGameObject = MonoBehaviour.Instantiate(Resources.Load<GameObject>("Prefabs/Abilities/Boost"));
@@ -18,5 +13,5 @@ public class Test_IntegrationTests
     {
         yield return new WaitForSeconds(0.2f);
         Assert.Pass();
-    }
+    }*/
 }

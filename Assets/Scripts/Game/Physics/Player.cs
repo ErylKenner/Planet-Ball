@@ -20,9 +20,9 @@ public class Player : MonoBehaviour
             return attachedPlanetRadius;
         }
         private set {
-            if (attachedPlanet != null)
+            if (AttachedPlanet != null)
             {
-                attachedPlanetRadius = Mathf.Clamp(value, attachedPlanet.minDistance, attachedPlanet.maxDistance);
+                attachedPlanetRadius = Mathf.Clamp(value, AttachedPlanet.minDistance, AttachedPlanet.maxDistance);
             }
             else
             {
@@ -30,10 +30,10 @@ public class Player : MonoBehaviour
             }
         }
     }
+    public Planet AttachedPlanet { get; private set; } = null;
 
     private LineRenderer lineRenderer;
     private Planet[] planets;
-    private Planet attachedPlanet = null;
     private float attachedPlanetRadius = 0.0f;
     private bool reelTether = false;
 
@@ -61,11 +61,11 @@ public class Player : MonoBehaviour
     {
         if (Input.GetKeyUp(KeyCode.Space) || (ControllerInput != null && Input.GetButtonUp(ControllerInput.Button("R"))))
         {
-            DetatchTether();
+            DetachTether();
         }
         else if ((Input.GetKeyDown(KeyCode.Space) || (ControllerInput != null && Input.GetButtonDown(ControllerInput.Button("R")))) && !TetherDisabled)
         {
-            AttatchTether();
+            AttachTether();
         }
         if (Input.GetKey(KeyCode.DownArrow) || (ControllerInput != null && Input.GetButton(ControllerInput.Button("B"))))
         {
@@ -79,21 +79,21 @@ public class Player : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (attachedPlanet == null || TetherDisabled)
+        if (AttachedPlanet == null || TetherDisabled)
         {
             Body.velocity = Body.velocity.normalized * Speed;
         }
-        else if (attachedPlanet != null)
+        else if (AttachedPlanet != null)
         {
             if (reelTether)
             {
                 AttachedPlanetRadius -= ReelSpeed * Time.deltaTime;
             }
-            RotationalPhysics.RotateAroundPoint(Body, attachedPlanet.transform.position, AttachedPlanetRadius, Speed, Time.deltaTime);
+            RotationalPhysics.RotateAroundPoint(Body, AttachedPlanet.transform.position, AttachedPlanetRadius, Speed, Time.deltaTime);
         }
 
         //Display tether
-        if (attachedPlanet == null)
+        if (AttachedPlanet == null)
         {
             lineRenderer.startColor = lineRenderer.endColor = DisabledTetherColor;
             lineRenderer.SetPosition(0, getClosestPlanet().transform.position);
@@ -101,7 +101,7 @@ public class Player : MonoBehaviour
         else
         {
             lineRenderer.startColor = lineRenderer.endColor = EnabledTetherColor;
-            lineRenderer.SetPosition(0, attachedPlanet.transform.position);
+            lineRenderer.SetPosition(0, AttachedPlanet.transform.position);
         }
         lineRenderer.SetPosition(1, Body.position + Body.velocity * Time.deltaTime);
     }
@@ -121,7 +121,7 @@ public class Player : MonoBehaviour
     {
         float shortestDistance = Mathf.Infinity;
         Planet closest = null;
-        foreach (Planet cur in planets)
+        foreach (Planet cur in FindObjectsOfType<Planet>())
         {
             float dist = Vector2.Distance(cur.transform.position, Body.position);
             if (dist < shortestDistance)
@@ -137,26 +137,26 @@ public class Player : MonoBehaviour
     {
         TetherDisabled = true;
         lineRenderer.enabled = false;
-        DetatchTether();
+        DetachTether();
         yield return new WaitForSeconds(time);
         TetherDisabled = false;
         lineRenderer.enabled = true;
         if (Input.GetKey(KeyCode.Space) || (ControllerInput != null && Input.GetButton(ControllerInput.Button("R"))))
         {
-            AttatchTether();
+            AttachTether();
         }
     }
 
-    void AttatchTether()
+    public void AttachTether()
     {
-        attachedPlanet = getClosestPlanet();
-        AttachedPlanetRadius = Vector2.Distance(Body.position, attachedPlanet.transform.position);
-        Body.velocity = Speed * RotationalPhysics.ConvertToUnitTangentialVelocity(Body.position, Body.velocity, attachedPlanet.transform.position);
+        AttachedPlanet = getClosestPlanet();
+        AttachedPlanetRadius = Vector2.Distance(Body.position, AttachedPlanet.transform.position);
+        Body.velocity = Speed * RotationalPhysics.ConvertToUnitTangentialVelocity(Body.position, Body.velocity, AttachedPlanet.transform.position);
     }
 
-    void DetatchTether()
+    void DetachTether()
     {
-        attachedPlanet = null;
+        AttachedPlanet = null;
         AttachedPlanetRadius = 0;
     }
 }
