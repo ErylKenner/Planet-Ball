@@ -16,7 +16,8 @@ before_install:
 jobs:
   include:
     - stage: test
-      script: "chmod +x ./ci/* && ./ci/docker_test.sh"
+      script:
+        - "chmod +x ./ci/* && ./ci/docker_test.sh"
       env: TEST_PLATFORM=editmode
       addons:
         artifacts:
@@ -24,8 +25,9 @@ jobs:
           paths:
           - "$(pwd)/$TEST_PLATFORM-results.xml"
     - stage: test
-      script: "chmod +x ./ci/* && ./ci/docker_test.sh"
-      env: TEST_PLATFORM=playmode IMAGE_NAME=gableroux/unity3d:2019.3.7f1
+      script:
+        - "chmod +x ./ci/* && ./ci/docker_test.sh"
+      env: TEST_PLATFORM=playmode
       addons:
         artifacts:
           s3_region: "us-west-1"
