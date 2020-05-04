@@ -6,21 +6,35 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     public float DefaultSpeed = 200.0f;
-    public float ReelSpeedRatio = 0.75f;
+    public float ReelSpeed = 120.0f;
     public Color DisabledTetherColor = new Color(0.5f, 0.5f, 0.5f, 0.1f);
     public Color EnabledTetherColor = new Color(0.0f, 0.0f, 0.0f, 1.0f);
 
     public float Speed;
     public int PlayerNumber;
     public bool TetherDisabled { get; private set; } = false;
-    public Rigidbody2D Body { get; private set; }
+    public Rigidbody2D Body { get; private set; } = null;
     public PlayerInput ControllerInput = null;
+    public float AttachedPlanetRadius {
+        get {
+            return attachedPlanetRadius;
+        }
+        private set {
+            if (attachedPlanet != null)
+            {
+                attachedPlanetRadius = Mathf.Clamp(value, attachedPlanet.minDistance, attachedPlanet.maxDistance);
+            }
+            else
+            {
+                attachedPlanetRadius = value;
+            }
+        }
+    }
 
     private LineRenderer lineRenderer;
     private Planet[] planets;
     private Planet attachedPlanet = null;
-    private float attachedPlanetRadius = 0f;
-
+    private float attachedPlanetRadius = 0.0f;
     private bool reelTether = false;
 
 
@@ -53,11 +67,11 @@ public class Player : MonoBehaviour
         {
             AttatchTether();
         }
-        if (Input.GetKey(KeyCode.DownArrow) || (ControllerInput != null && Input.GetButton(ControllerInput.Button("A"))))
+        if (Input.GetKey(KeyCode.DownArrow) || (ControllerInput != null && Input.GetButton(ControllerInput.Button("B"))))
         {
             reelTether = true;
         }
-        if (Input.GetKeyUp(KeyCode.DownArrow) || (ControllerInput != null && Input.GetButtonUp(ControllerInput.Button("A"))))
+        if (Input.GetKeyUp(KeyCode.DownArrow) || (ControllerInput != null && Input.GetButtonUp(ControllerInput.Button("B"))))
         {
             reelTether = false;
         }
@@ -73,10 +87,9 @@ public class Player : MonoBehaviour
         {
             if (reelTether)
             {
-                attachedPlanetRadius -= ReelSpeedRatio * Speed * Time.deltaTime;
-                attachedPlanetRadius = Mathf.Clamp(attachedPlanetRadius, attachedPlanet.minDistance, attachedPlanet.maxDistance);
+                AttachedPlanetRadius -= ReelSpeed * Time.deltaTime;
             }
-            RotationalPhysics.RotateAroundPoint(Body, attachedPlanet.transform.position, attachedPlanetRadius, Speed, attachedPlanet.minDistance);
+            RotationalPhysics.RotateAroundPoint(Body, attachedPlanet.transform.position, AttachedPlanetRadius, Speed, Time.deltaTime);
         }
 
         //Display tether
@@ -137,13 +150,13 @@ public class Player : MonoBehaviour
     void AttatchTether()
     {
         attachedPlanet = getClosestPlanet();
-        attachedPlanetRadius = Vector2.Distance(Body.position, attachedPlanet.transform.position);
-        Body.velocity = RotationalPhysics.ConvertToTangentialVelocity(Body, attachedPlanet.transform.position);
+        AttachedPlanetRadius = Vector2.Distance(Body.position, attachedPlanet.transform.position);
+        Body.velocity = Speed * RotationalPhysics.ConvertToUnitTangentialVelocity(Body.position, Body.velocity, attachedPlanet.transform.position);
     }
 
     void DetatchTether()
     {
         attachedPlanet = null;
-        attachedPlanetRadius = 0;
+        AttachedPlanetRadius = 0;
     }
 }

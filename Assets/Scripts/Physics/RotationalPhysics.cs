@@ -3,49 +3,44 @@
 public static class RotationalPhysics
 {
 
-    public static void RotateAroundPoint(Rigidbody2D body, Vector2 centerPoint, float radius, float speed, float minDistance)
+    public static void RotateAroundPoint(Rigidbody2D body, Vector2 centerPoint, float desiredRadius, float speed, float dt)
     {
-        radius = Mathf.Clamp(radius, minDistance, Mathf.Infinity);
-        Vector2 distance = body.position - centerPoint;
-        if (Mathf.Abs(distance.magnitude - radius) > speed * Time.deltaTime)
+        Vector2 diff = body.position - centerPoint;
+        if (Mathf.Abs(diff.magnitude - desiredRadius) > speed * dt)
         {
             //Too large a distance to make in one step. Go towards new radius at 45 deg angle
-            Vector2 tangentVelocity = ConvertToTangentialVelocity(body, centerPoint);
-            Vector2 radialChange = distance.normalized * radius - distance;
-            body.velocity = speed * (tangentVelocity.normalized + radialChange.normalized).normalized;
+            Vector2 tangentVelocity = ConvertToUnitTangentialVelocity(body.position, body.velocity, centerPoint);
+            Vector2 radialChange = diff.normalized * desiredRadius - diff;
+            body.velocity = speed * (tangentVelocity + radialChange.normalized).normalized;
         }
         else
         {
             //Can make the radius change. So, solve for the new angle.
-            float currentAngle = Mathf.Atan2(distance.y, distance.x);
-            float rotationDirection = -Mathf.Sign(Vector2.Dot(new Vector2(distance.y, -distance.x), body.velocity));
+            float currentAngle = Mathf.Atan2(diff.y, diff.x);
+            float rotationDirection = -Mathf.Sign(Vector2.Dot(new Vector2(diff.y, -diff.x), body.velocity));
             if (rotationDirection == 0)
             {
                 rotationDirection = 1;
             }
-            float deltaAngle = (distance.magnitude * distance.magnitude + radius * radius - Mathf.Pow(speed * Time.deltaTime, 2)) / (2 * distance.magnitude * radius);
+            float deltaAngle = (diff.magnitude * diff.magnitude + desiredRadius * desiredRadius - Mathf.Pow(speed * dt, 2)) / (2 * diff.magnitude * desiredRadius);
             deltaAngle = Mathf.Acos(deltaAngle);
             float newAngle = currentAngle + deltaAngle * rotationDirection;
 
-            Vector2 newPosition = centerPoint + radius * new Vector2(Mathf.Cos(newAngle), Mathf.Sin(newAngle));
+            Vector2 newPosition = centerPoint + desiredRadius * new Vector2(Mathf.Cos(newAngle), Mathf.Sin(newAngle));
             body.velocity = speed * (newPosition - body.position).normalized;
         }
     }
 
-    public static Vector2 ConvertToTangentialVelocity(Rigidbody2D body, Vector2 centerPoint)
+    public static Vector2 ConvertToUnitTangentialVelocity(Vector2 position, Vector2 velocity, Vector2 centerPoint)
     {
-        Vector2 distanceVector = body.position - centerPoint;
-        float rotationDirection = Mathf.Sign(Vector2.Dot(new Vector2(distanceVector.y, -distanceVector.x), body.velocity));
+        Vector2 diff = position - centerPoint;
+        Vector2 tangent = new Vector2(diff.y, -diff.x).normalized;
+        float rotationDirection = Mathf.Sign(Vector2.Dot(tangent, velocity));
         if (rotationDirection == 0)
         {
             rotationDirection = 1;
         }
-        Vector2 tangentVector = new Vector2(distanceVector.y, -distanceVector.x).normalized * rotationDirection;
-        return body.velocity.magnitude * tangentVector;
+        return tangent * rotationDirection;
     }
 
-    public static float GetRadius(Rigidbody2D body, Vector2 centerPoint)
-    {
-        return Vector2.Distance(body.position, centerPoint);
-    }
 }

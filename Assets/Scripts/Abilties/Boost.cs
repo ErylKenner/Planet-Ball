@@ -2,8 +2,8 @@
 
 public class Boost : Ability
 {
-    public float BooostSpeed;
-    public float BoostDeceleration;
+    public float BooostSpeed = 500f;
+    public float BoostDeceleration = 250f;
 
     protected override void DerivedUpdate() { }
 

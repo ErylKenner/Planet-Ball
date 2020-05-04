@@ -3,10 +3,10 @@ using UnityEngine;
 
 public class Iron : Ability
 {
-    public float Duration = 2f;
-    public float IncreasedMass = 10f;
+    public float Duration = 1f;
+    public float IncreasedMass = 15f;
     public Sprite IronSprite;
-    public Color IronColor;
+    public Color IronColor = new Color32(167, 167, 167, 255);
 
     private float orignalMass;
     private Sprite originalSprite;
