@@ -34,3 +34,6 @@ ehthumbs.db
 Thumbs.db
 /.vs/
 /Build
+
+# Word temporary
+~$*.doc*
