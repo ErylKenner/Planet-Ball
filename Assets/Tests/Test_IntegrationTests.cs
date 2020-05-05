@@ -65,9 +65,53 @@ namespace Tests
             ball.spawnPoint = spawnpoint.transform;
             ball.barrier = mockBarrier.GetComponent<GoalBarrier>();
 
+            GameObject mockObjectScore = new GameObject();
+            mockObjectScore.AddComponent<Score>();
+            Score score = mockObjectScore.GetComponent<Score>();
+            Score.ScoreTeam1 = Score.ScoreTeam2 = 0;
+
+            GameObject mockObjectEndScreen = new GameObject();
+            mockObjectEndScreen.AddComponent<EndScreen>();
+            EndScreen endScreen = mockObjectEndScreen.GetComponent<EndScreen>();
+
+            GameObject temp1 = new GameObject();
+            GameObject temp2 = new GameObject();
+            GameObject temp3 = new GameObject();
+            temp1.AddComponent<Text>();
+            temp2.AddComponent<Image>();
+            temp3.AddComponent<Text>();
+            endScreen.screen = temp2.GetComponent<Image>();
+            endScreen.text = temp1.GetComponent<Text>();
+            endScreen.scoreText = temp3.GetComponent<Text>();
+
+            Score.Instance.EndScreen = endScreen;
+
+            GameObject text = new GameObject();
+            text.AddComponent<Text>();
+
+            GameObject countdown = new GameObject();
+            countdown.AddComponent<CountDownUI>();
+            countdown.GetComponent<CountDownUI>().countDownText = text.GetComponent<Text>();
+
             pl.AttachTether();
 
             Time.timeScale = originalTimeScale;
+        }
+
+        [Test]
+        public void Goal_OnTriggerEnter()
+        {
+            GameObject goalObj = new GameObject();
+            goalObj.AddComponent<BoxCollider2D>();
+            goalObj.AddComponent<Goal>();
+            Goal goal = goalObj.GetComponent<Goal>();
+            goal.TeamNumber = 1;
+
+            GameObject particle = new GameObject();
+            particle.AddComponent<ParticleSystem>();
+            goal.particle = particle.GetComponent<ParticleSystem>();
+
+            goal.OnScore(mockBall.GetComponent<CircleCollider2D>());
         }
 
         [UnityTest]
@@ -155,33 +199,6 @@ namespace Tests
         [Test]
         public void Ball_CountDownUI()
         {
-            GameObject mockObjectScore = new GameObject();
-            mockObjectScore.AddComponent<Score>();
-            Score score = mockObjectScore.GetComponent<Score>();
-            Score.ScoreTeam1 = Score.ScoreTeam2 = 0;
-
-            GameObject mockObjectEndScreen = new GameObject();
-            mockObjectEndScreen.AddComponent<EndScreen>();
-            EndScreen endScreen = mockObjectEndScreen.GetComponent<EndScreen>();
-
-            GameObject temp1 = new GameObject();
-            GameObject temp2 = new GameObject();
-            GameObject temp3 = new GameObject();
-            temp1.AddComponent<Text>();
-            temp2.AddComponent<Image>();
-            temp3.AddComponent<Text>();
-            endScreen.screen = temp2.GetComponent<Image>();
-            endScreen.text = temp1.GetComponent<Text>();
-            endScreen.scoreText = temp3.GetComponent<Text>();
-
-            Score.Instance.EndScreen = endScreen;
-
-            GameObject text = new GameObject();
-            text.AddComponent<Text>();
-
-            GameObject countdown = new GameObject();
-            countdown.AddComponent<CountDownUI>();
-            countdown.GetComponent<CountDownUI>().countDownText = text.GetComponent<Text>();
             CountDownUI.StartCountdown(ball, 1);
 
             Assert.IsTrue(CountDownUI.Instance.countDownText.gameObject.activeSelf);

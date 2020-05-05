@@ -78,5 +78,6 @@ namespace Tests
             Assert.AreEqual(-1, Score.GetScore(3));
             LogAssert.Expect(LogType.Error, "Invalid team number!");
         }
+
     }
 }

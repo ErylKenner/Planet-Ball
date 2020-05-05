@@ -11,6 +11,11 @@ public class Goal : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        OnScore(other);
+    }
+
+    public void OnScore(Collider2D other)
+    {
         Ball ball = other.GetComponent<Ball>();
         if (ball != null && !ball.Scored)
         {
@@ -20,6 +25,5 @@ public class Goal : MonoBehaviour
             CountDownUI.StartCountdown(ball, scoringTeam);
             particle.Play();
         }
-
     }
 }

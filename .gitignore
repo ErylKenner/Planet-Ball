@@ -6,7 +6,6 @@ Obj/
 UnityGenerated/
 Library/
 Assets/AssetStoreTools*
-CodeCoverage/
 
 # ===================================== #
 # Visual Studio / MonoDevelop generated #

@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CoverageReport scope="Summary">
+  <Summary>
+    <Generatedon>5/4/2020 - 5:15:31 PM</Generatedon>
+    <Parser>MultiReportParser (157x CoberturaParser, 3x OpenCoverParser)</Parser>
+    <Assemblies>1</Assemblies>
+    <Classes>16</Classes>
+    <Files>16</Files>
+    <Coveredlines>362</Coveredlines>
+    <Uncoveredlines>117</Uncoveredlines>
+    <Coverablelines>479</Coverablelines>
+    <Totallines>824</Totallines>
+    <Linecoverage>75.5</Linecoverage>
+    <Coveredbranches>0</Coveredbranches>
+    <Totalbranches>0</Totalbranches>
+  </Summary>
+  <Coverage>
+    <Assembly name="GameAssembly" classes="16" coverage="75.5" coveredlines="362" coverablelines="479" totallines="824" branchcoverage="" coveredbranches="0" totalbranches="0">
+      <Class name="Ability" coverage="76.1" coveredlines="32" coverablelines="42" totallines="75" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Ball" coverage="100" coveredlines="13" coverablelines="13" totallines="34" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Boost" coverage="100" coveredlines="13" coverablelines="13" totallines="24" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="CountDownUI" coverage="100" coveredlines="45" coverablelines="45" totallines="73" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="EndScreen" coverage="43.3" coveredlines="13" coverablelines="30" totallines="48" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Goal" coverage="76.9" coveredlines="10" coverablelines="13" totallines="29" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="GoalBarrier" coverage="100" coveredlines="3" coverablelines="3" totallines="13" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="InputAssign" coverage="13.1" coveredlines="5" coverablelines="38" totallines="66" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Iron" coverage="100" coveredlines="22" coverablelines="22" totallines="41" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Planet" coverage="100" coveredlines="2" coverablelines="2" totallines="7" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Player" coverage="68.6" coveredlines="81" coverablelines="118" totallines="162" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="PlayerInput" coverage="87.8" coveredlines="29" coverablelines="33" totallines="60" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="RotationalPhysics" coverage="100" coveredlines="24" coverablelines="24" totallines="37" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Score" coverage="94.6" coveredlines="53" coverablelines="56" totallines="92" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="ScorePanel" coverage="0" coveredlines="0" coverablelines="10" totallines="28" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="Shadow" coverage="100" coveredlines="17" coverablelines="17" totallines="35" branchcoverage="" coveredbranches="0" totalbranches="0" />
+    </Assembly>
+  </Coverage>
+</CoverageReport>
