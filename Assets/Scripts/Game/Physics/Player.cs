@@ -37,6 +37,9 @@ public class Player : MonoBehaviour
     private float attachedPlanetRadius = 0.0f;
     public bool ReelTether = false;
 
+    public delegate void PlayerCollision(Vector2 position);
+    public static event PlayerCollision OnPlayerCollision;
+
 
     void Awake()
     {
@@ -111,6 +114,7 @@ public class Player : MonoBehaviour
         if (collision.collider.GetComponent<Player>() != null)
         {
             StartCoroutine(DisableTether(0.75f));
+            OnPlayerCollision?.Invoke(collision.GetContact(0).point);
         }
     }
 
