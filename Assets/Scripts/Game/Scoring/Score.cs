@@ -1,92 +1,96 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 public class Score : MonoBehaviour
 {
+    public List<Team> Teams;
+    public int ScoreToWin = 3;
 
-    public static int ScoreTeam1 = 0;
-    public static int ScoreTeam2 = 0;
+    private static Score instance;
 
-    public readonly static int ScoreToWin = 3;
-
-    public static Score Instance;
-
-    public Color team1Color = new Color32(25, 10, 218, 255);
-    public Color team2Color = new Color32(218, 10, 10, 255);
-
-    public EndScreen EndScreen;
+    public delegate void EndGame(int teamNumber);
+    public static event EndGame OnEndGame;
 
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
+        if (instance != null)
         {
             Destroy(gameObject);
-        }
-    }
-
-    public static void AddToScore(int teamNumber, int amount = 1)
-    {
-        if (teamNumber == 1)
-        {
-            ScoreTeam1 += amount;
-        }
-        else if (teamNumber == 2)
-        {
-            ScoreTeam2 += amount;
-        }
-        else
-        {
-            Debug.LogError("Invalid team number!");
             return;
         }
+        instance = this;
+        Goal.OnBallScored += OnBallScored;
 
-        if (ScoreTeam1 >= ScoreToWin || ScoreTeam2 >= ScoreToWin)
-        {
-            GameEnd(teamNumber);
-        }
+        Teams = new List<Team>();
+        Teams.Add(new Team(1, new Color32(25, 10, 218, 255)));
+        Teams.Add(new Team(2, new Color32(218, 10, 10, 255)));
 
     }
 
-    public static int GetScore(int teamNumber)
+    public static Team GetTeam(int teamNumber)
     {
-        if (teamNumber == 1)
-        {
-            return ScoreTeam1;
-        }
-        else if (teamNumber == 2)
-        {
-            return ScoreTeam2;
-        }
-        else
-        {
-            Debug.LogError("Invalid team number!");
-            return -1;
-        }
+        return instance.Teams.Find(x => x.TeamNumber == teamNumber);
     }
 
     public static Color GetColor(int teamNumber)
     {
-        if (teamNumber == 1)
-        {
-            return Instance.team1Color;
-        }
-        else if (teamNumber == 2)
-        {
-            return Instance.team2Color;
-        }
-        else
-        {
-            Debug.LogError("Invalid team number!");
-            return Color.black;
-        }
+        return GetTeam(teamNumber).TeamColor;
     }
 
-    public static void GameEnd(int teamNumber)
+    public static int GetScore(int teamNumber)
     {
-        Instance.EndScreen.EndGame(teamNumber);
+        return GetTeam(teamNumber).Score;
     }
 
+    public static string GetScoresTextLong()
+    {
+        string ret = "";
+        for (int i = 0; i < instance.Teams.Count - 1; ++i)
+        {
+            ret += "Player " + instance.Teams.ElementAt(i).TeamNumber + "  -  " + instance.Teams.ElementAt(i).Score + " goals\n";
+        }
+        ret += "Player " + instance.Teams.Last().TeamNumber + "  -  " + instance.Teams.Last().Score;
+        return ret;
+    }
+
+    public static string GetScoresTextShort()
+    {
+        string ret = "";
+        for (int i = 0; i < instance.Teams.Count - 1; ++i)
+        {
+            ret += instance.Teams.ElementAt(i).Score + " - ";
+        }
+        ret += instance.Teams.Last().Score;
+        return ret;
+    }
+
+    public static void ResetScores()
+    {
+        foreach (Team team in instance.Teams)
+        {
+            team.Score = 0;
+        }
+    }
+
+    private Team GetWinner()
+    {
+        foreach (Team team in Teams)
+        {
+            if (team.Score >= ScoreToWin)
+            {
+                return team;
+            }
+        }
+        return null;
+    }
+
+    private void OnBallScored(int teamNumber)
+    {
+        GetTeam(teamNumber).Score += 1;
+        if (GetWinner() != null)
+        {
+            OnEndGame?.Invoke(teamNumber);
+        }
+    }
 }

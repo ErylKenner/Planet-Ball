@@ -6,29 +6,32 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 public class Ball : MonoBehaviour
 {
-
-    public Transform spawnPoint;
-    public GoalBarrier barrier;
+    public Transform SpawnPoint;
+    public GoalBarrier Barrier;
 
     public bool Scored { get; private set; } = false;
 
+    private void Awake()
+    {
+        Goal.OnBallScored += Score;
+        CountDownUI.OnRestartScene += ResetBall;
+    }
+
     private void Start()
     {
+        Barrier.IgnoreCollision(GetComponent<Collider2D>());
         ResetBall();
     }
 
-    public void Score()
+    private void Score(int team)
     {
         Scored = true;
-        //GetComponent<Collider2D>().enabled = false;
     }
 
-    public void ResetBall()
+    private void ResetBall()
     {
         Scored = false;
         GetComponent<Rigidbody2D>().velocity = Vector2.zero;
-        transform.position = spawnPoint.position;
-        //GetComponent<Collider2D>().enabled = true;
-        barrier.IgnoreCollision(GetComponent<Collider2D>());
+        transform.position = SpawnPoint.position;
     }
 }

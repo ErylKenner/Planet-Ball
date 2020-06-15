@@ -5,69 +5,46 @@ using UnityEngine.UI;
 
 public class CountDownUI : MonoBehaviour
 {
+    public int CountDownTime = 3;
+    public int DisplayScoreTime = 2;
 
-    public static CountDownUI Instance = null;
+    private Text text;
+    private float remainingTime = 0;
 
-    public int countDownTime = 5;
-    public Text countDownText;
-
-    private float currentCountDown = 0;
-    private bool counting = false;
-    private Ball currentBall;
+    public delegate void RestartScene();
+    public static event RestartScene OnRestartScene;
 
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        Goal.OnBallScored += StartCountdown;
+        text = GetComponent<Text>();
     }
 
     private void Update()
     {
-        if (counting)
+        if (remainingTime > 0)
         {
-            int num = Mathf.CeilToInt(currentCountDown);
-
-            if (num <= 3)
+            if (remainingTime > CountDownTime)
             {
-                countDownText.text = num.ToString();
+                text.text = Score.GetScoresTextShort();
             }
             else
             {
-                int p1score = Score.GetScore(1);
-                int p2score = Score.GetScore(2);
-                int max = Mathf.Max(p1score, p2score);
-                int min = Mathf.Min(p1score, p2score);
-                countDownText.text = max + " - " + min;
+                text.text = Mathf.CeilToInt(remainingTime).ToString();
             }
-
-            currentCountDown -= Time.deltaTime;
-
-            if (currentCountDown < 0)
+            remainingTime -= Time.deltaTime;
+            if (remainingTime <= 0.0f)
             {
-                currentBall.ResetBall();
-                counting = false;
-                countDownText.gameObject.SetActive(false);
+                text.enabled = false;
+                OnRestartScene?.Invoke();
             }
         }
     }
 
-    public static void StartCountdown(Ball ball, int playerNumber)
+    private void StartCountdown(int team)
     {
-
-
-        ball.Score();
-        Instance.currentBall = ball;
-        Instance.currentCountDown = Instance.countDownTime;
-        Instance.counting = true;
-        Instance.countDownText.color = Score.GetColor(playerNumber);
-        Instance.countDownText.gameObject.SetActive(true);
+        remainingTime = CountDownTime + DisplayScoreTime;
+        text.color = Score.GetColor(team);
+        text.enabled = true;
     }
-
-
 }

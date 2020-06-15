@@ -6,23 +6,20 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Text))]
 public class ScorePanel : MonoBehaviour
 {
-
-    public int teamNumber;
-
+    public int TeamNumber;
     private Text text;
 
-    private void Start()
+    private void Awake()
     {
         text = GetComponent<Text>();
+        Goal.OnBallScored += UpdateText;
     }
 
-    void Update()
+    private void UpdateText(int teamNumber)
     {
-        int currentScore = Score.GetScore(teamNumber);
-
-        if (text.text != currentScore.ToString())
+        if (teamNumber == TeamNumber)
         {
-            GetComponent<Text>().text = currentScore.ToString();
+            text.text = Score.GetScore(teamNumber).ToString();
         }
     }
 }

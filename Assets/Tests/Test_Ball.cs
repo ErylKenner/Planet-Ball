@@ -28,24 +28,14 @@ namespace Tests
             mockBall.AddComponent<Rigidbody2D>();
             mockBall.AddComponent<Ball>();
             ball = mockBall.GetComponent<Ball>();
-            ball.spawnPoint = spawnpoint.transform;
-            ball.barrier = mockBarrier.GetComponent<GoalBarrier>();
+            ball.SpawnPoint = spawnpoint.transform;
+            ball.Barrier = mockBarrier.GetComponent<GoalBarrier>();
         }
 
         [Test]
         public void Ball_ScoredFalse()
         {
             Assert.IsFalse(ball.Scored);
-        }
-
-        [Test]
-        public void Ball_Reset()
-        {
-            ball.Score();
-            ball.ResetBall();
-            Assert.IsFalse(ball.Scored);
-            Assert.AreEqual(spawnpoint.transform.position.x, mockBall.transform.position.x, 0);
-            Assert.AreEqual(spawnpoint.transform.position.y, mockBall.transform.position.y, 0);
         }
 
 

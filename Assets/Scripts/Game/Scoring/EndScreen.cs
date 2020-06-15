@@ -5,21 +5,25 @@ using UnityEngine.UI;
 public class EndScreen : MonoBehaviour
 {
 
-    public Image screen;
-    public Text text;
-    public Text scoreText;
+    public Image EndScreenImage;
+    public Text EndScreenText;
+    public Text FinalScoreText;
 
     public bool Ended = false;
+
+    private void Awake()
+    {
+        Score.OnEndGame += EndGame;
+    }
 
     public void EndGame(int teamNumber)
     {
         Time.timeScale = 0;
         Ended = true;
-        screen.gameObject.SetActive(true);
-        screen.color = Score.GetColor(teamNumber);
-        text.text = "Player " + teamNumber + " wins!";
-        int otherTeam = teamNumber == 1 ? 2 : 1;
-        scoreText.text = Score.GetScore(teamNumber) + " - " + Score.GetScore(otherTeam);
+        EndScreenImage.gameObject.SetActive(true);
+        EndScreenImage.color = Score.GetColor(teamNumber);
+        EndScreenText.text = "Player " + teamNumber + " wins!";
+        FinalScoreText.text = Score.GetScoresTextLong();
     }
 
     private void Update()
@@ -38,8 +42,7 @@ public class EndScreen : MonoBehaviour
                 {
                     Time.timeScale = 1;
                     InputAssign.currentPlayer = 1;
-                    Score.ScoreTeam1 = 0;
-                    Score.ScoreTeam2 = 0;
+                    Score.ResetScores();
                     SceneManager.LoadScene(SceneManager.GetActiveScene().name);
                 }
             }

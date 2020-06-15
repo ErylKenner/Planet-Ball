@@ -62,13 +62,12 @@ namespace Tests
             mockBall.AddComponent<Rigidbody2D>();
             mockBall.AddComponent<Ball>();
             ball = mockBall.GetComponent<Ball>();
-            ball.spawnPoint = spawnpoint.transform;
-            ball.barrier = mockBarrier.GetComponent<GoalBarrier>();
+            ball.SpawnPoint = spawnpoint.transform;
+            ball.Barrier = mockBarrier.GetComponent<GoalBarrier>();
 
             GameObject mockObjectScore = new GameObject();
             mockObjectScore.AddComponent<Score>();
             Score score = mockObjectScore.GetComponent<Score>();
-            Score.ScoreTeam1 = Score.ScoreTeam2 = 0;
 
             GameObject mockObjectEndScreen = new GameObject();
             mockObjectEndScreen.AddComponent<EndScreen>();
@@ -80,38 +79,19 @@ namespace Tests
             temp1.AddComponent<Text>();
             temp2.AddComponent<Image>();
             temp3.AddComponent<Text>();
-            endScreen.screen = temp2.GetComponent<Image>();
-            endScreen.text = temp1.GetComponent<Text>();
-            endScreen.scoreText = temp3.GetComponent<Text>();
-
-            Score.Instance.EndScreen = endScreen;
+            endScreen.EndScreenImage = temp2.GetComponent<Image>();
+            endScreen.EndScreenText = temp1.GetComponent<Text>();
+            endScreen.FinalScoreText = temp3.GetComponent<Text>();
 
             GameObject text = new GameObject();
             text.AddComponent<Text>();
 
             GameObject countdown = new GameObject();
             countdown.AddComponent<CountDownUI>();
-            countdown.GetComponent<CountDownUI>().countDownText = text.GetComponent<Text>();
 
             pl.AttachTether();
 
             Time.timeScale = originalTimeScale;
-        }
-
-        [Test]
-        public void Goal_OnTriggerEnter()
-        {
-            GameObject goalObj = new GameObject();
-            goalObj.AddComponent<BoxCollider2D>();
-            goalObj.AddComponent<Goal>();
-            Goal goal = goalObj.GetComponent<Goal>();
-            goal.TeamNumber = 1;
-
-            GameObject particle = new GameObject();
-            particle.AddComponent<ParticleSystem>();
-            goal.particle = particle.GetComponent<ParticleSystem>();
-
-            goal.OnScore(mockBall.GetComponent<CircleCollider2D>());
         }
 
         [UnityTest]
@@ -194,15 +174,6 @@ namespace Tests
             float angleDeg = Mathf.Rad2Deg * Mathf.Atan2(pl.Body.position.y, pl.Body.position.x);
             Assert.AreEqual(0, angleDeg, 15);
             Assert.AreEqual(100, Vector2.Distance(pl.Body.position, planet.transform.position), 5);
-        }
-
-        [Test]
-        public void Ball_CountDownUI()
-        {
-            CountDownUI.StartCountdown(ball, 1);
-
-            Assert.IsTrue(CountDownUI.Instance.countDownText.gameObject.activeSelf);
-            Assert.AreEqual(Score.Instance.team1Color, CountDownUI.Instance.countDownText.color);
         }
     }
 }
