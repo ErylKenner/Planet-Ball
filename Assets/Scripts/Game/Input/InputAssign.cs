@@ -42,13 +42,13 @@ public class InputAssign : MonoBehaviour
                     continue;
                 }
 
-                if (Input.GetButtonDown(PlayerInput.Button("Start", currentController)))
+                if (Input.GetButtonDown(CustomPlayerInput.Button("Start", currentController)))
                 {
                     Player player = GetPlayer(currentPlayer);
 
                     if (player != null)
                     {
-                        player.ControllerInput = new PlayerInput(currentController);
+                        player.ControllerInput = new CustomPlayerInput(currentController);
                         connectedControllerNumbers.Add(currentController);
                         currentPlayer++;
                         Debug.Log("Assigned " + player.name + " to controller " + currentController);

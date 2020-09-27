@@ -15,17 +15,20 @@ public abstract class Ability : MonoBehaviour
 
     private void Start()
     {
+        /*
         player = InputAssign.GetPlayer(PlayerNumber);
         if (player == null)
         {
             Debug.LogError("Could not find player with given player number!");
         }
+        */
         DerivedStart();
     }
 
 
     private void Update()
     {
+        /*
         if (!AbilityOnCooldown && player != null && player.ControllerInput != null)
         {
             string buttonString = player.ControllerInput.Button(Button);
@@ -34,6 +37,7 @@ public abstract class Ability : MonoBehaviour
                 StartAbility();
             }
         }
+        */
 
         if (AbilityOnCooldown && Cooldown != 0.0f)
         {
@@ -45,9 +49,15 @@ public abstract class Ability : MonoBehaviour
     }
 
 
-    public void StartAbility()
+    public void StartAbility(Player player)
     {
-        UseAbility();
+        if(AbilityOnCooldown)
+        {
+            return;
+        }
+
+        this.player = player;
+        UseAbility(player);
         StartCoolDown();
     }
 
@@ -69,7 +79,7 @@ public abstract class Ability : MonoBehaviour
     }
 
 
-    protected abstract void UseAbility();
+    protected abstract void UseAbility(Player player);
     protected abstract void DerivedStart();
     protected abstract void DerivedUpdate();
 }

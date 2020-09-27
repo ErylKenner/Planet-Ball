@@ -64,7 +64,7 @@ namespace Tests
         [UnityTest]
         public IEnumerator IronTimers()
         {
-            iron.StartAbility();
+            //iron.StartAbility();
             Assert.IsTrue(iron.AbilityOnCooldown);
 
             yield return new WaitForSeconds(0.75f);
@@ -82,7 +82,7 @@ namespace Tests
         [UnityTest]
         public IEnumerator BoostTimer()
         {
-            boost.StartAbility();
+            //boost.StartAbility();
             Assert.IsTrue(boost.AbilityOnCooldown);
 
             yield return new WaitForSeconds(3.0f);

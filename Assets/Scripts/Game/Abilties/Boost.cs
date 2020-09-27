@@ -9,7 +9,7 @@ public class Boost : Ability
 
     private void FixedUpdate()
     {
-        if (player.Speed > player.DefaultSpeed)
+        if (player != null && player.Speed > player.DefaultSpeed)
         {
             player.Speed -= BoostDeceleration * Time.deltaTime;
         }
@@ -17,7 +17,7 @@ public class Boost : Ability
 
     protected override void DerivedStart() { }
 
-    protected override void UseAbility()
+    protected override void UseAbility(Player player)
     {
         player.Speed = BooostSpeed;
     }

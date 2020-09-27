@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerInput
+public class CustomPlayerInput
 {
 
     public int ControllerIndex;
@@ -10,7 +10,7 @@ public class PlayerInput
     public readonly static string[] ButtonNames = { "Start", "A", "B", "X", "Y", "Z", "L", "R" };
     private readonly static string controllerConstant = "_C";
 
-    public PlayerInput(int controller)
+    public CustomPlayerInput(int controller)
     {
         if (controller < 1)
         {

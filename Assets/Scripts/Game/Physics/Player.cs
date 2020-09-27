@@ -1,6 +1,8 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(PlayerInput))]
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(LineRenderer))]
 public class Player : MonoBehaviour
@@ -14,7 +16,7 @@ public class Player : MonoBehaviour
     public int PlayerNumber;
     public bool TetherDisabled { get; private set; } = false;
     public Rigidbody2D Body { get; private set; } = null;
-    public PlayerInput ControllerInput = null;
+    public CustomPlayerInput ControllerInput = null;
     public float AttachedPlanetRadius {
         get {
             return attachedPlanetRadius;
@@ -37,6 +39,13 @@ public class Player : MonoBehaviour
     private float attachedPlanetRadius = 0.0f;
     public bool ReelTether = false;
 
+    float reelRate = 0;
+    int speedChangeDir = 0;
+    bool attachTether = false;
+
+    public Iron ironAbility;
+    public Boost boostAbility;
+
     public delegate void PlayerCollision(Vector2 position);
     public static event PlayerCollision OnPlayerCollision;
 
@@ -46,6 +55,8 @@ public class Player : MonoBehaviour
         Body = GetComponent<Rigidbody2D>();
     }
 
+
+    private PlayerInput playerInput;
 
     void Start()
     {
@@ -62,6 +73,7 @@ public class Player : MonoBehaviour
 
     void Update()
     {
+        /*
         if (Input.GetKeyUp(KeyCode.Space) || (ControllerInput != null && Input.GetButtonUp(ControllerInput.Button("R"))))
         {
             DetachTether();
@@ -78,20 +90,36 @@ public class Player : MonoBehaviour
         {
             ReelTether = false;
         }
+        */
     }
 
     void FixedUpdate()
     {
+        //Atach tether
+        if (!TetherDisabled && attachTether && AttachedPlanet == null)
+        {
+            AttachTether();
+        }
+
+        //Detach tether
+        if (!attachTether && AttachedPlanet != null)
+        {
+            DetachTether();
+        }
+
+        //Reel tether
+        if (reelRate > 0.0f && AttachedPlanet != null)
+        {
+            AttachedPlanetRadius -= reelRate * Time.fixedDeltaTime;
+        }
+
+        // Set velocity
         if (AttachedPlanet == null || TetherDisabled)
         {
             Body.velocity = Body.velocity.normalized * Speed;
         }
         else if (AttachedPlanet != null)
         {
-            if (ReelTether)
-            {
-                AttachedPlanetRadius -= ReelSpeed * Time.deltaTime;
-            }
             RotationalPhysics.RotateAroundPoint(Body, AttachedPlanet.transform.position, AttachedPlanetRadius, Speed, Time.deltaTime);
         }
 
@@ -145,14 +173,21 @@ public class Player : MonoBehaviour
         yield return new WaitForSeconds(time);
         TetherDisabled = false;
         lineRenderer.enabled = true;
+
+        /*
         if (Input.GetKey(KeyCode.Space) || (ControllerInput != null && Input.GetButton(ControllerInput.Button("R"))))
         {
             AttachTether();
         }
+        */
     }
 
     public void AttachTether()
     {
+        if (AttachedPlanet != null)
+        {
+            return;
+        }
         AttachedPlanet = getClosestPlanet();
         AttachedPlanetRadius = Vector2.Distance(Body.position, AttachedPlanet.transform.position);
         Body.velocity = Speed * RotationalPhysics.ConvertToUnitTangentialVelocity(Body.position, Body.velocity, AttachedPlanet.transform.position);
@@ -162,5 +197,27 @@ public class Player : MonoBehaviour
     {
         AttachedPlanet = null;
         AttachedPlanetRadius = 0;
+    }
+
+    public void OnTether(InputValue input)
+    {
+        bool atttach = (int)(float)input.Get() == 1 ? true : false;
+        attachTether = atttach;
+    }
+
+    public void OnShortenTether(InputValue input)
+    {
+        float inputReel = (float)input.Get();
+        reelRate = ReelSpeed * inputReel;
+    }
+
+    public void OnBoost(InputValue input)
+    {
+        boostAbility.StartAbility(this);
+    }
+
+    public void OnIron(InputValue input)
+    {
+        ironAbility.StartAbility(this);
     }
 }

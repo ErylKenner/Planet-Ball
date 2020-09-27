@@ -8,28 +8,30 @@ public class Iron : Ability
     public Sprite IronSprite;
     public Color IronColor = new Color32(167, 167, 167, 255);
 
-    private float orignalMass;
-    private Sprite originalSprite;
-    private Color originalColor;
-    private SpriteRenderer spriteRenderer;
-
     protected override void DerivedUpdate() { }
 
-    protected override void UseAbility()
+    protected override void UseAbility(Player player)
     {
-        StartCoroutine(SetIron());
+        StartCoroutine(SetIron(player));
     }
 
     protected override void DerivedStart()
     {
-        spriteRenderer = player.GetComponent<SpriteRenderer>();
+        /*spriteRenderer = player.GetComponent<SpriteRenderer>();
         orignalMass = player.Body.mass;
         originalSprite = spriteRenderer.sprite;
         originalColor = spriteRenderer.color;
+        */
     }
 
-    IEnumerator SetIron()
+    IEnumerator SetIron(Player player)
     {
+        SpriteRenderer spriteRenderer = player.GetComponent<SpriteRenderer>();
+        // potential issue if player somehow triggers during Iron
+        float orignalMass = player.Body.mass;
+        Sprite originalSprite = spriteRenderer.sprite;
+        Color originalColor = spriteRenderer.color;
+
         spriteRenderer.sprite = IronSprite;
         spriteRenderer.color = IronColor;
         player.Body.mass = IncreasedMass;
