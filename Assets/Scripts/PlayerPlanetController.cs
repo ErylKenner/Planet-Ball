@@ -30,7 +30,7 @@ public class PlayerPlanetController : NetworkBehaviour
             float xDir = Input.GetAxis("Horizontal");
             float zDir = Input.GetAxis("Vertical");
             Vector3 dir = new Vector3(xDir, 0.0f, zDir);
-            gameObject.transform.position += dir * 3 * Time.deltaTime;
+            gameObject.transform.position += dir * 5 * Time.deltaTime;
         }
     }
 }
