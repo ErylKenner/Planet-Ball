@@ -18,13 +18,13 @@ public class PlayerPlanetController : NetworkBehaviour
     public void Start()
     {
         //base.Start();
-        if (!isLocalPlayer)
+        if (isLocalPlayer)
         {
-            // Disable any components that we don't want to compute since they belong to other players
+            controller = gameObject.GetComponent<CharacterController>();
         }
         else
         {
-            controller = gameObject.GetComponent<CharacterController>();
+            // Disable any components that we don't want to compute since they belong to other players
         }
     }
 
@@ -36,7 +36,7 @@ public class PlayerPlanetController : NetworkBehaviour
             float xDir = Input.GetAxis("Horizontal");
             float zDir = Input.GetAxis("Vertical");
             Vector3 dir = new Vector3(xDir, 0.0f, zDir);
-            controller.Move(dir * 5 * Time.deltaTime);
+            controller.Move(dir.normalized * 5 * Time.deltaTime);
         }
     }
 }

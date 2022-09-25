@@ -8,13 +8,13 @@ using Mirror;
 	API Reference: https://mirror-networking.com/docs/api/Mirror.NetworkManager.html
 */
 
-public class TestingNetworkManager : NetworkManager
+public class TestingOnlyNetworkManager : NetworkManager
 {
 
     public GameObject Ball;
     // Overrides the base singleton so we don't
     // have to cast to this type everywhere.
-    public static new TestingNetworkManager singleton { get; private set; }
+    public static new TestingOnlyNetworkManager singleton { get; private set; }
 
     #region Unity Callbacks
 
