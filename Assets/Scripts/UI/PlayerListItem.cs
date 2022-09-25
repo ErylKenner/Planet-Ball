@@ -27,7 +27,7 @@ public class PlayerListItem : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (player.Name == null)
+        if (player == null || player.Name == null)
         {
             return;
         }
