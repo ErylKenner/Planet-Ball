@@ -42,7 +42,7 @@ public class SteamLobby : MonoBehaviour
         {
             return;
         }
-        Debug.Log("Lobby created successfully!");
+        Debug.Log("Steam lobby created");
 
         manager.StartHost();
 
@@ -52,7 +52,7 @@ public class SteamLobby : MonoBehaviour
 
     private void OnJoinRequest(GameLobbyJoinRequested_t callback)
     {
-        Debug.Log("Request to Join Lobby");
+        Debug.Log("Player " + callback.m_steamIDFriend.ToString() + " requesting to join lobby");
         SteamMatchmaking.JoinLobby(callback.m_steamIDLobby);
     }
 

@@ -18,6 +18,8 @@ using Mirror;
 /// </summary>
 public class CustomRoomManager : NetworkRoomManager
 {
+    public GameObject MainMenuGui;
+    public GameObject RoomSceneGui;
 
     #region Server Callbacks
 
@@ -37,11 +39,7 @@ public class CustomRoomManager : NetworkRoomManager
     /// <summary>
     /// This is called on the host when a host is started.
     /// </summary>
-    public override void OnRoomStartHost()
-    {
-        //Instantiate(roomPlayerPrefab);
-
-    }
+    public override void OnRoomStartHost() { }
 
     /// <summary>
     /// This is called on the host when the host is stopped.
@@ -64,7 +62,10 @@ public class CustomRoomManager : NetworkRoomManager
     /// This is called on the server when a networked scene finishes loading.
     /// </summary>
     /// <param name="sceneName">Name of the new scene.</param>
-    public override void OnRoomServerSceneChanged(string sceneName) { }
+    public override void OnRoomServerSceneChanged(string sceneName)
+    {
+        SetSceneGui(sceneName);
+    }
 
     /// <summary>
     /// This allows customization of the creation of the room-player object on the server.
@@ -174,7 +175,8 @@ public class CustomRoomManager : NetworkRoomManager
     /// <summary>
     /// This is called on the client when the client is finished loading a new networked scene.
     /// </summary>
-    public override void OnRoomClientSceneChanged() {
+    public override void OnRoomClientSceneChanged()
+    {
     }
 
     /// <summary>
@@ -187,9 +189,46 @@ public class CustomRoomManager : NetworkRoomManager
 
     #region Optional UI
 
+    public void SetSceneGui(string scene)
+    {
+        if (scene.Contains("MainMenu"))
+        {
+            MainMenuGui.SetActive(true);
+            RoomSceneGui.SetActive(false);
+        }
+        else if (scene.Contains("RoomScene"))
+        {
+            MainMenuGui.SetActive(false);
+            RoomSceneGui.SetActive(true);
+        }
+        else if (scene.Contains("GameScene"))
+        {
+            MainMenuGui.SetActive(false);
+            RoomSceneGui.SetActive(false);
+
+        }
+    }
+
+
     public override void OnGUI()
     {
-        base.OnGUI();
+        if (!showRoomGUI)
+            return;
+
+        if (NetworkServer.active && IsSceneActive(GameplayScene))
+        {
+            GUILayout.BeginArea(new Rect(Screen.width - 150f, 10f, 140f, 30f));
+            if (GUILayout.Button("Return to Room"))
+            {
+                ServerChangeScene(RoomScene);
+            }
+            GUILayout.EndArea();
+        }
+
+        //if (IsSceneActive(RoomScene))
+        //{
+        //    GUI.Box(new Rect(200f, 180f, 520f, 150f), "PLAYERS");
+        //}
     }
 
     #endregion

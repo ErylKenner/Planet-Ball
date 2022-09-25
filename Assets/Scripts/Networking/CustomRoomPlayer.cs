@@ -1,6 +1,7 @@
 using UnityEngine;
 using Mirror;
 using Steamworks;
+using System.Collections.Generic;
 
 /*
 	Documentation: https://mirror-networking.gitbook.io/docs/components/network-room-player
@@ -48,8 +49,15 @@ public class CustomRoomPlayer : NetworkRoomPlayer
     /// Called when the local player object has been set up.
     /// <para>This happens after OnStartClient(), as it is triggered by an ownership message from the server. This is an appropriate place to activate components or functionality that should only be active for the local player, such as cameras and input.</para>
     /// </summary>
-    public override void OnStartLocalPlayer() {
+    public override void OnStartLocalPlayer()
+    {
         CmdSetName(SteamFriends.GetPersonaName().ToString());
+        var playerList = FindObjectOfType<DisplayPlayerList>();
+        if (playerList.ConnectedPlayers == null)
+        {
+            playerList.ConnectedPlayers = new List<CustomRoomPlayer>();
+        }
+        playerList.ConnectedPlayers.Add(this);
     }
 
     /// <summary>
@@ -123,8 +131,19 @@ public class CustomRoomPlayer : NetworkRoomPlayer
             if (!NetworkManager.IsSceneActive(room.RoomScene))
                 return;
 
-            DrawPlayerReadyState();
-            DrawPlayerReadyButton();
+            //DrawPlayerReadyState();
+            //DrawPlayerReadyButton();
+        }
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.KeypadEnter))
+        {
+            CmdChangeReadyState(true);
+        } else if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            CmdChangeReadyState(false);
         }
     }
 
@@ -132,7 +151,7 @@ public class CustomRoomPlayer : NetworkRoomPlayer
     {
         GUILayout.BeginArea(new Rect(20f + (index * 100), 200f, 90f, 130f));
 
-        //GUILayout.Label($"Player [{index + 1}]");
+
         GUILayout.Label(Name);
 
         if (readyToBegin)
