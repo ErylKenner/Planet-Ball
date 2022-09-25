@@ -15,6 +15,8 @@ using Steamworks;
 /// </summary>
 public class CustomRoomPlayer : NetworkRoomPlayer
 {
+    [SyncVar]
+    public string Name;
     #region Start & Stop Callbacks
 
     /// <summary>
@@ -46,7 +48,9 @@ public class CustomRoomPlayer : NetworkRoomPlayer
     /// Called when the local player object has been set up.
     /// <para>This happens after OnStartClient(), as it is triggered by an ownership message from the server. This is an appropriate place to activate components or functionality that should only be active for the local player, such as cameras and input.</para>
     /// </summary>
-    public override void OnStartLocalPlayer() { }
+    public override void OnStartLocalPlayer() {
+        Name = SteamFriends.GetPersonaName().ToString();
+    }
 
     /// <summary>
     /// This is invoked on behaviours that have authority, based on context and <see cref="NetworkIdentity.hasAuthority">NetworkIdentity.hasAuthority</see>.
@@ -124,7 +128,7 @@ public class CustomRoomPlayer : NetworkRoomPlayer
         GUILayout.BeginArea(new Rect(20f + (index * 100), 200f, 90f, 130f));
 
         //GUILayout.Label($"Player [{index + 1}]");
-        GUILayout.Label(SteamFriends.GetPersonaName().ToString());
+        GUILayout.Label(Name);
 
         if (readyToBegin)
             GUILayout.Label("Ready");

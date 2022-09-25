@@ -120,7 +120,6 @@ public class CustomRoomManager : NetworkRoomManager
     public override void OnRoomServerPlayersReady()
     {
         base.OnRoomServerPlayersReady();
-        //ServerChangeScene(GameplayScene);
     }
 
     /// <summary>
@@ -138,7 +137,10 @@ public class CustomRoomManager : NetworkRoomManager
     /// </summary>
     public override void OnRoomClientEnter()
     {
-        //NetworkClient.AddPlayer();
+        if (NetworkClient.connection?.identity == null)
+        {
+            NetworkClient.AddPlayer();
+        }
     }
 
     /// <summary>
@@ -173,10 +175,6 @@ public class CustomRoomManager : NetworkRoomManager
     /// This is called on the client when the client is finished loading a new networked scene.
     /// </summary>
     public override void OnRoomClientSceneChanged() {
-        if (IsSceneActive(RoomScene))
-        {
-            NetworkClient.AddPlayer();
-        }
     }
 
     /// <summary>

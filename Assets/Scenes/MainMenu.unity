@@ -1028,6 +1028,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: NetworkRoomManager
       objectReference: {fileID: 0}
+    - target: {fileID: 6763624423850853222, guid: c8441de286e76434e9616c01ec7ea2a0, type: 3}
+      propertyPath: sceneId
+      value: 3406885733
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c8441de286e76434e9616c01ec7ea2a0, type: 3}
 --- !u!1 &2119459325

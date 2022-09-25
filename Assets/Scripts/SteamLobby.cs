@@ -48,7 +48,6 @@ public class SteamLobby : MonoBehaviour
 
         SteamMatchmaking.SetLobbyData(new CSteamID(callback.m_ulSteamIDLobby), HostAddressKey, SteamUser.GetSteamID().ToString());
         SteamMatchmaking.SetLobbyData(new CSteamID(callback.m_ulSteamIDLobby), "name", SteamFriends.GetPersonaName().ToString() + "'s Lobby");
-        //NetworkClient.AddPlayer();
     }
 
     private void OnJoinRequest(GameLobbyJoinRequested_t callback)
@@ -68,6 +67,5 @@ public class SteamLobby : MonoBehaviour
         if(NetworkServer.active) { return; }
         manager.networkAddress = SteamMatchmaking.GetLobbyData(new CSteamID(callback.m_ulSteamIDLobby), HostAddressKey);
         manager.StartClient();
-
     }
 }
