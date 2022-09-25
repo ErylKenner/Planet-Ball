@@ -16,7 +16,7 @@ public class Ball : NetworkBehaviour
     public override void OnStartLocalPlayer()
     {
         base.OnStartLocalPlayer();
-        Debug.Log("In ball start");
+        //Debug.Log("In ball start");
         CmdSpawnBall();
     }
 
