@@ -49,7 +49,7 @@ public class CustomRoomPlayer : NetworkRoomPlayer
     /// <para>This happens after OnStartClient(), as it is triggered by an ownership message from the server. This is an appropriate place to activate components or functionality that should only be active for the local player, such as cameras and input.</para>
     /// </summary>
     public override void OnStartLocalPlayer() {
-        CmdSetName();
+        CmdSetName(SteamFriends.GetPersonaName().ToString());
     }
 
     /// <summary>
@@ -104,9 +104,9 @@ public class CustomRoomPlayer : NetworkRoomPlayer
     #region Optional UI
 
     [Command]
-    private void CmdSetName()
+    private void CmdSetName(string value)
     {
-        Name = SteamFriends.GetPersonaName().ToString();
+        Name = value;
     }
 
     public override void OnGUI()
