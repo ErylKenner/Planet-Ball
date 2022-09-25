@@ -18,13 +18,14 @@ using Mirror;
 /// </summary>
 public class CustomRoomManager : NetworkRoomManager
 {
-    
+
     #region Server Callbacks
 
     /// <summary>
     /// This is called on the server when the server is started - including when a host is started.
     /// </summary>
-    public override void OnRoomStartServer() {
+    public override void OnRoomStartServer()
+    {
         ServerChangeScene(RoomScene);
     }
 
@@ -36,9 +37,10 @@ public class CustomRoomManager : NetworkRoomManager
     /// <summary>
     /// This is called on the host when a host is started.
     /// </summary>
-    public override void OnRoomStartHost() {
-        Instantiate(roomPlayerPrefab);
-        Instantiate(roomPlayerPrefab);
+    public override void OnRoomStartHost()
+    {
+        //Instantiate(roomPlayerPrefab);
+
     }
 
     /// <summary>
@@ -118,7 +120,7 @@ public class CustomRoomManager : NetworkRoomManager
     public override void OnRoomServerPlayersReady()
     {
         base.OnRoomServerPlayersReady();
-        ServerChangeScene(GameplayScene);
+        //ServerChangeScene(GameplayScene);
     }
 
     /// <summary>
@@ -134,8 +136,9 @@ public class CustomRoomManager : NetworkRoomManager
     /// <summary>
     /// This is a hook to allow custom behaviour when the game client enters the room.
     /// </summary>
-    public override void OnRoomClientEnter() {
-        
+    public override void OnRoomClientEnter()
+    {
+        //NetworkClient.AddPlayer();
     }
 
     /// <summary>
@@ -146,8 +149,9 @@ public class CustomRoomManager : NetworkRoomManager
     /// <summary>
     /// This is called on the client when it connects to server.
     /// </summary>
-    public override void OnRoomClientConnect() {
-        
+    public override void OnRoomClientConnect()
+    {
+
     }
 
     /// <summary>
@@ -168,7 +172,12 @@ public class CustomRoomManager : NetworkRoomManager
     /// <summary>
     /// This is called on the client when the client is finished loading a new networked scene.
     /// </summary>
-    public override void OnRoomClientSceneChanged() { }
+    public override void OnRoomClientSceneChanged() {
+        if (IsSceneActive(RoomScene))
+        {
+            NetworkClient.AddPlayer();
+        }
+    }
 
     /// <summary>
     /// Called on the client when adding a player to the room fails.

@@ -184,7 +184,7 @@ public class TestingNetworkManager : NetworkManager
     public override void OnClientConnect()
     {
         base.OnClientConnect();
-        NetworkClient.AddPlayer();
+        //NetworkClient.AddPlayer();
     }
 
     /// <summary>

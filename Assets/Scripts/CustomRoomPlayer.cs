@@ -144,11 +144,8 @@ public class CustomRoomPlayer : NetworkRoomPlayer
 
     void DrawPlayerReadyButton()
     {
-        Debug.Log(NetworkClient.active);
-        Debug.Log(isLocalPlayer);
         if (NetworkClient.active && isLocalPlayer)
         {
-            Debug.Log("Got here");
             GUILayout.BeginArea(new Rect(20f, 300f, 120f, 20f));
 
             if (readyToBegin)
