@@ -6,6 +6,8 @@ using Mirror;
 public class PlayerPlanetController : NetworkBehaviour
 {
     public GameObject Model;
+    private CharacterController controller;
+
 
     public override void OnStartLocalPlayer()
     {
@@ -20,6 +22,10 @@ public class PlayerPlanetController : NetworkBehaviour
         {
             // Disable any components that we don't want to compute since they belong to other players
         }
+        else
+        {
+            controller = gameObject.GetComponent<CharacterController>();
+        }
     }
 
     // Update is called once per frame
@@ -30,7 +36,7 @@ public class PlayerPlanetController : NetworkBehaviour
             float xDir = Input.GetAxis("Horizontal");
             float zDir = Input.GetAxis("Vertical");
             Vector3 dir = new Vector3(xDir, 0.0f, zDir);
-            gameObject.transform.position += dir * 5 * Time.deltaTime;
+            controller.Move(dir * 5 * Time.deltaTime);
         }
     }
 }
