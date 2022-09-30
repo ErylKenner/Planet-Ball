@@ -15,16 +15,16 @@ public class SteamLobby : MonoBehaviour
     //Variables
     public ulong CurrentLobbyID;
     private const string HostAddressKey = "HostAddress";
-    private CustomNetworkManager manager;
+    private CustomRoomManager manager;
 
     //Gameobject
-    public GameObject HostButton;
-    public TextMeshProUGUI LobbyNameText;
+    //public GameObject HostButton;
+    //public TextMeshProUGUI LobbyNameText;
 
     private void Start()
     {
         if(!SteamManager.Initialized) { return; }
-        manager = GetComponent<CustomNetworkManager>();
+        manager = GetComponent<CustomRoomManager>();
 
         LobbyCreated = Callback<LobbyCreated_t>.Create(OnLobbyCreated);
         JoinRequest = Callback<GameLobbyJoinRequested_t>.Create(OnJoinRequest);
@@ -42,7 +42,7 @@ public class SteamLobby : MonoBehaviour
         {
             return;
         }
-        Debug.Log("Lobby created successfully!");
+        Debug.Log("Steam lobby created");
 
         manager.StartHost();
 
@@ -52,22 +52,21 @@ public class SteamLobby : MonoBehaviour
 
     private void OnJoinRequest(GameLobbyJoinRequested_t callback)
     {
-        Debug.Log("Request to Join Lobby");
+        Debug.Log("Player " + callback.m_steamIDFriend.ToString() + " requesting to join lobby");
         SteamMatchmaking.JoinLobby(callback.m_steamIDLobby);
     }
 
     private void OnLobbyEntered(LobbyEnter_t callback)
     {
         //Everyone
-        HostButton.SetActive(false);
         CurrentLobbyID = callback.m_ulSteamIDLobby;
-        LobbyNameText.gameObject.SetActive(true);
-        LobbyNameText.text = SteamMatchmaking.GetLobbyData(new CSteamID(callback.m_ulSteamIDLobby), "name");
+        //LobbyNameText.gameObject.SetActive(true);
+        //LobbyNameText.text = SteamMatchmaking.GetLobbyData(new CSteamID(callback.m_ulSteamIDLobby), "name");
 
         //Clients
         if(NetworkServer.active) { return; }
         manager.networkAddress = SteamMatchmaking.GetLobbyData(new CSteamID(callback.m_ulSteamIDLobby), HostAddressKey);
+        Debug.Log("Lobby entered");
         manager.StartClient();
-
     }
 }
