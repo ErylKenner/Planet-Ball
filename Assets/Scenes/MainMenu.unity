@@ -239,6 +239,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2251717295832044514, guid: 3823a5ff2abc8e047bb404e58c9b8fb0, type: 3}
+      propertyPath: m_UIInputModule
+      value: 
+      objectReference: {fileID: 1172419496}
+    - target: {fileID: 2251717295832044514, guid: 3823a5ff2abc8e047bb404e58c9b8fb0, type: 3}
+      propertyPath: m_DefaultControlScheme
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 2251717295832044515, guid: 3823a5ff2abc8e047bb404e58c9b8fb0, type: 3}
       propertyPath: m_Name
       value: MainMenuPlayerInput
@@ -460,6 +468,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1145613354}
   m_CullTransparentMesh: 1
+--- !u!114 &1172419496 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1286990591, guid: c8441de286e76434e9616c01ec7ea2a0, type: 3}
+  m_PrefabInstance: {fileID: 1737145292}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01614664b831546d2ae94a42149d80ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1173550557
 GameObject:
   m_ObjectHideFlags: 0
