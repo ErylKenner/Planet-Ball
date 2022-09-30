@@ -18,6 +18,8 @@ public class CustomRoomPlayer : NetworkRoomPlayer
 {
     [SyncVar]
     public string Name;
+
+    public TestingInputSystem input;
     #region Start & Stop Callbacks
 
     /// <summary>
@@ -130,16 +132,24 @@ public class CustomRoomPlayer : NetworkRoomPlayer
         }
     }
 
-    private void Update()
+    public void OnSubmit()
     {
-        if (isLocalPlayer && Input.GetKeyDown(KeyCode.KeypadEnter))
+        if (isLocalPlayer)
         {
             CmdChangeReadyState(true);
         }
-        else if (isLocalPlayer && Input.GetKeyDown(KeyCode.Escape))
+    }
+
+    public void OnCancel()
+    {
+        if (isLocalPlayer)
         {
             CmdChangeReadyState(false);
         }
+    }
+
+    private void Update()
+    {
     }
 
     void DrawPlayerReadyState()

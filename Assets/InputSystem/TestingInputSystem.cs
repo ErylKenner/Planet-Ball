@@ -1,3 +1,4 @@
+using Mirror;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,6 +8,7 @@ public class TestingInputSystem : MonoBehaviour
 {
     private Rigidbody rigidbody;
     private PlayerInputActions playerInputActions;
+    private CustomRoomPlayer player;
 
     private void Awake()
     {
@@ -15,6 +17,9 @@ public class TestingInputSystem : MonoBehaviour
         playerInputActions = new PlayerInputActions();
         playerInputActions.Player.Enable();
         playerInputActions.Player.Jump.performed += OnJump;
+        List<CustomRoomPlayer> players = new List < CustomRoomPlayer >(FindObjectsOfType<CustomRoomPlayer>());
+        player = players.Find(player => player.netId == NetworkClient.localPlayer.netId);
+        player.input = this;
     }
 
     private void FixedUpdate()
