@@ -64,7 +64,6 @@ public class CustomRoomManager : NetworkRoomManager
     /// <param name="sceneName">Name of the new scene.</param>
     public override void OnRoomServerSceneChanged(string sceneName)
     {
-        SetSceneGui(sceneName);
     }
 
     /// <summary>
@@ -160,7 +159,9 @@ public class CustomRoomManager : NetworkRoomManager
     /// <summary>
     /// This is called on the client when disconnected from a server.
     /// </summary>
-    public override void OnRoomClientDisconnect() { }
+    public override void OnRoomClientDisconnect() {
+        SetSceneGui("MainMenu");
+    }
 
     /// <summary>
     /// This is called on the client when a client is started.
@@ -177,6 +178,7 @@ public class CustomRoomManager : NetworkRoomManager
     /// </summary>
     public override void OnRoomClientSceneChanged()
     {
+        SetSceneGui(NetworkManager.networkSceneName);
     }
 
     /// <summary>

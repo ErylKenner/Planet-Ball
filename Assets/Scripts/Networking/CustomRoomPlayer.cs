@@ -52,15 +52,6 @@ public class CustomRoomPlayer : NetworkRoomPlayer
     public override void OnStartLocalPlayer()
     {
         CmdSetName(SteamFriends.GetPersonaName().ToString());
-        var playerList = FindObjectOfType<DisplayPlayerList>();
-        if (playerList != null)
-        {
-            if (playerList.ConnectedPlayers == null)
-            {
-                playerList.ConnectedPlayers = new List<CustomRoomPlayer>();
-            }
-            playerList.ConnectedPlayers.Add(this);
-        }
     }
 
     /// <summary>
