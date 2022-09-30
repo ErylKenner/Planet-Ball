@@ -53,11 +53,14 @@ public class CustomRoomPlayer : NetworkRoomPlayer
     {
         CmdSetName(SteamFriends.GetPersonaName().ToString());
         var playerList = FindObjectOfType<DisplayPlayerList>();
-        if (playerList.ConnectedPlayers == null)
+        if (playerList != null)
         {
-            playerList.ConnectedPlayers = new List<CustomRoomPlayer>();
+            if (playerList.ConnectedPlayers == null)
+            {
+                playerList.ConnectedPlayers = new List<CustomRoomPlayer>();
+            }
+            playerList.ConnectedPlayers.Add(this);
         }
-        playerList.ConnectedPlayers.Add(this);
     }
 
     /// <summary>
@@ -138,10 +141,11 @@ public class CustomRoomPlayer : NetworkRoomPlayer
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.KeypadEnter))
+        if (isLocalPlayer && Input.GetKeyDown(KeyCode.KeypadEnter))
         {
             CmdChangeReadyState(true);
-        } else if (Input.GetKeyDown(KeyCode.Escape))
+        }
+        else if (isLocalPlayer && Input.GetKeyDown(KeyCode.Escape))
         {
             CmdChangeReadyState(false);
         }

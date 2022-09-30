@@ -5,19 +5,15 @@ using UnityEngine;
 public class DisplayPlayerList : MonoBehaviour
 {
     public List<CustomRoomPlayer> ConnectedPlayers;
-    //Name, Ready State, Remove button (will be X button)
-    // Start is called before the first frame update
-    void Start()
+
+    private void OnEnable()
     {
-        if (ConnectedPlayers == null)
-        {
-            ConnectedPlayers = new List<CustomRoomPlayer>();
-        }
+        ConnectedPlayers = new List<CustomRoomPlayer>(FindObjectsOfType<CustomRoomPlayer>());
     }
 
     private void OnDisable()
     {
-        ConnectedPlayers.Clear();
+        
     }
 
     // Update is called once per frame

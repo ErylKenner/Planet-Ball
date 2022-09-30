@@ -138,7 +138,7 @@ public class CustomRoomManager : NetworkRoomManager
     /// </summary>
     public override void OnRoomClientEnter()
     {
-        if (NetworkClient.connection?.identity == null)
+        if (NetworkClient.localPlayer == null)
         {
             NetworkClient.AddPlayer();
         }
