@@ -223,7 +223,6 @@ public class CustomRoomManager : NetworkRoomManager
             if (GUILayout.Button("Return to Room"))
             {
                 ServerChangeScene(RoomScene);
-                SetSceneGui("MainMenu");
             }
             GUILayout.EndArea();
         }
