@@ -92,7 +92,8 @@ GameObject:
   - component: {fileID: 5123957401559552801}
   - component: {fileID: 5123957401559552800}
   - component: {fileID: 5123957401559552807}
-  - component: {fileID: 5864852453168169125}
+  - component: {fileID: 3051642857162482356}
+  - component: {fileID: 9046785060179961281}
   m_Layer: 0
   m_Name: RoomPlayer
   m_TagString: Untagged
@@ -156,7 +157,6 @@ MonoBehaviour:
   readyToBegin: 0
   index: 0
   Name: 
-  input: {fileID: 0}
 --- !u!114 &5123957401559552807
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -170,7 +170,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerName: {fileID: 2749969915812261055}
---- !u!114 &5864852453168169125
+--- !u!114 &3051642857162482356
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -183,7 +183,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Actions: {fileID: -944628639613478452, guid: 522eeb8487d9c7a49bb5cf49adebbc78, type: 3}
-  m_NotificationBehavior: 0
+  m_NotificationBehavior: 1
   m_UIInputModule: {fileID: 0}
   m_DeviceLostEvent:
     m_PersistentCalls:
@@ -249,6 +249,18 @@ MonoBehaviour:
     m_ActionName: UI/TrackedDeviceOrientation
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
-  m_DefaultActionMap: c68a9558-263a-402e-aaf7-1655a7e20998
+  m_DefaultActionMap: UI
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!114 &9046785060179961281
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5123957401559552803}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a751055a164a40d4c945c5b9c74334e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

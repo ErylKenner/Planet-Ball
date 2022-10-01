@@ -27,6 +27,7 @@ public class PlayerPlanetController : NetworkBehaviour
         else
         {
             // Disable any components that we don't want to compute since they belong to other players
+            GetComponent<PlayerInput>().enabled = false;
         }
     }
     

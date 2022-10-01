@@ -148,6 +148,7 @@ GameObject:
   - component: {fileID: 1441618538}
   - component: {fileID: 1441618537}
   - component: {fileID: 1441618536}
+  - component: {fileID: 8572837277910907477}
   m_Layer: 5
   m_Name: Play
   m_TagString: Untagged
@@ -238,7 +239,7 @@ MonoBehaviour:
     m_NormalColor: {r: 0.27450982, g: 0.5058824, b: 0.95686275, a: 1}
     m_HighlightedColor: {r: 0.32016847, g: 0.48244572, b: 0.807, a: 1}
     m_PressedColor: {r: 0.26139727, g: 0.39660272, b: 0.65800005, a: 1}
-    m_SelectedColor: {r: 0.27450982, g: 0.5058824, b: 0.9568628, a: 1}
+    m_SelectedColor: {r: 0.4764151, g: 0.6539524, b: 1, a: 1}
     m_DisabledColor: {r: 0.27450982, g: 0.5058824, b: 0.9568628, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
@@ -280,6 +281,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 651778dfef28f9b4f9a08f7359160594, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &8572837277910907477
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1441618534}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54ac6ec030f93164ba6e060163489852, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &219154484085788193
@@ -1057,9 +1070,11 @@ GameObject:
   m_Component:
   - component: {fileID: 9006286804218316636}
   - component: {fileID: 7690547895590442529}
-  - component: {fileID: 1357104332166703074}
   - component: {fileID: 1357104332166703075}
   - component: {fileID: 1357104332166703072}
+  - component: {fileID: 3074756360497950031}
+  - component: {fileID: 8570988956656296479}
+  - component: {fileID: 756019975827356045}
   m_Layer: 0
   m_Name: NetworkRoomManager
   m_TagString: Untagged
@@ -1103,7 +1118,7 @@ MonoBehaviour:
   serverTickRate: 30
   offlineScene: 
   onlineScene: 
-  transport: {fileID: 1357104332166703074}
+  transport: {fileID: 0}
   networkAddress: localhost
   maxConnections: 4
   authenticator: {fileID: 0}
@@ -1121,24 +1136,7 @@ MonoBehaviour:
   clientIndex: 0
   MainMenuGui: {fileID: 1891491261740482244}
   RoomSceneGui: {fileID: 8817576475727613307}
---- !u!114 &1357104332166703074
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1357104332166703078}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ea368fb6f27ec2f40a40e20977992b9c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Channels: 0200000001000000
-  Timeout: 25
-  SteamAppID: 480
-  AllowSteamRelay: 1
-  UseNextGenSteamNetworking: 1
-  SteamUserID: 0
+  MainMenuScene: Assets/Scenes/MainMenu.unity
 --- !u!114 &1357104332166703075
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1164,6 +1162,67 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CurrentLobbyID: 0
+--- !u!114 &3074756360497950031
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1357104332166703078}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea368fb6f27ec2f40a40e20977992b9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Channels: 0200000001000000
+  Timeout: 25
+  SteamAppID: 480
+  AllowSteamRelay: 1
+  UseNextGenSteamNetworking: 1
+  SteamUserID: 0
+--- !u!114 &8570988956656296479
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1357104332166703078}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b0fecffa3f624585964b0d0eb21b18e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Port: 7777
+  DualMode: 1
+  NoDelay: 1
+  Interval: 10
+  Timeout: 10000
+  FastResend: 2
+  CongestionWindow: 0
+  SendWindowSize: 4096
+  ReceiveWindowSize: 4096
+  MaxRetransmit: 40
+  NonAlloc: 1
+  MaximizeSendReceiveBuffersToOSLimit: 1
+  ReliableMaxMessageSize: 298449
+  UnreliableMaxMessageSize: 1199
+  debugLog: 0
+  statisticsGUI: 0
+  statisticsLog: 0
+--- !u!114 &756019975827356045
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1357104332166703078}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6442dc8070ceb41f094e44de0bf87274, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  offsetX: 0
+  offsetY: 0
 --- !u!1 &1357104332245960391
 GameObject:
   m_ObjectHideFlags: 0
@@ -1523,7 +1582,7 @@ MonoBehaviour:
     m_NormalColor: {r: 0.27450982, g: 0.5058824, b: 0.95686275, a: 1}
     m_HighlightedColor: {r: 0.32016847, g: 0.48244572, b: 0.807, a: 1}
     m_PressedColor: {r: 0.26139727, g: 0.39660272, b: 0.65800005, a: 1}
-    m_SelectedColor: {r: 0.27450982, g: 0.5058824, b: 0.9568628, a: 1}
+    m_SelectedColor: {r: 0.504717, g: 0.6726577, b: 1, a: 1}
     m_DisabledColor: {r: 0.27450982, g: 0.5058824, b: 0.9568628, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
@@ -2134,7 +2193,7 @@ MonoBehaviour:
   m_ScrollWheelAction: {fileID: -5541403393267422928, guid: 522eeb8487d9c7a49bb5cf49adebbc78, type: 3}
   m_TrackedDevicePositionAction: {fileID: -4599600590177691776, guid: 522eeb8487d9c7a49bb5cf49adebbc78, type: 3}
   m_TrackedDeviceOrientationAction: {fileID: -1910678212381727554, guid: 522eeb8487d9c7a49bb5cf49adebbc78, type: 3}
-  m_DeselectOnBackgroundClick: 1
+  m_DeselectOnBackgroundClick: 0
   m_PointerBehavior: 0
   m_CursorLockBehavior: 0
 --- !u!1 &3580009245883737040
@@ -2374,7 +2433,7 @@ MonoBehaviour:
     m_NormalColor: {r: 0.27450982, g: 0.5058824, b: 0.95686275, a: 1}
     m_HighlightedColor: {r: 0.32016847, g: 0.48244572, b: 0.807, a: 1}
     m_PressedColor: {r: 0.26139727, g: 0.39660272, b: 0.65800005, a: 1}
-    m_SelectedColor: {r: 0.27450982, g: 0.5058824, b: 0.9568628, a: 1}
+    m_SelectedColor: {r: 0.6309185, g: 0.7432713, b: 0.9622642, a: 1}
     m_DisabledColor: {r: 0.27450982, g: 0.5058824, b: 0.9568628, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
@@ -2809,6 +2868,7 @@ GameObject:
   - component: {fileID: 2585342371238176309}
   - component: {fileID: 1910782490630684350}
   - component: {fileID: 652662779368353037}
+  - component: {fileID: 6125119953162080908}
   m_Layer: 5
   m_Name: Back
   m_TagString: Untagged
@@ -2899,7 +2959,7 @@ MonoBehaviour:
     m_NormalColor: {r: 0.27450982, g: 0.5058824, b: 0.95686275, a: 1}
     m_HighlightedColor: {r: 0.32016847, g: 0.48244572, b: 0.807, a: 1}
     m_PressedColor: {r: 0.26139727, g: 0.39660272, b: 0.65800005, a: 1}
-    m_SelectedColor: {r: 0.27450982, g: 0.5058824, b: 0.9568628, a: 1}
+    m_SelectedColor: {r: 0.6179246, g: 0.74747884, b: 1, a: 1}
     m_DisabledColor: {r: 0.27450982, g: 0.5058824, b: 0.9568628, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
@@ -2943,7 +3003,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1357104332166703074}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: Mirror.FizzySteam.FizzySteamworks, Mirror
         m_MethodName: ServerDisconnect
         m_Mode: 3
@@ -2967,6 +3027,18 @@ MonoBehaviour:
           m_StringArgument: MainMenu
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &6125119953162080908
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4670480989507634325}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54ac6ec030f93164ba6e060163489852, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5226047708827390731
 GameObject:
   m_ObjectHideFlags: 0

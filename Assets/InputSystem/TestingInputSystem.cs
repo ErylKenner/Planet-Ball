@@ -19,7 +19,6 @@ public class TestingInputSystem : MonoBehaviour
         playerInputActions.Player.Jump.performed += OnJump;
         List<CustomRoomPlayer> players = new List < CustomRoomPlayer >(FindObjectsOfType<CustomRoomPlayer>());
         player = players.Find(player => player.netId == NetworkClient.localPlayer.netId);
-        player.input = this;
     }
 
     private void FixedUpdate()

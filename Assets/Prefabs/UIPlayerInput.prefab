@@ -10,8 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 2251717295832044525}
   - component: {fileID: 2251717295832044514}
+  - component: {fileID: 8355610253454018889}
   m_Layer: 0
-  m_Name: MainMenuPlayerInput
+  m_Name: UIPlayerInput
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -45,7 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Actions: {fileID: -944628639613478452, guid: 522eeb8487d9c7a49bb5cf49adebbc78, type: 3}
-  m_NotificationBehavior: 0
+  m_NotificationBehavior: 1
   m_UIInputModule: {fileID: 0}
   m_DeviceLostEvent:
     m_PersistentCalls:
@@ -114,3 +115,15 @@ MonoBehaviour:
   m_DefaultActionMap: UI
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!114 &8355610253454018889
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2251717295832044515}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a751055a164a40d4c945c5b9c74334e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

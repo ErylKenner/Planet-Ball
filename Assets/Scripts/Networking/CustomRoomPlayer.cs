@@ -2,6 +2,7 @@ using UnityEngine;
 using Mirror;
 using Steamworks;
 using System.Collections.Generic;
+using UnityEngine.InputSystem;
 
 /*
 	Documentation: https://mirror-networking.gitbook.io/docs/components/network-room-player
@@ -19,7 +20,6 @@ public class CustomRoomPlayer : NetworkRoomPlayer
     [SyncVar]
     public string Name;
 
-    public TestingInputSystem input;
     #region Start & Stop Callbacks
 
     /// <summary>
@@ -39,7 +39,8 @@ public class CustomRoomPlayer : NetworkRoomPlayer
     /// Called on every NetworkBehaviour when it is activated on a client.
     /// <para>Objects on the host have this function called, as there is a local client on the host. The values of SyncVars on object are guaranteed to be initialized correctly with the latest state from the server when this function is called on the client.</para>
     /// </summary>
-    public override void OnStartClient() { }
+    public override void OnStartClient() { 
+    }
 
     /// <summary>
     /// This is invoked on clients when the server has caused this object to be destroyed.
@@ -53,7 +54,14 @@ public class CustomRoomPlayer : NetworkRoomPlayer
     /// </summary>
     public override void OnStartLocalPlayer()
     {
-        CmdSetName(SteamFriends.GetPersonaName().ToString());
+        if(Application.isEditor || Debug.isDebugBuild)
+        {
+            int numPlayers = new List<CustomRoomPlayer>(FindObjectsOfType<CustomRoomPlayer>()).Count;
+            CmdSetName("Player " + numPlayers);
+        } else
+        {
+            CmdSetName(SteamFriends.GetPersonaName().ToString());
+        }
     }
 
     /// <summary>
@@ -77,12 +85,23 @@ public class CustomRoomPlayer : NetworkRoomPlayer
     /// This is a hook that is invoked on all player objects when entering the room.
     /// <para>Note: isLocalPlayer is not guaranteed to be set until OnStartLocalPlayer is called.</para>
     /// </summary>
-    public override void OnClientEnterRoom() { }
+    public override void OnClientEnterRoom() {
+        if(isLocalPlayer)
+        {
+            GetComponent<PlayerInput>().enabled = true;
+        } else
+        {
+            GetComponent<PlayerInput>().enabled = false;
+        }
+       
+    }
 
     /// <summary>
     /// This is a hook that is invoked on all player objects when exiting the room.
     /// </summary>
-    public override void OnClientExitRoom() { }
+    public override void OnClientExitRoom() {
+        GetComponent<PlayerInput>().enabled = false;
+    }
 
     #endregion
 
@@ -132,19 +151,11 @@ public class CustomRoomPlayer : NetworkRoomPlayer
         }
     }
 
-    public void OnSubmit()
+    public void OnReadyUp()
     {
         if (isLocalPlayer)
         {
-            CmdChangeReadyState(true);
-        }
-    }
-
-    public void OnCancel()
-    {
-        if (isLocalPlayer)
-        {
-            CmdChangeReadyState(false);
+            CmdChangeReadyState(!readyToBegin);
         }
     }
 
