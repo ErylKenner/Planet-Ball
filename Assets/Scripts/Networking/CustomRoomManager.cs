@@ -33,7 +33,7 @@ public class CustomRoomManager : NetworkRoomManager
         FizzySteamworks fizzySteamWorks = GetComponent<FizzySteamworks>();
         KcpTransport kcpTransport = GetComponent<KcpTransport>();
 
-        if (Application.isEditor || Debug.isDebugBuild)
+        if (!ConfigManager.UseSteamworks)
         {
             
             if(fizzySteamWorks != null)

@@ -54,7 +54,7 @@ public class CustomRoomPlayer : NetworkRoomPlayer
     /// </summary>
     public override void OnStartLocalPlayer()
     {
-        if(Application.isEditor || Debug.isDebugBuild)
+        if(!ConfigManager.UseSteamworks)
         {
             int numPlayers = new List<CustomRoomPlayer>(FindObjectsOfType<CustomRoomPlayer>()).Count;
             CmdSetName("Player " + numPlayers);

@@ -25,7 +25,7 @@ public class SteamLobby : MonoBehaviour
     private void Start()
     {
         manager = GetComponent<CustomRoomManager>();
-        if (!SteamManager.Initialized || Application.isEditor || Debug.isDebugBuild) { return; }
+        if (!ConfigManager.UseSteamworks) { return; }
 
         LobbyCreated = Callback<LobbyCreated_t>.Create(OnLobbyCreated);
         JoinRequest = Callback<GameLobbyJoinRequested_t>.Create(OnJoinRequest);
@@ -34,7 +34,7 @@ public class SteamLobby : MonoBehaviour
 
     public void HostLobby()
     {
-        if (Application.isEditor || Debug.isDebugBuild)
+        if (!ConfigManager.UseSteamworks)
         {
             manager.StartHost();
         } else
