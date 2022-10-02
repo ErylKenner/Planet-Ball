@@ -226,7 +226,10 @@ public class TestingOnlyNetworkManager : NetworkManager
     /// This is invoked when a server is started - including when a host is started.
     /// <para>StartServer has multiple signatures, but they all cause this hook to be called.</para>
     /// </summary>
-    public override void OnStartServer() { }
+    public override void OnStartServer() {
+        GameObject ball = Instantiate(spawnPrefabs[0]);
+        NetworkServer.Spawn(ball);
+    }
 
     /// <summary>
     /// This is invoked when the client is started.
