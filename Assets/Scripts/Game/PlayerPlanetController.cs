@@ -10,7 +10,7 @@ public class PlayerPlanetController : NetworkBehaviour
     public float MaxSpeed = 10f;
     private Rigidbody2D rigidbody2d;
 
-    private Vector2 movement;
+    //public Vector2 movement;
 
     public override void OnStartLocalPlayer()
     {
@@ -36,27 +36,33 @@ public class PlayerPlanetController : NetworkBehaviour
             GetComponent<PlayerInput>().enabled = false;
         }
     }
-    
-    public void OnMove(InputValue axis)
-    {
-        if (axis.Get() == null)
-        {
-            movement = Vector2.zero;
-        }
-        else
-        {
-            movement = (Vector2)axis.Get();
-        }
-        
-    }
+
+    //public void OnMove(InputValue axis)
+    //{
+    //    if (axis.Get() == null)
+    //    {
+    //        movement = Vector2.zero;
+    //    }
+    //    else
+    //    {
+    //        movement = (Vector2)axis.Get();
+    //    }
+
+    //}
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        if (isLocalPlayer)
-        {
-            rigidbody2d.AddForce(100 * movement);
-            rigidbody2d.velocity = Mathf.Clamp(rigidbody2d.velocity.magnitude, 0f, MaxSpeed) * rigidbody2d.velocity.normalized;
-        }
+        //if (isLocalPlayer)
+        //{
+        //    rigidbody2d.AddForce(100 * movement);
+        //    rigidbody2d.velocity = Mathf.Clamp(rigidbody2d.velocity.magnitude, 0f, MaxSpeed) * rigidbody2d.velocity.normalized;
+        //}
+    }
+
+    public void Move(Vector2 movement)
+    {
+        rigidbody2d.AddForce(100 * movement);
+        rigidbody2d.velocity = Mathf.Clamp(rigidbody2d.velocity.magnitude, 0f, MaxSpeed) * rigidbody2d.velocity.normalized;
     }
 }
