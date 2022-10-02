@@ -1,5 +1,9 @@
 using UnityEngine;
 using Mirror;
+using kcp2k;
+using Mirror.FizzySteam;
+using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
 
 /*
 	Documentation: https://mirror-networking.gitbook.io/docs/components/network-room-manager
@@ -20,6 +24,37 @@ public class CustomRoomManager : NetworkRoomManager
 {
     public GameObject MainMenuGui;
     public GameObject RoomSceneGui;
+
+    [Scene]
+    public string MainMenuScene;
+
+    public override void Awake()
+    {
+        FizzySteamworks fizzySteamWorks = GetComponent<FizzySteamworks>();
+        KcpTransport kcpTransport = GetComponent<KcpTransport>();
+
+        if (!ConfigManager.UseSteamworks)
+        {
+            
+            if(fizzySteamWorks != null)
+            {
+                Destroy(fizzySteamWorks);
+                transport = kcpTransport;
+                GetComponent<NetworkManagerHUD>().enabled = true;
+            }
+        } else
+        {
+            
+            if (kcpTransport != null)
+            {
+                Destroy(kcpTransport);
+                transport = fizzySteamWorks;
+            }
+        }
+
+        base.Awake();
+
+    }
 
     #region Server Callbacks
 
@@ -160,7 +195,15 @@ public class CustomRoomManager : NetworkRoomManager
     /// This is called on the client when disconnected from a server.
     /// </summary>
     public override void OnRoomClientDisconnect() {
-        SetSceneGui("MainMenu");
+        SceneManager.LoadScene(MainMenuScene);
+        SceneManager.sceneLoaded += SetMainMenuScene;
+
+    }
+
+    private void SetMainMenuScene(Scene scene, LoadSceneMode mode)
+    {
+        SetSceneGui(MainMenuScene);
+        SceneManager.sceneLoaded -= SetMainMenuScene;
     }
 
     /// <summary>
@@ -178,7 +221,7 @@ public class CustomRoomManager : NetworkRoomManager
     /// </summary>
     public override void OnRoomClientSceneChanged()
     {
-        SetSceneGui(NetworkManager.networkSceneName);
+        SetSceneGui(networkSceneName);
     }
 
     /// <summary>
@@ -193,17 +236,17 @@ public class CustomRoomManager : NetworkRoomManager
 
     public void SetSceneGui(string scene)
     {
-        if (scene.Contains("MainMenu"))
+        if (scene.Contains(MainMenuScene))
         {
             MainMenuGui.SetActive(true);
             RoomSceneGui.SetActive(false);
         }
-        else if (scene.Contains("RoomScene"))
+        else if (scene.Contains(RoomScene))
         {
             MainMenuGui.SetActive(false);
             RoomSceneGui.SetActive(true);
         }
-        else if (scene.Contains("GameScene"))
+        else if (scene.Contains(GameplayScene))
         {
             MainMenuGui.SetActive(false);
             RoomSceneGui.SetActive(false);

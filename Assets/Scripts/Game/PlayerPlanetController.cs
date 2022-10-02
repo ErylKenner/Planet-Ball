@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using UnityEngine.InputSystem;
 
 public class PlayerPlanetController : NetworkBehaviour
 {
@@ -9,6 +10,7 @@ public class PlayerPlanetController : NetworkBehaviour
     public float MaxSpeed = 10f;
     private Rigidbody2D rigidbody2d;
 
+    private Vector2 movement;
 
     public override void OnStartLocalPlayer()
     {
@@ -31,7 +33,21 @@ public class PlayerPlanetController : NetworkBehaviour
         else
         {
             // Disable any components that we don't want to compute since they belong to other players
+            GetComponent<PlayerInput>().enabled = false;
         }
+    }
+    
+    public void OnMove(InputValue axis)
+    {
+        if (axis.Get() == null)
+        {
+            movement = Vector2.zero;
+        }
+        else
+        {
+            movement = (Vector2)axis.Get();
+        }
+        
     }
 
     // Update is called once per frame
@@ -39,12 +55,7 @@ public class PlayerPlanetController : NetworkBehaviour
     {
         if (isLocalPlayer)
         {
-            float xDir = Input.GetAxis("Horizontal");
-            float zDir = Input.GetAxis("Vertical");
-            Vector2 dir = new Vector2(xDir, zDir);
-            Vector2 diff = 5 * Time.deltaTime * dir.normalized;
-            //rigidbody2d.MovePosition(rigidbody2d.position + diff);
-            rigidbody2d.AddForce(40 * dir);
+            rigidbody2d.AddForce(100 * movement);
             rigidbody2d.velocity = Mathf.Clamp(rigidbody2d.velocity.magnitude, 0f, MaxSpeed) * rigidbody2d.velocity.normalized;
         }
     }

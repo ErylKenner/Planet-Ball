@@ -4,6 +4,7 @@ using UnityEngine;
 using Mirror;
 using Steamworks;
 using TMPro;
+using Mirror.FizzySteam;
 
 public class SteamLobby : MonoBehaviour
 {
@@ -23,8 +24,8 @@ public class SteamLobby : MonoBehaviour
 
     private void Start()
     {
-        if(!SteamManager.Initialized) { return; }
         manager = GetComponent<CustomRoomManager>();
+        if (!ConfigManager.UseSteamworks) { return; }
 
         LobbyCreated = Callback<LobbyCreated_t>.Create(OnLobbyCreated);
         JoinRequest = Callback<GameLobbyJoinRequested_t>.Create(OnJoinRequest);
@@ -33,7 +34,13 @@ public class SteamLobby : MonoBehaviour
 
     public void HostLobby()
     {
-        SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypeFriendsOnly, manager.maxConnections);
+        if (!ConfigManager.UseSteamworks)
+        {
+            manager.StartHost();
+        } else
+        {
+            SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypeFriendsOnly, manager.maxConnections);
+        }
     }
 
     private void OnLobbyCreated(LobbyCreated_t callback)
