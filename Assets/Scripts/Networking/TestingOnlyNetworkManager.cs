@@ -227,8 +227,8 @@ public class TestingOnlyNetworkManager : NetworkManager
     /// <para>StartServer has multiple signatures, but they all cause this hook to be called.</para>
     /// </summary>
     public override void OnStartServer() {
-        GameObject ball = Instantiate(spawnPrefabs[0]);
-        NetworkServer.Spawn(ball);
+        //GameObject ball = Instantiate(spawnPrefabs[0]);
+        //NetworkServer.Spawn(ball);
     }
 
     /// <summary>
