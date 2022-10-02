@@ -23,15 +23,19 @@ public class PlayerPlanetController : NetworkBehaviour
     //  - Vector2 position
     //  - Vector2 velocity
     //  - float rotation
-    //  - float angular velocity 
+    //  - float angular velocity
     public bool IsTethered = false;
     public bool IsWindTether = false;
     public float OrbitRadius = 0;
     public Vector2 CenterPoint = Vector2.zero;
 
     // Const attributes - not state
-    public float WindTetherSpeed = 120.0f;
+    public float WindTetherSpeed = 5.0f;
     public float Speed = 10.0f;
+
+    // For testing. Input system callbacks set these which are then read in FixedUpdate
+    private bool _attachTether = false;
+    private bool _windTether = false;
 
     private Rigidbody2D body;
 
@@ -51,6 +55,12 @@ public class PlayerPlanetController : NetworkBehaviour
         }
     }
 
+    private void FixedUpdate()
+    {
+        PlayerInputState input = new PlayerInputState(_attachTether, _windTether);
+        PhysicsPreStep(input, Time.fixedDeltaTime);
+    }
+
     public void PhysicsPreStep(PlayerInputState input, float dt)
     {
         SetStateFromInput(input, dt);
@@ -67,8 +77,8 @@ public class PlayerPlanetController : NetworkBehaviour
             if (!wasTethered)
             {
                 // This is the first tick where the tether is attached. Find the nearest planet to attach to
-                CenterPoint = NearestPlanet();
-                if (CenterPoint == null)
+                Planet nearestPlanet = NearestPlanet();
+                if (nearestPlanet == null)
                 {
                     // No Planet could be tethered. Set IsTethered to false and try again next tick
                     IsTethered = false;
@@ -76,6 +86,7 @@ public class PlayerPlanetController : NetworkBehaviour
                 }
                 else
                 {
+                    CenterPoint = nearestPlanet.transform.position;
                     OrbitRadius = Vector2.Distance(body.position, CenterPoint);
                 }
             }
@@ -104,7 +115,7 @@ public class PlayerPlanetController : NetworkBehaviour
         {
             rotationDirection = 1;
         }
-        if (Mathf.Abs(diff.magnitude - OrbitRadius) > Speed * dt)
+        if (Mathf.Abs(diff.magnitude - OrbitRadius) > Speed * dt * 0.75f)
         {
             //Too large a distance to make in one step. Go towards new radius at 45 deg angle
             Vector2 tangentUnit = new Vector2(diff.y, -diff.x).normalized * rotationDirection;
@@ -123,7 +134,7 @@ public class PlayerPlanetController : NetworkBehaviour
         }
     }
 
-    private Vector2 NearestPlanet()
+    private Planet NearestPlanet()
     {
         float shortestDistance = Mathf.Infinity;
         Planet closest = null;
@@ -136,11 +147,19 @@ public class PlayerPlanetController : NetworkBehaviour
                 closest = cur;
             }
         }
-        if (closest != null)
-        {
-            return closest.transform.position;
-        }
-        return Vector2.zero;
+        return closest;
     }
+
+
+    public void OnAttachTether(InputValue input)
+    {
+        _attachTether = input.isPressed;
+    }
+
+    public void OnWindTether(InputValue input)
+    {
+        _windTether = input.isPressed;
+    }
+
 
 }

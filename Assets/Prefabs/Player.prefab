@@ -151,7 +151,7 @@ Rigidbody2D:
   m_Interpolate: 1
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!114 &3527783654770303330
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -166,8 +166,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  Model: {fileID: 0}
-  MaxSpeed: 10
+  IsTethered: 0
+  IsWindTether: 0
+  OrbitRadius: 0
+  CenterPoint: {x: 0, y: 0}
+  WindTetherSpeed: 5
+  Speed: 10
 --- !u!114 &1583510539398823933
 MonoBehaviour:
   m_ObjectHideFlags: 0
