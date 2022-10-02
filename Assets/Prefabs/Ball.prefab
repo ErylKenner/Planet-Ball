@@ -69,7 +69,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.05
-  clientAuthority: 0
+  clientAuthority: 1
   sendRate: 30
   bufferTimeMultiplier: 2
   bufferSizeLimit: 64
@@ -107,7 +107,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.05
   target: {fileID: 7630827321948953590}
-  clientAuthority: 0
+  clientAuthority: 1
   syncVelocity: 1
   clearVelocity: 0
   velocitySensitivity: 0
