@@ -7,7 +7,8 @@ using UnityEngine.InputSystem;
 public class PlayerPlanetController : NetworkBehaviour
 {
     public GameObject Model;
-    private CharacterController controller;
+    public float MaxSpeed = 10f;
+    private Rigidbody2D rigidbody2d;
 
     private Vector2 movement;
 
@@ -16,13 +17,18 @@ public class PlayerPlanetController : NetworkBehaviour
         base.OnStartLocalPlayer();
     }
 
+    private void Awake()
+    {
+        rigidbody2d = GetComponent<Rigidbody2D>();
+    }
+
     // Start is called before the first frame update
     public void Start()
     {
         //base.Start();
         if (isLocalPlayer)
         {
-            controller = gameObject.GetComponent<CharacterController>();
+            //controller = gameObject.GetComponent<CharacterController>();
         }
         else
         {
@@ -45,12 +51,12 @@ public class PlayerPlanetController : NetworkBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if (isLocalPlayer)
         {
-            Vector3 dir = new Vector3(movement.x, 0.0f, movement.y);
-            controller.Move(dir.normalized * 5 * Time.deltaTime);
+            rigidbody2d.AddForce(100 * movement);
+            rigidbody2d.velocity = Mathf.Clamp(rigidbody2d.velocity.magnitude, 0f, MaxSpeed) * rigidbody2d.velocity.normalized;
         }
     }
 }
