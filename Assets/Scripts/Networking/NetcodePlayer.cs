@@ -6,9 +6,6 @@ using UnityEngine.InputSystem;
 
 public class NetcodePlayer : NetcodeObject
 {
-
-
-
     public struct InputMessage
     {
         public uint start_tick_number;
@@ -54,12 +51,12 @@ public class NetcodePlayer : NetcodeObject
     protected override void Update()
     {
         base.Update();
-        if (isLocalPlayer && isClient)
-        {
-            float dt = Time.fixedDeltaTime;
-            UpdateClient(dt);
-        }
-        
+        //if (isLocalPlayer && isClient)
+        //{
+        //    float dt = Time.fixedDeltaTime;
+        //    UpdateClient(dt);
+        //}
+
     }
 
     [Command]
@@ -68,7 +65,7 @@ public class NetcodePlayer : NetcodeObject
         server_input_msgs.Enqueue(input_msg);
     }
 
-    private void UpdateClient(float dt)
+    public void UpdateClient(float dt)
     {
         float client_timer = NetcodeManager.client_timer;
         uint client_tick_number = NetcodeManager.client_tick_number;
@@ -86,7 +83,17 @@ public class NetcodePlayer : NetcodeObject
             this.client_input_buffer[buffer_slot] = inputs;
 
             // store state for this tick, then use current state + input to step simulation
+            NetcodeObject[] netcodeObjects = FindObjectsOfType<NetcodeObject>();
+            // Store all state
+            foreach (NetcodeObject netcodeObject in netcodeObjects)
+            {
+                netcodeObject.StoreClientState(buffer_slot);
+            }
             StoreClientState(buffer_slot);
+            if (buffer_slot == 100)
+            {
+                //Debug.Log("Stop");
+            }
             NetcodeManager.PrePhysicsStep(this, client_input_buffer[buffer_slot]);
             Physics.Simulate(dt);
 
