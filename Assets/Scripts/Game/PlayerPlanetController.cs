@@ -4,59 +4,167 @@ using UnityEngine;
 using Mirror;
 using UnityEngine.InputSystem;
 
+public class PlayerInputState
+{
+    public bool AttachTether = false;
+    public bool WindTether = false;
+    public PlayerInputState(bool attachTether, bool windTether)
+    {
+        AttachTether = attachTether;
+        WindTether = windTether;
+    }
+}
+
+[RequireComponent(typeof(Rigidbody2D))]
 public class PlayerPlanetController : NetworkBehaviour
 {
-    public GameObject Model;
-    public float MaxSpeed = 10f;
-    private Rigidbody2D rigidbody2d;
+    // ----- Player State Needed for NetcodeManager Clientside-prediction Rewind -----
+    // Other required state included in RigidBody2D:
+    //  - Vector2 position
+    //  - Vector2 velocity
+    //  - float rotation
+    //  - float angular velocity
+    public bool IsTethered = false;
+    public bool IsWindTether = false;
+    public float OrbitRadius = 0;
+    public Vector2 CenterPoint = Vector2.zero;
+    public float Speed = 10.0f;
 
-    private Vector2 movement;
+    // Const attributes - not state
+    public float WindTetherRatio = 0.11f;
+    public float MinRadius = 0.5f;
+    public float MaxRadius = 9f;
 
-    public override void OnStartLocalPlayer()
-    {
-        base.OnStartLocalPlayer();
-    }
+    // For testing. Input system callbacks set these which are then read in FixedUpdate
+    private bool _attachTether = false;
+    private bool _windTether = false;
+
+    private Rigidbody2D body;
+
 
     private void Awake()
     {
-        rigidbody2d = GetComponent<Rigidbody2D>();
+        body = GetComponent<Rigidbody2D>();
     }
 
     // Start is called before the first frame update
     public void Start()
     {
-        //base.Start();
-        if (isLocalPlayer)
-        {
-            //controller = gameObject.GetComponent<CharacterController>();
-        }
-        else
+        if (!isLocalPlayer)
         {
             // Disable any components that we don't want to compute since they belong to other players
             GetComponent<PlayerInput>().enabled = false;
         }
     }
-    
-    public void OnMove(InputValue axis)
+
+    private void FixedUpdate()
     {
-        if (axis.Get() == null)
+        PlayerInputState input = new PlayerInputState(_attachTether, _windTether);
+        PhysicsPreStep(input, Time.fixedDeltaTime);
+    }
+
+    public void PhysicsPreStep(PlayerInputState input, float dt)
+    {
+        SetStateFromInput(input, dt);
+        SetRigidBodyVelocity(dt);
+    }
+
+    private void SetStateFromInput(PlayerInputState input, float dt)
+    {
+        bool wasTethered = IsTethered;
+        IsTethered = (input == null && IsTethered) || (input != null && input.AttachTether);
+        IsWindTether = (input == null && IsWindTether) || (input != null && input.WindTether);
+        if (IsTethered)
         {
-            movement = Vector2.zero;
+            if (!wasTethered)
+            {
+                // This is the first tick where the tether is attached. Find the nearest planet to attach to
+                Planet nearestPlanet = NearestPlanet();
+                if (nearestPlanet == null)
+                {
+                    // No Planet could be tethered. Set IsTethered to false and try again next tick
+                    IsTethered = false;
+                    OrbitRadius = 0;
+                }
+                else
+                {
+                    CenterPoint = nearestPlanet.transform.position;
+                    OrbitRadius = Vector2.Distance(body.position, CenterPoint);
+                }
+            }
+            if (IsWindTether)
+            {
+                // Wind in the same orbit shape regardless of speed.
+                float windRate = WindTetherRatio * OrbitRadius * Speed;
+                OrbitRadius -= windRate * dt;
+            }
         }
         else
         {
-            movement = (Vector2)axis.Get();
+            CenterPoint = Vector2.zero;
+            OrbitRadius = 0;
         }
-        
+        OrbitRadius = Mathf.Clamp(OrbitRadius, MinRadius, MaxRadius);
     }
 
-    // Update is called once per frame
-    void FixedUpdate()
+    private void SetRigidBodyVelocity(float dt)
     {
-        if (isLocalPlayer)
+        if (!IsTethered)
         {
-            rigidbody2d.AddForce(100 * movement);
-            rigidbody2d.velocity = Mathf.Clamp(rigidbody2d.velocity.magnitude, 0f, MaxSpeed) * rigidbody2d.velocity.normalized;
+            body.velocity = Speed * body.velocity.normalized;
+            return;
+        }
+        Vector2 diff = body.position - CenterPoint;
+        float rotationDirection = Mathf.Sign(Vector2.Dot(new Vector2(diff.y, -diff.x), body.velocity));
+        if (rotationDirection == 0)
+        {
+            rotationDirection = 1;
+        }
+        if (Mathf.Abs(diff.magnitude - OrbitRadius) > Speed * dt * 0.75f)
+        {
+            //Too large a distance to make in one step. Go towards new radius at 45 deg angle
+            Vector2 tangentUnit = new Vector2(diff.y, -diff.x).normalized * rotationDirection;
+            Vector2 radialChangeUnit = (diff.normalized * OrbitRadius - diff).normalized; // TODO: Could this just be -diff.normalized ?
+            body.velocity = Speed * (tangentUnit + radialChangeUnit).normalized;
+        }
+        else
+        {
+            //Can make the radius change. So, solve for the new angle
+            float currentAngle = Mathf.Atan2(diff.y, diff.x);
+            float deltaAngle = (diff.magnitude * diff.magnitude + OrbitRadius * OrbitRadius - Mathf.Pow(Speed * dt, 2)) / (2 * diff.magnitude * OrbitRadius);
+            deltaAngle = Mathf.Acos(deltaAngle);
+            float newAngle = currentAngle + deltaAngle * -rotationDirection;
+            Vector2 newPosition = CenterPoint + OrbitRadius * new Vector2(Mathf.Cos(newAngle), Mathf.Sin(newAngle));
+            body.velocity = Speed * (newPosition - body.position).normalized;
         }
     }
+
+    public Planet NearestPlanet()
+    {
+        float shortestDistance = Mathf.Infinity;
+        Planet closest = null;
+        foreach (Planet cur in FindObjectsOfType<Planet>())
+        {
+            float dist = Vector2.Distance(cur.transform.position, body.position);
+            if (dist < shortestDistance && dist <= MaxRadius)
+            {
+                shortestDistance = dist;
+                closest = cur;
+            }
+        }
+        return closest;
+    }
+
+
+    public void OnAttachTether(InputValue input)
+    {
+        _attachTether = input.isPressed;
+    }
+
+    public void OnWindTether(InputValue input)
+    {
+        _windTether = input.isPressed;
+    }
+
+
 }
