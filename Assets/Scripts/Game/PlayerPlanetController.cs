@@ -28,10 +28,12 @@ public class PlayerPlanetController : NetworkBehaviour
     public bool IsWindTether = false;
     public float OrbitRadius = 0;
     public Vector2 CenterPoint = Vector2.zero;
+    public float Speed = 10.0f;
 
     // Const attributes - not state
-    public float WindTetherSpeed = 5.0f;
-    public float Speed = 10.0f;
+    public float WindTetherRatio = 0.11f;
+    public float MinRadius = 0.5f;
+    public float MaxRadius = 9f;
 
     // For testing. Input system callbacks set these which are then read in FixedUpdate
     private bool _attachTether = false;
@@ -92,7 +94,9 @@ public class PlayerPlanetController : NetworkBehaviour
             }
             if (IsWindTether)
             {
-                OrbitRadius -= WindTetherSpeed * dt;
+                // Wind in the same orbit shape regardless of speed.
+                float windRate = WindTetherRatio * OrbitRadius * Speed;
+                OrbitRadius -= windRate * dt;
             }
         }
         else
@@ -100,6 +104,7 @@ public class PlayerPlanetController : NetworkBehaviour
             CenterPoint = Vector2.zero;
             OrbitRadius = 0;
         }
+        OrbitRadius = Mathf.Clamp(OrbitRadius, MinRadius, MaxRadius);
     }
 
     private void SetRigidBodyVelocity(float dt)
@@ -134,14 +139,14 @@ public class PlayerPlanetController : NetworkBehaviour
         }
     }
 
-    private Planet NearestPlanet()
+    public Planet NearestPlanet()
     {
         float shortestDistance = Mathf.Infinity;
         Planet closest = null;
         foreach (Planet cur in FindObjectsOfType<Planet>())
         {
             float dist = Vector2.Distance(cur.transform.position, body.position);
-            if (dist < shortestDistance)
+            if (dist < shortestDistance && dist <= MaxRadius)
             {
                 shortestDistance = dist;
                 closest = cur;
