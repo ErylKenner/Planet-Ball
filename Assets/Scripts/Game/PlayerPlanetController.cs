@@ -8,10 +8,12 @@ public class PlayerInputState
 {
     public bool AttachTether = false;
     public bool WindTether = false;
-    public PlayerInputState(bool attachTether, bool windTether)
+    public bool UnwindTether = false;
+    public PlayerInputState(bool attachTether, bool windTether, bool unwindTether)
     {
         AttachTether = attachTether;
         WindTether = windTether;
+        UnwindTether = unwindTether;
     }
 }
 
@@ -26,18 +28,23 @@ public class PlayerPlanetController : NetworkBehaviour
     //  - float angular velocity
     public bool IsTethered = false;
     public bool IsWindTether = false;
+    public bool IsUnwindTether = false;
     public float OrbitRadius = 0;
     public Vector2 CenterPoint = Vector2.zero;
-    public float Speed = 10.0f;
+    public float Speed = 12.0f;
 
     // Const attributes - not state
-    public float WindTetherRatio = 0.11f;
-    public float MinRadius = 0.5f;
-    public float MaxRadius = 9f;
+    public float WIND_TETHER_RATIO = 0.11f;
+    public float MIN_RADIUS = 0.5f;
+    public float MAX_RADIUS = 9f;
+    public float MIN_SPEED = 12f;
+    public float MAX_SPEED = 40f;
+    public float SPEED_FALLOFF = 0.62f;
 
     // For testing. Input system callbacks set these which are then read in FixedUpdate
     private bool _attachTether = false;
     private bool _windTether = false;
+    private bool _unwindTether = false;
 
     private Rigidbody2D body;
 
@@ -59,7 +66,7 @@ public class PlayerPlanetController : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        PlayerInputState input = new PlayerInputState(_attachTether, _windTether);
+        PlayerInputState input = new PlayerInputState(_attachTether, _windTether, _unwindTether);
         PhysicsPreStep(input, Time.fixedDeltaTime);
     }
 
@@ -74,6 +81,7 @@ public class PlayerPlanetController : NetworkBehaviour
         bool wasTethered = IsTethered;
         IsTethered = (input == null && IsTethered) || (input != null && input.AttachTether);
         IsWindTether = (input == null && IsWindTether) || (input != null && input.WindTether);
+        IsUnwindTether = (input == null && IsUnwindTether) || (input != null && input.UnwindTether);
         if (IsTethered)
         {
             if (!wasTethered)
@@ -94,9 +102,16 @@ public class PlayerPlanetController : NetworkBehaviour
             }
             if (IsWindTether)
             {
-                // Wind in the same orbit shape regardless of speed.
-                float windRate = WindTetherRatio * OrbitRadius * Speed;
+                // Wind in the same orbit shape regardless of speed via exponential falloff of the radius
+                float windRate = WIND_TETHER_RATIO * OrbitRadius * Speed;
                 OrbitRadius -= windRate * dt;
+            }
+            if (IsUnwindTether)
+            {
+                // Unwind in the same orbit shape regardless of speed via exponential falloff of the radius
+                float windRate = WIND_TETHER_RATIO * OrbitRadius * Speed;
+                // Double the unwind speed vs the wind speed since it feels better
+                OrbitRadius += 2 * windRate * dt;
             }
         }
         else
@@ -104,7 +119,11 @@ public class PlayerPlanetController : NetworkBehaviour
             CenterPoint = Vector2.zero;
             OrbitRadius = 0;
         }
-        OrbitRadius = Mathf.Clamp(OrbitRadius, MinRadius, MaxRadius);
+        OrbitRadius = Mathf.Clamp(OrbitRadius, MIN_RADIUS, MAX_RADIUS);
+
+        // Speed exponential falloff
+        Speed -= SPEED_FALLOFF * (Speed - MIN_SPEED + 1) * dt;
+        Speed = Mathf.Clamp(Speed, MIN_SPEED, MAX_SPEED);
     }
 
     private void SetRigidBodyVelocity(float dt)
@@ -146,7 +165,7 @@ public class PlayerPlanetController : NetworkBehaviour
         foreach (Planet cur in FindObjectsOfType<Planet>())
         {
             float dist = Vector2.Distance(cur.transform.position, body.position);
-            if (dist < shortestDistance && dist <= MaxRadius)
+            if (dist < shortestDistance && dist <= MAX_RADIUS)
             {
                 shortestDistance = dist;
                 closest = cur;
@@ -165,6 +184,9 @@ public class PlayerPlanetController : NetworkBehaviour
     {
         _windTether = input.isPressed;
     }
-
+    public void OnUnwindTether(InputValue input)
+    {
+        _unwindTether = input.isPressed;
+    }
 
 }

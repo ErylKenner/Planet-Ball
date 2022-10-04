@@ -22,6 +22,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "UnwindTether",
+                    "type": "PassThrough",
+                    "id": "d2464b1f-6748-4d32-a85e-afe2267d60b3",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -61,11 +70,33 @@
                 {
                     "name": "",
                     "id": "7a29bc90-c74d-4391-9c24-97d38d94442f",
-                    "path": "<Gamepad>/buttonSouth",
+                    "path": "<Gamepad>/rightStick/down",
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
                     "action": "WindTether",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5c2bb0ab-88d5-4cf8-a965-5204f2c86d3e",
+                    "path": "<Keyboard>/upArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "UnwindTether",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ef952230-cab6-4939-b00d-7a102b2fa0c6",
+                    "path": "<Gamepad>/rightStick/up",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "UnwindTether",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
