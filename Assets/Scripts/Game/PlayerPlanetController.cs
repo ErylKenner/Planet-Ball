@@ -9,11 +9,15 @@ public class PlayerInputState
     public bool AttachTether = false;
     public bool WindTether = false;
     public bool UnwindTether = false;
-    public PlayerInputState(bool attachTether, bool windTether, bool unwindTether)
+    public bool SpeedBoost = false;
+    public bool Heavy = false;
+    public PlayerInputState(bool attachTether, bool windTether, bool unwindTether, bool speedBoost, bool heavy)
     {
         AttachTether = attachTether;
         WindTether = windTether;
         UnwindTether = unwindTether;
+        SpeedBoost = speedBoost;
+        Heavy = heavy;
     }
 }
 
@@ -29,9 +33,13 @@ public class PlayerPlanetController : NetworkBehaviour
     public bool IsTethered = false;
     public bool IsWindTether = false;
     public bool IsUnwindTether = false;
+    public bool IsSpeedBoost = false;
+    public bool IsHeavy = false;
     public float OrbitRadius = 0;
     public Vector2 CenterPoint = Vector2.zero;
     public float Speed = 12.0f;
+    public float CurSpeedBoostCooldown = 0f;
+    public float CurHeavyCooldown = 0f;
 
     // Const attributes - not state
     public float WIND_TETHER_RATIO = 0.11f;
@@ -40,11 +48,17 @@ public class PlayerPlanetController : NetworkBehaviour
     public float MIN_SPEED = 12f;
     public float MAX_SPEED = 40f;
     public float SPEED_FALLOFF = 0.62f;
+    public float SPEED_BOOST_COOLDOWN = 10f;
+    public float HEAVY_COOLDOWN = 10f;
+    public float HEAVY_DURATION = 4f;
+    public float HEAVY_MASS = 20f;
 
     // For testing. Input system callbacks set these which are then read in FixedUpdate
     private bool _attachTether = false;
     private bool _windTether = false;
     private bool _unwindTether = false;
+    private bool _speedBoost = false;
+    private bool _heavy = false;
 
     private Rigidbody2D body;
 
@@ -66,7 +80,7 @@ public class PlayerPlanetController : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        PlayerInputState input = new PlayerInputState(_attachTether, _windTether, _unwindTether);
+        PlayerInputState input = new PlayerInputState(_attachTether, _windTether, _unwindTether, _speedBoost, _heavy);
         PhysicsPreStep(input, Time.fixedDeltaTime);
     }
 
@@ -82,6 +96,8 @@ public class PlayerPlanetController : NetworkBehaviour
         IsTethered = (input == null && IsTethered) || (input != null && input.AttachTether);
         IsWindTether = (input == null && IsWindTether) || (input != null && input.WindTether);
         IsUnwindTether = (input == null && IsUnwindTether) || (input != null && input.UnwindTether);
+        IsSpeedBoost = (input == null && IsSpeedBoost) || (input != null && input.SpeedBoost);
+        IsHeavy = (input == null && IsHeavy) || (input != null && input.Heavy);
         if (IsTethered)
         {
             if (!wasTethered)
@@ -123,7 +139,26 @@ public class PlayerPlanetController : NetworkBehaviour
 
         // Speed exponential falloff
         Speed -= SPEED_FALLOFF * (Speed - MIN_SPEED + 1) * dt;
+        if (IsSpeedBoost && CurSpeedBoostCooldown <= 0f)
+        {
+            CurSpeedBoostCooldown = SPEED_BOOST_COOLDOWN;
+            Speed = MAX_SPEED;
+        }
         Speed = Mathf.Clamp(Speed, MIN_SPEED, MAX_SPEED);
+
+        // Set mass
+        if (IsHeavy && CurHeavyCooldown <= 0)
+        {
+            CurHeavyCooldown = HEAVY_COOLDOWN;
+            body.mass = HEAVY_MASS;
+        } else if (CurHeavyCooldown <= HEAVY_COOLDOWN - HEAVY_DURATION)
+        {
+            body.mass = 1;
+        }
+
+        // Decrement cooldown timers
+        CurSpeedBoostCooldown = Mathf.Clamp(CurSpeedBoostCooldown - dt, 0, Mathf.Infinity);
+        CurHeavyCooldown = Mathf.Clamp(CurHeavyCooldown - dt, 0, Mathf.Infinity);
     }
 
     private void SetRigidBodyVelocity(float dt)
@@ -187,6 +222,16 @@ public class PlayerPlanetController : NetworkBehaviour
     public void OnUnwindTether(InputValue input)
     {
         _unwindTether = input.isPressed;
+    }
+
+    public void OnSpeedBoost(InputValue input)
+    {
+        _speedBoost = input.isPressed;
+    }
+
+    public void OnHeavy(InputValue input)
+    {
+        _heavy = input.isPressed;
     }
 
 }
