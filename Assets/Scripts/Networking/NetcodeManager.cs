@@ -7,6 +7,7 @@ using static NetcodePlayer;
 using static NetcodeObject;
 using System.Linq;
 using TMPro;
+using Unity.Profiling;
 
 public class NetcodeManager : NetworkBehaviour
 {
@@ -40,13 +41,25 @@ public class NetcodeManager : NetworkBehaviour
 
     // TODO: Handle state syncing in batching instead of min input
     // Override the client_tick_number if it is less than the state tick
-    [SyncVar(hook = nameof(SetServerTickText))]
+    [SyncVar]
     public uint server_tick_number;
     private uint server_tick_accumulator;
 
-    public TextMeshProUGUI serverTick;
-    public TextMeshProUGUI playerTick;
-    public TextMeshProUGUI clientTick;
+    public static readonly ProfilerCategory NetcodeCategory = ProfilerCategory.Scripts;
+    public static readonly ProfilerCounter<uint> ServerTickCounter =
+        new ProfilerCounter<uint>(NetcodeCategory, "Server Tick", ProfilerMarkerDataUnit.Count);
+
+    public static readonly ProfilerCounter<uint> ClientTickCounter =
+        new ProfilerCounter<uint>(NetcodeCategory, "Client Tick", ProfilerMarkerDataUnit.Count);
+
+    public static readonly ProfilerCounter<uint> PlayerTickCounter1 =
+        new ProfilerCounter<uint>(NetcodeCategory, "Player 1 Tick", ProfilerMarkerDataUnit.Count);
+
+    public static readonly ProfilerCounter<uint> PlayerTickCounter2 =
+        new ProfilerCounter<uint>(NetcodeCategory, "Player 2 Tick", ProfilerMarkerDataUnit.Count);
+
+    public static readonly ProfilerCounter<uint>[] PlayerTickCounters = new ProfilerCounter<uint>[] { PlayerTickCounter1, PlayerTickCounter2 };
+    public static List<(uint, ProfilerCounter<uint>)> NetIdToPlayerTickCounter = new List<(uint, ProfilerCounter<uint>)>();
 
     #endregion
 
@@ -74,9 +87,17 @@ public class NetcodeManager : NetworkBehaviour
         {
             UpdateServer(dt);
         }
+
+        SendProfilerMetrics();
     }
 
     #endregion
+
+    private void SendProfilerMetrics()
+    {
+        ServerTickCounter.Sample(server_tick_number % NetcodeManager.c_client_buffer_size);
+        ClientTickCounter.Sample(client_tick_number % NetcodeManager.c_client_buffer_size);
+    }
 
     #region Client
 
@@ -179,8 +200,6 @@ public class NetcodeManager : NetworkBehaviour
             }
 
         }
-
-        clientTick.text = "Client Tick: " + client_tick_number;
     }
 
     private static void ClientPerformCorrection(NetcodeObject[] netcodeObjects, StateMessage state_msg, Dictionary<uint, State> netIdToState, float dt)
@@ -267,19 +286,10 @@ public class NetcodeManager : NetworkBehaviour
         {
             ServerSendState();
         }
-
-        serverTick.text = "Server Tick: " + server_tick_number;
-    }
-
-    private void SetServerTickText(uint old_server_tick_number, uint new_server_tick_number)
-    {
-        serverTick.text = "Server Tick: " + new_server_tick_number;
     }
 
     private void ServerUpdateInputBuffer(NetcodePlayer[] netcodePlayers)
     {
-        List<string> playerTickText = new List<string>();
-
         foreach (NetcodePlayer netcodePlayer in netcodePlayers)
         {
 
@@ -308,10 +318,31 @@ public class NetcodeManager : NetworkBehaviour
                 }
             }
 
-            playerTickText.Add("Player " + netcodePlayer.netId + " Tick: " + netcodePlayer.server_tick_number);
+            SamplePlayerTick(netcodePlayer);
+        }
+    }
+
+    private static void SamplePlayerTick(NetcodePlayer netcodePlayer)
+    {
+        ProfilerCounter<uint> playerTickMonitor;
+        var playerTickMonitorIndex = NetIdToPlayerTickCounter.FindIndex(tickMonitor => tickMonitor.Item1 == netcodePlayer.netId);
+        if (playerTickMonitorIndex == -1)
+        {
+            if (NetIdToPlayerTickCounter.Count >= PlayerTickCounters.Length)
+            {
+                // TODO: Handle the case that a player disconnected and then re-join with a new? netId
+                Debug.LogWarning($"Cannot track player {netcodePlayer.netId}, monitor list is full");
+            }
+
+            playerTickMonitor = PlayerTickCounters[NetIdToPlayerTickCounter.Count];
+            NetIdToPlayerTickCounter.Add((netcodePlayer.netId, playerTickMonitor));
+        }
+        else
+        {
+            playerTickMonitor = NetIdToPlayerTickCounter[playerTickMonitorIndex].Item2;
         }
 
-        playerTick.text = string.Join("\n", playerTickText);
+        playerTickMonitor.Sample(netcodePlayer.server_tick_number % NetcodeManager.c_client_buffer_size);
     }
 
     private void ServerProgress(NetcodePlayer[] netcodePlayers, float dt)
