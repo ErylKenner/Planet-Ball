@@ -1,13 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class StateMessage<S, I>
+public struct StateMessage
 {
     public uint lastProcessedClientTick;
     public uint lastProcessedServerTick;
     public uint serverTick;
-    public S state;
+    public NetcodeManager.State state;
 
     public uint missingInputs
     {
@@ -23,13 +19,5 @@ public class StateMessage<S, I>
         {
             return lastProcessedClientTick + missingInputs;
         }
-    }
-
-    public StateMessage(InputPacket<I> inputPacket, uint serverTick, S state)
-    {
-        lastProcessedClientTick = inputPacket.clientTick;
-        lastProcessedServerTick = inputPacket.serverTick;
-        this.serverTick = serverTick;
-        this.state = state;
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 using UnityEngine.InputSystem;
+using System.Linq;
 
 public class NetcodePlayer : NetcodeObject
 {
@@ -17,15 +18,30 @@ public class NetcodePlayer : NetcodeObject
         public Vector2 movement;
     }
 
-    public struct InputAck
-    {
-        public bool received;
-        public Inputs inputs;
+    static public NetcodePlayer LocalPlayer { get
+        {
+            return localPlayer;
+        }
     }
 
+    private static NetcodePlayer localPlayer = null;
+
+    // Client specific
     public Inputs[] client_input_buffer; // client stores predicted inputs here
-    public InputAck[] server_input_buffer;
-    public uint server_tick_number;
+    public uint client_tick_number;
+    public uint ClientLastRecievedTick
+    {
+        get
+        {
+            return (uint)clientLastRecievedTick;
+        }
+    }
+    private int clientLastRecievedTick;
+    private float client_timer;
+
+    // Server specific
+    public InputBuffer<Inputs> server_input_buffer;
+    //public uint server_tick_number;
     public Queue<InputMessage> server_input_msgs;
     private Vector2 movement;
 
@@ -35,13 +51,24 @@ public class NetcodePlayer : NetcodeObject
     {
         base.Start();
 
-        this.server_input_buffer = new InputAck[NetcodeManager.serverInputBuffer];
-        //for(int i = 0; i < server_input_buffer.Length; i++)
-        //{
-        //    server_input_buffer[i].received = false;
-        //}
+        client_timer = 0;
+
+        this.server_input_buffer = new InputBuffer<Inputs>(NetcodeManager.c_client_buffer_size);
         this.client_input_buffer = new Inputs[NetcodeManager.c_client_buffer_size];
         this.server_input_msgs = new Queue<InputMessage>();
+
+        clientLastRecievedTick = -1;
+        client_timer = 0;
+
+        if (isLocalPlayer)
+        {
+            if(localPlayer != null)
+            {
+                Debug.LogWarning("LocalPlayer was already set");
+            }
+
+            localPlayer = this;
+        }
     }
 
     public void OnMove(InputValue axis)
@@ -61,12 +88,6 @@ public class NetcodePlayer : NetcodeObject
     protected override void Update()
     {
         base.Update();
-        //if (isLocalPlayer && isClient)
-        //{
-        //    float dt = Time.fixedDeltaTime;
-        //    UpdateClient(dt);
-        //}
-
     }
 
     [Command]
@@ -75,10 +96,14 @@ public class NetcodePlayer : NetcodeObject
         server_input_msgs.Enqueue(input_msg);
     }
 
+    public void UpdateClientLastReceivedTick(NetcodeManager.GlobalStateMessage globalState)
+    {
+        StateMessage playerMessage = globalState.states.ToList().Find(state => state.state.netId == netId);
+        clientLastRecievedTick = (int)playerMessage.clientTick;
+    }
+
     public void UpdateClient(float dt)
     {
-        float client_timer = NetcodeManager.client_timer;
-        uint client_tick_number = NetcodeManager.client_tick_number;
 
         client_timer += Time.deltaTime;
         while (client_timer >= dt)
@@ -107,7 +132,7 @@ public class NetcodePlayer : NetcodeObject
             // send input packet to server
 
             InputMessage input_msg;
-            input_msg.start_tick_number = NetcodeManager.client_last_received_state_tick;
+            input_msg.start_tick_number = clientLastRecievedTick == -1 ? 0 : ClientLastRecievedTick;
             input_msg.inputs = new List<Inputs>();
 
             for (uint tick = input_msg.start_tick_number; tick <= client_tick_number; ++tick)
@@ -120,9 +145,6 @@ public class NetcodePlayer : NetcodeObject
 
             ++client_tick_number;
         }
-
-        NetcodeManager.client_timer = client_timer;
-        NetcodeManager.client_tick_number = client_tick_number;
     }
 
 

@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 public struct InputPacket<T>
 {
     public T input;
@@ -24,11 +21,11 @@ public class InputBuffer<T>
         }
     }
 
-    public bool Valid
+    public bool Ready
     {
         get
         {
-            return lastProcessed != 0;
+            return lastProcessed != -1;
         }
     }
 
@@ -48,9 +45,10 @@ public class InputBuffer<T>
 
     public InputPacket<T> Dequeue(uint serverTick)
     {
+
         lastProcessed++;
         lastProcessed %= (int)bufferSize;
-        unprocessedCount++;
+        unprocessedCount--;
 
         buffer[lastProcessed].serverTick = serverTick;
 
@@ -60,5 +58,10 @@ public class InputBuffer<T>
     public InputPacket<T> LastProcessed()
     {
         return buffer[lastProcessed];
+    }
+
+    public InputPacket<T> LastRecieved()
+    {
+        return buffer[(lastProcessed + unprocessedCount) % bufferSize];
     }
 }

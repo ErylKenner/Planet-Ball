@@ -25,12 +25,9 @@ public class NetcodeObject : NetworkBehaviour
         this.client_error.rotation = 0;
         this.client_error.angularVelocity = 0;
     }
-
-    // Update is called once per frame
     protected virtual void Update()
     {
     }
-
 
     public void StoreClientState(uint buffer_slot)
     {

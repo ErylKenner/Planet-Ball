@@ -80,6 +80,11 @@ public class ProfileDataDisplay : MonoBehaviour
 
     float GetCorrectionPercentage()
     {
+        if(!NetcodePlayer.LocalPlayer)
+        {
+            return 0f;
+        }
+
         if (positionCorrectionTickRecorder.LastValue != 0)
         {
             for (; previousCorrectionTick < positionCorrectionTickRecorder.LastValue;)
@@ -98,7 +103,7 @@ public class ProfileDataDisplay : MonoBehaviour
 
         int corrections = 0;
         int total = 0;
-        for(; total < frameBufferSize && total < (int)NetcodeManager.client_tick_number; total++)
+        for(; total < frameBufferSize && total < (int)NetcodePlayer.LocalPlayer.client_tick_number; total++)
         {
             if(correctionBuffer[total])
             {
