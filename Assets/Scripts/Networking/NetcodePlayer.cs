@@ -17,8 +17,14 @@ public class NetcodePlayer : NetcodeObject
         public Vector2 movement;
     }
 
+    public struct InputAck
+    {
+        public bool received;
+        public Inputs inputs;
+    }
+
     public Inputs[] client_input_buffer; // client stores predicted inputs here
-    public Inputs[] server_input_buffer;
+    public InputAck[] server_input_buffer;
     public uint server_tick_number;
     public Queue<InputMessage> server_input_msgs;
     private Vector2 movement;
@@ -29,7 +35,11 @@ public class NetcodePlayer : NetcodeObject
     {
         base.Start();
 
-        this.server_input_buffer = new Inputs[NetcodeManager.c_client_buffer_size];
+        this.server_input_buffer = new InputAck[NetcodeManager.serverInputBuffer];
+        //for(int i = 0; i < server_input_buffer.Length; i++)
+        //{
+        //    server_input_buffer[i].received = false;
+        //}
         this.client_input_buffer = new Inputs[NetcodeManager.c_client_buffer_size];
         this.server_input_msgs = new Queue<InputMessage>();
     }
@@ -90,10 +100,6 @@ public class NetcodePlayer : NetcodeObject
                 netcodeObject.StoreClientState(buffer_slot);
             }
             StoreClientState(buffer_slot);
-            if (buffer_slot == 100)
-            {
-                //Debug.Log("Stop");
-            }
             NetcodeManager.PrePhysicsStep(this, client_input_buffer[buffer_slot]);
             Physics.Simulate(dt);
 

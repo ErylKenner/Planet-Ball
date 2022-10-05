@@ -20,6 +20,7 @@ public class NetcodeManager : NetworkBehaviour
     public struct StateMessage
     {
         public uint tick_number;
+        public float time;
         public State[] states;
     }
 
@@ -34,6 +35,7 @@ public class NetcodeManager : NetworkBehaviour
     public static uint client_tick_number;
     public static uint client_last_received_state_tick;
     private Queue<StateMessage> client_state_msgs;
+    private bool clientStarted = false;
 
     int last_correction_tick;
 
@@ -43,9 +45,12 @@ public class NetcodeManager : NetworkBehaviour
 
     // TODO: Handle state syncing in batching instead of min input
     // Override the client_tick_number if it is less than the state tick
-    [SyncVar]
+    //[SyncVar]
     public uint server_tick_number;
+    public static float server_timer;
     private uint server_tick_accumulator;
+    private uint desiredServerTickNumber;
+    public static readonly uint serverInputBuffer = 64;
 
     #endregion
 
@@ -55,6 +60,9 @@ public class NetcodeManager : NetworkBehaviour
     public static readonly ProfilerCategory NetcodeCategory = ProfilerCategory.Scripts;
     public static readonly ProfilerCounter<uint> ServerTickCounter =
         new ProfilerCounter<uint>(NetcodeCategory, "Server Tick", ProfilerMarkerDataUnit.Count);
+
+    public static readonly ProfilerCounter<uint> ServerDesiredTickCounter =
+    new ProfilerCounter<uint>(NetcodeCategory, "Server Desired Tick", ProfilerMarkerDataUnit.Count);
 
     public static readonly ProfilerCounter<uint> ClientTickCounter =
         new ProfilerCounter<uint>(NetcodeCategory, "Client Tick", ProfilerMarkerDataUnit.Count);
@@ -91,7 +99,8 @@ public class NetcodeManager : NetworkBehaviour
 
         server_tick_accumulator = 0;
 
-        client_tick_number = server_tick_number;
+        server_tick_number = 0;
+        client_tick_number = 0;
     }
 
     private void Update()
@@ -115,6 +124,7 @@ public class NetcodeManager : NetworkBehaviour
     private void SendProfilerMetrics()
     {
         ServerTickCounter.Sample(server_tick_number % NetcodeManager.c_client_buffer_size);
+        ServerDesiredTickCounter.Sample(desiredServerTickNumber % NetcodeManager.c_client_buffer_size);
         ClientTickCounter.Sample(client_tick_number % NetcodeManager.c_client_buffer_size);
         ClientLastReceivedTickCounter.Sample(client_last_received_state_tick % NetcodeManager.c_client_buffer_size);
     }
@@ -126,22 +136,23 @@ public class NetcodeManager : NetworkBehaviour
     {
         NetcodeObject[] netcodeObjects = FindObjectsOfType<NetcodeObject>();
 
-        // Trigger player input
-        foreach (NetcodeObject netcodeObject in netcodeObjects)
+        // Do not send input messages until the server has sent the first state
+        if (clientStarted)
         {
-            if (netcodeObject is NetcodePlayer)
+            // Trigger player input
+            foreach (NetcodeObject netcodeObject in netcodeObjects)
             {
-                NetcodePlayer player = (NetcodePlayer)netcodeObject;
-
-                if (player.isLocalPlayer)
+                if (netcodeObject is NetcodePlayer)
                 {
-                    player.UpdateClient(dt);
+                    NetcodePlayer player = (NetcodePlayer)netcodeObject;
+
+                    if (player.isLocalPlayer)
+                    {
+                        player.UpdateClient(dt);
+                    }
                 }
             }
         }
-
-        // Perform correction on a client only
-        if (!isClientOnly) { return; }
 
         Dictionary<uint, NetcodeObject> netIdToNetcodeObject = new Dictionary<uint, NetcodeObject>();
 
@@ -158,6 +169,13 @@ public class NetcodeManager : NetworkBehaviour
             while (client_state_msgs.Count > 0) // make sure if there are any newer state messages available, we use those instead
             {
                 state_msg = this.client_state_msgs.Dequeue();
+            }
+
+            if(!clientStarted)
+            {
+                client_tick_number = state_msg.tick_number + (uint)((Time.time - state_msg.time) * 2 * dt);
+                client_timer = dt;
+                clientStarted = true;
             }
 
             Dictionary<uint, State> netIdToState = new Dictionary<uint, State>();
@@ -193,9 +211,10 @@ public class NetcodeManager : NetworkBehaviour
             const float positionCorrectionMargin = 0.01f;
 
             bool doCorrection = (position_errors.Any(error => error.sqrMagnitude > positionCorrectionMargin)); //||
-            //rotation_errors.Any(error => Mathf.Abs(error) > 0.00001f));
+                                                                                                               //rotation_errors.Any(error => Mathf.Abs(error) > 0.00001f));
 
-
+            // Perform correction on a client only
+            if (!isClientOnly) { return; }
 
             if (doCorrection)
             {
@@ -329,7 +348,13 @@ public class NetcodeManager : NetworkBehaviour
 
         NetcodePlayer[] netcodePlayers = FindObjectsOfType<NetcodePlayer>();
         ServerUpdateInputBuffer(netcodePlayers);
-        ServerProgress(netcodePlayers, dt);
+
+        server_timer += Time.deltaTime;
+        while (server_timer >= dt)
+        {
+            server_timer -= dt;
+            ServerProgress(netcodePlayers, dt);
+        }
 
         if (server_tick_accumulator >= this.server_snapshot_rate)
         {
@@ -360,8 +385,10 @@ public class NetcodeManager : NetworkBehaviour
                     // run through all relevant inputs, and step player forward
                     for (int i = (int)start_i; i < input_msg.inputs.Count; ++i)
                     {
-
-                        netcodePlayer.server_input_buffer[netcodePlayer.server_tick_number % c_client_buffer_size] = input_msg.inputs[i];
+                        InputAck inputAck;
+                        inputAck.received = true;
+                        inputAck.inputs = input_msg.inputs[i];
+                        netcodePlayer.server_input_buffer[netcodePlayer.server_tick_number % serverInputBuffer] = inputAck;
                         ++netcodePlayer.server_tick_number;
                     }
                 }
@@ -399,30 +426,51 @@ public class NetcodeManager : NetworkBehaviour
         // TODO: Find a smarter way to progress the server
         if (netcodePlayers.Length > 0)
         {
-            uint new_server_tick_number = netcodePlayers.Min(player => player.server_tick_number);
+            desiredServerTickNumber++;
+            uint lowest_player_server_tick_number = netcodePlayers.Min(player => player.server_tick_number);
 
-            // TODO: Switch to a fixed progression rate
-            // TODO: If we missed an input, wait a frame to see if it comes in
-
-            for (int i = (int)server_tick_number; i < new_server_tick_number; ++i)
+            uint missingInput = desiredServerTickNumber - lowest_player_server_tick_number;
+            if (missingInput <= serverInputBuffer && missingInput > 0)
             {
+                return;
+            }
+        }
 
-                foreach (NetcodePlayer netcodePlayer in netcodePlayers)
-                {
-                    NetcodeManager.PrePhysicsStep(netcodePlayer, netcodePlayer.server_input_buffer[i % NetcodeManager.c_client_buffer_size]);
-                }
+        // All clients are ready to progress ->  lowest_player_server_tick_number > server_tick_number
+        // Not all clients are ready to progress -> lowest_player_server_tick_number <= server_tick_number
+        // 
+        // WRONG: I don't care, skip the input -> lowest_player_server_tick_number + serverInputBuffer <= server_tick_number
 
-                //Debug.Log("Running physics");
-                Physics.Simulate(dt);
-                ++server_tick_accumulator;
+        // Need a DESIRED server_tick_number based on the number of physics frames that have passed
+        // If any client is behind the desired by less than serverInputBuffer, just skip the update
+
+
+        // TODO: Switch to a fixed progression rate
+        // TODO: If we missed an input, wait a frame to see if it comes in
+
+        for (int i = (int)server_tick_number; i < desiredServerTickNumber; ++i)
+        {
+
+            foreach (NetcodePlayer netcodePlayer in netcodePlayers)
+            {
+                InputAck inputAck = netcodePlayer.server_input_buffer[i % serverInputBuffer];
+                //if(inputAck.received)
+                //{
+                    NetcodeManager.PrePhysicsStep(netcodePlayer, inputAck.inputs);
+                //}
+                netcodePlayer.server_tick_number = (uint)i;
             }
 
-            // TODO: Seperate server display
-            //this.server_display_player.transform.position = server_rigidbody.position;
-            //this.server_display_player.transform.rotation = server_rigidbody.rotation;
-
-            server_tick_number = new_server_tick_number;
+            //Debug.Log("Running physics");
+            Physics.Simulate(dt);
+            ++server_tick_accumulator;
+            server_tick_number++;
         }
+
+        // TODO: Seperate server display
+        //this.server_display_player.transform.position = server_rigidbody.position;
+        //this.server_display_player.transform.rotation = server_rigidbody.rotation;
+        
     }
 
     public void ServerSendState()
@@ -431,6 +479,7 @@ public class NetcodeManager : NetworkBehaviour
 
         StateMessage state_msg;
         state_msg.tick_number = server_tick_number;
+        state_msg.time = Time.time;
         NetcodeObject[] netcodeObjects = FindObjectsOfType<NetcodeObject>();
         state_msg.states = new State[netcodeObjects.Length];
 

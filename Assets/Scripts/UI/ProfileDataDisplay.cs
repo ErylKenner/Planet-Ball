@@ -11,6 +11,7 @@ public class ProfileDataDisplay : MonoBehaviour
     public TextMeshProUGUI statsText;
 
     ProfilerRecorder serverTickRecorder;
+    ProfilerRecorder serverDesiredTickRecorder;
     ProfilerRecorder clientTickRecorder;
     ProfilerRecorder clientTickLastRecRecorder;
     ProfilerRecorder playerRecorder1;
@@ -34,6 +35,7 @@ public class ProfileDataDisplay : MonoBehaviour
         correctionBuffer = new bool[frameBufferSize];
 
         serverTickRecorder = ProfilerRecorder.StartNew(NetcodeManager.NetcodeCategory, "Server Tick");
+        serverDesiredTickRecorder = ProfilerRecorder.StartNew(NetcodeManager.NetcodeCategory, "Server Desired Tick");
         clientTickRecorder = ProfilerRecorder.StartNew(NetcodeManager.NetcodeCategory, "Client Tick");
         clientTickLastRecRecorder = ProfilerRecorder.StartNew(NetcodeManager.NetcodeCategory, "Client Last Received Tick");
         playerRecorder1 = ProfilerRecorder.StartNew(NetcodeManager.NetcodeCategory, "Player 1 Tick");
@@ -48,6 +50,7 @@ public class ProfileDataDisplay : MonoBehaviour
     void OnDisable()
     {
         serverTickRecorder.Dispose();
+        serverDesiredTickRecorder.Dispose();
         clientTickRecorder.Dispose();
         clientTickLastRecRecorder.Dispose();
         playerRecorder1.Dispose();
@@ -133,6 +136,7 @@ public class ProfileDataDisplay : MonoBehaviour
     {
         var stringBuilder = new StringBuilder(500);
         stringBuilder.AppendLine($"Server Tick: {serverTickRecorder.LastValue}");
+        stringBuilder.AppendLine($"Server Desired Tick: {serverDesiredTickRecorder.LastValue}");
         stringBuilder.AppendLine($"Client Tick: {clientTickRecorder.LastValue}");
         stringBuilder.AppendLine($"Client Last Rec Tick: {clientTickLastRecRecorder.LastValue}");
 

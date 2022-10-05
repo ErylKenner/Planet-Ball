@@ -467,7 +467,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8371194678007894156, guid: 6516116c255b8c242afed73bbb6c7fb5, type: 3}
       propertyPath: server_snapshot_rate
-      value: 1
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 8371194678007894157, guid: 6516116c255b8c242afed73bbb6c7fb5, type: 3}
       propertyPath: m_RootOrder
