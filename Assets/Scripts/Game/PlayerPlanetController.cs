@@ -98,6 +98,14 @@ public class PlayerPlanetController : NetworkBehaviour
         IsUnwindTether = (input == null && IsUnwindTether) || (input != null && input.UnwindTether);
         IsSpeedBoost = (input == null && IsSpeedBoost) || (input != null && input.SpeedBoost);
         IsHeavy = (input == null && IsHeavy) || (input != null && input.Heavy);
+
+        HandleTether(wasTethered, dt);
+        HandleSpeedBoost(dt);
+        HandleHeavy(dt);
+    }
+
+    private void HandleTether(bool wasTethered, float dt)
+    {
         if (IsTethered)
         {
             if (!wasTethered)
@@ -136,7 +144,10 @@ public class PlayerPlanetController : NetworkBehaviour
             OrbitRadius = 0;
         }
         OrbitRadius = Mathf.Clamp(OrbitRadius, MIN_RADIUS, MAX_RADIUS);
+    }
 
+    private void HandleSpeedBoost(float dt)
+    {
         // Speed exponential falloff
         Speed -= SPEED_FALLOFF * (Speed - MIN_SPEED + 1) * dt;
         if (IsSpeedBoost && CurSpeedBoostCooldown <= 0f)
@@ -145,19 +156,20 @@ public class PlayerPlanetController : NetworkBehaviour
             Speed = MAX_SPEED;
         }
         Speed = Mathf.Clamp(Speed, MIN_SPEED, MAX_SPEED);
+        CurSpeedBoostCooldown = Mathf.Clamp(CurSpeedBoostCooldown - dt, 0, Mathf.Infinity);
+    }
 
-        // Set mass
+    private void HandleHeavy(float dt)
+    {
         if (IsHeavy && CurHeavyCooldown <= 0)
         {
             CurHeavyCooldown = HEAVY_COOLDOWN;
             body.mass = HEAVY_MASS;
-        } else if (CurHeavyCooldown <= HEAVY_COOLDOWN - HEAVY_DURATION)
+        }
+        else if (CurHeavyCooldown <= HEAVY_COOLDOWN - HEAVY_DURATION)
         {
             body.mass = 1;
         }
-
-        // Decrement cooldown timers
-        CurSpeedBoostCooldown = Mathf.Clamp(CurSpeedBoostCooldown - dt, 0, Mathf.Infinity);
         CurHeavyCooldown = Mathf.Clamp(CurHeavyCooldown - dt, 0, Mathf.Infinity);
     }
 
