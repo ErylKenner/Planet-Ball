@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using NetcodeData;
 
 public class NetcodeObject : NetworkBehaviour
 {
@@ -9,13 +10,6 @@ public class NetcodeObject : NetworkBehaviour
     public ClientState[] client_state_buffer; // client stores predicted moves here
     public ClientState client_error;
 
-    public struct ClientState
-    {
-        public Vector2 position;
-        public Vector2 velocity;
-        public float rotation;
-        public float angularVelocity;
-    }
     // Start is called before the first frame update
     protected virtual void Start()
     {

@@ -8,20 +8,11 @@ using static NetcodeObject;
 using System.Linq;
 using TMPro;
 using Unity.Profiling;
+using NetcodeData;
 
 public class NetcodeManager : NetworkBehaviour
 {
     #region Structs
-    public struct State
-    {
-        public uint netId;
-        public ClientState state;
-    }
-
-    public struct GlobalStateMessage
-    {
-        public StateMessage[] states;
-    }
 
     #endregion
 
@@ -300,7 +291,7 @@ public class NetcodeManager : NetworkBehaviour
                     // This client can only consider the input it makes because those are the only inputs in the future of the server
                     // None of this explains why having two player is COMPLETELY broken right now
                     // TODO: It's broken because the client starts at tick 0 by default and sends information as if it's in the past
-                    PrePhysicsStep(netcodePlayer, netcodePlayer.client_input_buffer[buffer_slot]);
+                    NetcodeSystem.PrePhysicsStep(netcodePlayer, netcodePlayer.client_input_buffer[buffer_slot]);
                 }
             }
             Physics.Simulate(dt);
@@ -343,55 +334,27 @@ public class NetcodeManager : NetworkBehaviour
 
         NetcodeObject[] netcodeObjects = FindObjectsOfType<NetcodeObject>().Where(netObj => !(netObj is NetcodePlayer) || ((NetcodePlayer)netObj).server_input_buffer != null).ToArray();
         NetcodePlayer[] netcodePlayers = FindObjectsOfType<NetcodePlayer>().Where(netObj => netObj.server_input_buffer != null).ToArray();
-        ServerUpdateInputBuffer(netcodePlayers);
+        NetcodeServerSystem.ServerUpdateInputBuffer(netcodePlayers);
 
         server_timer += Time.deltaTime;
         while (server_timer >= dt)
         {
             server_timer -= dt;
-            ServerProgress(netcodePlayers, dt);
-        }
-
-        ServerSendState(netcodeObjects);
-    }
-
-    private void ServerUpdateInputBuffer(NetcodePlayer[] netcodePlayers)
-    {
-        foreach (NetcodePlayer netcodePlayer in netcodePlayers)
-        {
-
-            while (netcodePlayer.server_input_msgs?.Count > 0)
+            if (NetcodeServerSystem.ServerDesireProgression(server_tick_number, serverInputBuffer, ref desiredServerTickNumber))
             {
-                InputMessage input_msg = netcodePlayer.server_input_msgs.Dequeue();
-
-                // message contains an array of inputs, calculate what tick the final one is
-                uint max_tick = input_msg.start_tick_number + (uint)input_msg.inputs.Count - 1;
-
-                // if that tick is greater than or equal to the current tick we're on, then it
-                // has inputs which are new
-                uint lastRecievedClientTick = netcodePlayer.server_input_buffer.Ready ? netcodePlayer.server_input_buffer.LastRecieved().clientTick: 0;
-                if (max_tick >= lastRecievedClientTick)
-                {
-                    // there may be some inputs in the array that we've already had,
-                    // so figure out where to start
-                    uint start_i = lastRecievedClientTick > input_msg.start_tick_number ? (lastRecievedClientTick - input_msg.start_tick_number) : 0;
-
-                    // run through all relevant inputs, and step player forward
-                    for (int i = (int)start_i; i < input_msg.inputs.Count; ++i)
-                    {
-                        InputPacket<Inputs> inputPacket;
-                        inputPacket.input = input_msg.inputs[i];
-                        inputPacket.clientTick = input_msg.start_tick_number + (uint)i;
-                        inputPacket.serverTick = 0;
-                        netcodePlayer.server_input_buffer.Enqueue(inputPacket);
-                    }
-                }
+                server_tick_number += NetcodeServerSystem.ServerProgress(netcodePlayers, server_tick_number, desiredServerTickNumber, dt);
             }
+            
+        }
 
-            SamplePlayerTick(netcodePlayer);
+        GlobalStateMessage? stateMessage = NetcodeServerSystem.ServerSendState(netcodeObjects, server_tick_number);
+        if(stateMessage != null)
+        {
+            RpcQueueClientState((GlobalStateMessage)stateMessage);
         }
     }
 
+    // TODO: Do this in the NetcodePlayer script
     private static void SamplePlayerTick(NetcodePlayer netcodePlayer)
     {
         ProfilerCounter<uint> playerTickMonitor;
@@ -418,89 +381,6 @@ public class NetcodeManager : NetworkBehaviour
         }
     }
 
-    private void ServerProgress(NetcodePlayer[] netcodePlayers, float dt)
-    {
-        desiredServerTickNumber++;
-        if(desiredServerTickNumber - server_tick_number < serverInputBuffer)
-        {
-            return;
-        }
-
-        for (int i = (int)server_tick_number; i < desiredServerTickNumber; ++i)
-        {
-
-            foreach (NetcodePlayer netcodePlayer in netcodePlayers)
-            {
-                if (netcodePlayer.server_input_buffer.Count > 0)
-                {
-                    PrePhysicsStep(netcodePlayer, netcodePlayer.server_input_buffer.Dequeue(server_tick_number).input);
-                }
-            }
-
-            //Debug.Log("Running physics");
-            Physics.Simulate(dt);
-            server_tick_number++;
-        }
-
-        // TODO: Seperate server display
-        //this.server_display_player.transform.position = server_rigidbody.position;
-        //this.server_display_player.transform.rotation = server_rigidbody.rotation;
-        
-    }
-
-    public void ServerSendState(NetcodeObject[] netcodeObjects)
-    {
-
-        if(netcodeObjects.Length == 0)
-        {
-            return;
-        }
-
-        GlobalStateMessage state_msg;
-        state_msg.states = new StateMessage[netcodeObjects.Length];
-
-        for (int i = 0; i < netcodeObjects.Length; i++)
-        {
-            State state;
-            Rigidbody2D rigidbody = netcodeObjects[i].GetComponent<Rigidbody2D>();
-            state.netId = netcodeObjects[i].netId;
-            state.state.position = rigidbody.position;
-            state.state.rotation = rigidbody.rotation;
-            state.state.velocity = rigidbody.velocity;
-            state.state.angularVelocity = rigidbody.angularVelocity;
-
-            StateMessage stateMessage;
-            stateMessage.serverTick = server_tick_number;
-            stateMessage.state = state;
-
-            // Attached the last processed server and client tick for each player
-            // TODO: Send individual messages to each player instead of using GlobalStateMessage
-            if (netcodeObjects[i] is NetcodePlayer)
-            {
-                NetcodePlayer player = (NetcodePlayer)netcodeObjects[i];
-
-                if (player.server_input_buffer.Ready)
-                {
-                    InputPacket<Inputs> inputPacket = player.server_input_buffer.LastProcessed();
-                    stateMessage.lastProcessedClientTick = inputPacket.clientTick;
-                    stateMessage.lastProcessedServerTick = inputPacket.serverTick;
-                } else
-                {
-                    // TODO: Send to individual players
-                    return;
-                }
-            } else
-            // Ignored if not a player
-            {
-                stateMessage.lastProcessedClientTick = 0;
-                stateMessage.lastProcessedServerTick = 0;
-            }
-            state_msg.states[i] = stateMessage;
-
-        }
-
-        RpcQueueClientState(state_msg);
-    }
 
     [ClientRpc]
     void RpcQueueClientState(GlobalStateMessage state_msg)
@@ -511,8 +391,5 @@ public class NetcodeManager : NetworkBehaviour
 
     #endregion
 
-    public static void PrePhysicsStep(NetcodePlayer player, Inputs inputs)
-    {
-        player.GetComponent<PlayerPlanetController>().Move(inputs.movement);
-    }
+
 }

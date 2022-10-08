@@ -4,19 +4,10 @@ using UnityEngine;
 using Mirror;
 using UnityEngine.InputSystem;
 using System.Linq;
+using NetcodeData;
 
 public class NetcodePlayer : NetcodeObject
 {
-    public struct InputMessage
-    {
-        public uint start_tick_number;
-        public List<Inputs> inputs;
-    }
-
-    public struct Inputs
-    {
-        public Vector2 movement;
-    }
 
     static public NetcodePlayer LocalPlayer { get
         {
@@ -96,7 +87,7 @@ public class NetcodePlayer : NetcodeObject
         server_input_msgs.Enqueue(input_msg);
     }
 
-    public void UpdateClientLastReceivedTick(NetcodeManager.GlobalStateMessage globalState)
+    public void UpdateClientLastReceivedTick(GlobalStateMessage globalState)
     {
         StateMessage playerMessage = globalState.states.ToList().Find(state => state.state.netId == netId);
         clientLastRecievedTick = (int)playerMessage.clientTick;
@@ -125,7 +116,7 @@ public class NetcodePlayer : NetcodeObject
                 netcodeObject.StoreClientState(buffer_slot);
             }
             StoreClientState(buffer_slot);
-            NetcodeManager.PrePhysicsStep(this, client_input_buffer[buffer_slot]);
+            NetcodeSystem.PrePhysicsStep(this, client_input_buffer[buffer_slot]);
             Physics.Simulate(dt);
 
 
