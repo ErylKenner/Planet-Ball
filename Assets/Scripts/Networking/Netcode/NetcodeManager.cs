@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 using UnityEngine.SceneManagement;
-using static NetcodePlayer;
-using static NetcodeObject;
 using System.Linq;
 using TMPro;
 using Unity.Profiling;
@@ -87,7 +85,7 @@ public class NetcodeManager : NetworkBehaviour
     private void Update()
     {
         float dt = Time.fixedDeltaTime;
-        if (isClient)
+        if (isClientOnly)
         {
             UpdateClient(dt);
         }
@@ -125,28 +123,6 @@ public class NetcodeManager : NetworkBehaviour
     private void UpdateClient(float dt)
     {
         NetcodeObject[] netcodeObjects = FindObjectsOfType<NetcodeObject>();
-
-        // Trigger player input
-        foreach (NetcodeObject netcodeObject in netcodeObjects)
-        {
-            if (netcodeObject is NetcodePlayer)
-            {
-                NetcodePlayer player = (NetcodePlayer)netcodeObject;
-
-                if (player.isLocalPlayer)
-                {
-                    player.UpdateClient(dt);
-                }
-            }
-        }
-
-        if (!isClientOnly) { return; }
-
-        ClientCalculateCorrection(netcodeObjects, dt);
-    }
-
-    private void ClientCalculateCorrection(NetcodeObject[] netcodeObjects, float dt)
-    {
         // Generate a mapping netId -> netcodeObject
         Dictionary<uint, NetcodeObject> netIdToNetcodeObject = new Dictionary<uint, NetcodeObject>();
         foreach (NetcodeObject netcodeObject in netcodeObjects)
@@ -154,173 +130,21 @@ public class NetcodeManager : NetworkBehaviour
             netIdToNetcodeObject.Add(netcodeObject.netId, netcodeObject);
         }
 
-        // If there are available messages
-        if (client_state_msgs.Count > 0)
+        Dictionary<uint, State> netIdToState;
+
+        bool doCorrection = NetcodeClientSystem.ClientCalculateCorrection(netIdToNetcodeObject,
+                                  client_state_msgs,
+                                  c_client_buffer_size,
+                                  dt,
+                                  out netIdToState);
+
+        if(doCorrection)
         {
-
-            GlobalStateMessage state_msg = this.client_state_msgs.Dequeue();
-            while (client_state_msgs.Count > 0) // make sure if there are any newer state messages available, we use those instead
-            {
-                state_msg = this.client_state_msgs.Dequeue();
-            }
-
-            NetcodePlayer.LocalPlayer.UpdateClientLastReceivedTick(state_msg);
-            uint buffer_slot = NetcodePlayer.LocalPlayer.ClientLastRecievedTick % c_client_buffer_size;
-            Dictionary<uint, State> netIdToState = new Dictionary<uint, State>();
-            List<Vector2> position_errors = new List<Vector2>();
-            List<float> rotation_errors = new List<float>();
-
-            float playerPositionError = 0f;
-            foreach (StateMessage state in state_msg.states)
-            {
-                netIdToState.Add(state.state.netId, state.state);
-                if(!netIdToNetcodeObject.ContainsKey(state.state.netId))
-                {
-                    continue;
-                }
-
-                NetcodeObject currentObject = netIdToNetcodeObject[state.state.netId];
-                //Debug.Log(currentObject.gameObject.name);
-
-                Vector2 position_error = state.state.state.position - currentObject.client_state_buffer[buffer_slot].position;
-
-                if (currentObject.isLocalPlayer)
-                {
-                    playerPositionError = position_error.magnitude;
-                }
-
-                //Debug.Log(position_error);
-                position_errors.Add(position_error);
-                float rotation_error = state.state.state.rotation - currentObject.client_state_buffer[buffer_slot].rotation;
-                rotation_errors.Add(rotation_error);
-            }
-
-            const float positionCorrectionMargin = 0.01f;
-
-            bool doCorrection = (position_errors.Any(error => error.sqrMagnitude > positionCorrectionMargin)); //||
-                                                                                                               //rotation_errors.Any(error => Mathf.Abs(error) > 0.00001f));
-
-            // Perform correction on a client only
-
-            if (doCorrection)
-            {
-                //var offending = position_errors.Select((error, index) => new { error, index }).Where(error => error.error.sqrMagnitude > positionCorrectionMargin);
-                //foreach (var offend in offending)
-                //{
-                //    Debug.Log(netIdToNetcodeObject[state_msg.states[offend.index].netId] + ": " + offend.error.sqrMagnitude);
-                //}
-
-                PostionErrorMetric.Sample(playerPositionError);
-                last_correction_tick = (int)NetcodePlayer.LocalPlayer.client_tick_number;
-
-                ClientPerformCorrection(netcodeObjects,
-                                        buffer_slot,
-                                        netIdToState,
-                                        dt);
-            }
-            else
-            {
-                //Debug.Log("Not correcting");
-
-            }
-
-            // Smoothing
-            foreach (NetcodeObject netcodeObject in netcodeObjects)
-            {
-                // TODO: Turn on smoothing
-                //netcodeObject.client_error.position *= 0.9f;
-                //netcodeObject.client_error.rotation *= 0.9f;
-
-                // TODO: Use seperate object for the smoothed position
-                //this.smoothed_client_player.transform.position = client_rigidbody.position + this.client_pos_error;
-                //this.smoothed_client_player.transform.rotation = client_rigidbody.rotation * this.client_rot_error;
-
-                //Rigidbody2D netcodeRigidbody2D = netcodeObject.GetComponent<Rigidbody2D>();
-
-                //netcodeRigidbody2D.position = netcodeRigidbody2D.position + netcodeObject.client_error.position;
-                //netcodeRigidbody2D.rotation = netcodeRigidbody2D.rotation + netcodeObject.client_error.rotation;
-            }
-
-        }
-
-        PostionCorrectionTick.Sample(last_correction_tick);
-    }
-
-    private static void ClientPerformCorrection(NetcodeObject[] netcodeObjects, uint last_recieved_buffer_slot, Dictionary<uint, State> netIdToState, float dt)
-    {
-        //Debug.Log("Correcting for error at tick " + state_msg.tick_number + " (rewinding " + (client_tick_number - state_msg.tick_number) + " ticks)");
-        Dictionary<NetcodeObject, Vector2> previousPositions = new Dictionary<NetcodeObject, Vector2>();
-        Dictionary<NetcodeObject, float> previousRotations = new Dictionary<NetcodeObject, float>();
-
-        foreach (NetcodeObject netcodeObject in netcodeObjects)
-        {
-            Rigidbody2D netcodeRigidbody2D = netcodeObject.GetComponent<Rigidbody2D>();
-            // capture the current predicted pos for smoothing
-
-            // TODO: Add back error values when smoothing is implemented
-            //Vector2 prev_pos = netcodeRigidbody2D.position + netcodeObject.client_error.position;
-            Vector2 prev_pos = netcodeRigidbody2D.position;
-            previousPositions.Add(netcodeObject, prev_pos);
-            //float prev_rot = netcodeRigidbody2D.rotation + netcodeObject.client_error.rotation;
-            float prev_rot = netcodeRigidbody2D.rotation;
-            previousRotations.Add(netcodeObject, prev_rot);
-            State currentState = netIdToState[netcodeObject.netId];
-
-            // rewind & replay
-            netcodeRigidbody2D.position = currentState.state.position;
-            netcodeRigidbody2D.rotation = currentState.state.rotation;
-            netcodeRigidbody2D.velocity = currentState.state.velocity;
-            netcodeRigidbody2D.angularVelocity = currentState.state.angularVelocity;
-
-        }
-
-        uint rewind_buffer_slot = last_recieved_buffer_slot;
-        while (rewind_buffer_slot < NetcodePlayer.LocalPlayer.client_tick_number)
-        {
-            uint buffer_slot = rewind_buffer_slot % c_client_buffer_size;
-
-            foreach (NetcodeObject netcodeObject in netcodeObjects)
-            {
-                netcodeObject.StoreClientState(buffer_slot);
-                if (netcodeObject is NetcodePlayer)
-                {
-                    NetcodePlayer netcodePlayer = (NetcodePlayer)netcodeObject;
-                    // TODO: When we send foreign player inputs, we cannot apply those to the replay
-                    // I don't think it will help to send foreign inputs
-                    // The server generates the state based on the inputs
-                    // This client can only consider the input it makes because those are the only inputs in the future of the server
-                    // None of this explains why having two player is COMPLETELY broken right now
-                    // TODO: It's broken because the client starts at tick 0 by default and sends information as if it's in the past
-                    NetcodeSystem.PrePhysicsStep(netcodePlayer, netcodePlayer.client_input_buffer[buffer_slot]);
-                }
-            }
-            Physics.Simulate(dt);
-
-            ++rewind_buffer_slot;
-        }
-
-        foreach (NetcodeObject netcodeObject in netcodeObjects)
-        {
-            Rigidbody2D netcodeRigidbody2D = netcodeObject.GetComponent<Rigidbody2D>();
-            Vector2 prev_pos = previousPositions[netcodeObject];
-            float prev_rot = previousRotations[netcodeObject];
-
-            if(netcodeObject.isLocalPlayer)
-            {
-                PostionCorrectionMetric.Sample((prev_pos - netcodeRigidbody2D.position).magnitude);
-            }
-
-            // if more than 2ms apart, just snap
-            if ((prev_pos - netcodeRigidbody2D.position).sqrMagnitude >= 4.0f)
-            {
-                netcodeObject.client_error.position = Vector2.zero;
-                netcodeObject.client_error.rotation = 0f;
-            }
-            else
-            {
-                netcodeObject.client_error.position = prev_pos - netcodeRigidbody2D.position;
-                netcodeObject.client_error.rotation = prev_rot - netcodeRigidbody2D.rotation;
-            }
+            NetcodeClientSystem.ClientPerformCorrection(netcodeObjects,
+                                    NetcodePlayer.LocalPlayer.ClientLastRecievedTick % c_client_buffer_size,
+                                    netIdToState,
+                                    c_client_buffer_size,
+                                    dt);
         }
     }
 

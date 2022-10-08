@@ -79,6 +79,13 @@ public class NetcodePlayer : NetcodeObject
     protected override void Update()
     {
         base.Update();
+
+        float dt = Time.fixedDeltaTime;
+
+        if(isClient && isLocalPlayer)
+        {
+            UpdateClient(dt);
+        }
     }
 
     [Command]
@@ -101,37 +108,33 @@ public class NetcodePlayer : NetcodeObject
         {
             client_timer -= dt;
 
-            uint buffer_slot = client_tick_number % NetcodeManager.c_client_buffer_size;
+            uint bufferSlot = client_tick_number % NetcodeManager.c_client_buffer_size;
 
             // sample and store inputs for this tick
             Inputs inputs;
             inputs.movement = movement;
-            this.client_input_buffer[buffer_slot] = inputs;
+            client_input_buffer[bufferSlot] = inputs;
 
-            // store state for this tick, then use current state + input to step simulation
             NetcodeObject[] netcodeObjects = FindObjectsOfType<NetcodeObject>();
-            // Store all state
-            foreach (NetcodeObject netcodeObject in netcodeObjects)
-            {
-                netcodeObject.StoreClientState(buffer_slot);
-            }
-            StoreClientState(buffer_slot);
-            NetcodeSystem.PrePhysicsStep(this, client_input_buffer[buffer_slot]);
-            Physics.Simulate(dt);
 
+            NetcodeClientSystem.ClientProgress(
+                this,
+                netcodeObjects,
+                client_input_buffer,
+                bufferSlot,
+                dt
 
-            // send input packet to server
+            );
 
-            InputMessage input_msg;
-            input_msg.start_tick_number = clientLastRecievedTick == -1 ? 0 : ClientLastRecievedTick;
-            input_msg.inputs = new List<Inputs>();
+            InputMessage inputMessage = NetcodeClientSystem.GenerateClientInputMessage(
+                clientLastRecievedTick,
+                client_tick_number,
+                client_input_buffer,
+                NetcodeManager.c_client_buffer_size
+                
+            ) ;
 
-            for (uint tick = input_msg.start_tick_number; tick <= client_tick_number; ++tick)
-            {
-                input_msg.inputs.Add(this.client_input_buffer[tick % NetcodeManager.c_client_buffer_size]);
-            }
-
-            CmdQueueInputMessages(input_msg);
+            CmdQueueInputMessages(inputMessage);
 
 
             ++client_tick_number;
