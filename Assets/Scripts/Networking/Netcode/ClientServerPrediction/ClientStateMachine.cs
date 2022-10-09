@@ -5,6 +5,11 @@ namespace ClientServerPrediction
 {
     public static class ClientStateMachine
     {
+        public static StateMessage GetLatestStateMessage(ref Queue<StateMessage> stateQueue)
+        {
+            StateMessage stateMessage;
+            return stateMessage;
+        }
         public static void CorrectClient(ref Dictionary<uint, Input[]> inputBufferMap,
                                          ref Dictionary<uint, State[]> stateBufferMap,
                                          ref Dictionary<uint, IStateful> stateMap,
