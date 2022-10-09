@@ -1,18 +1,35 @@
-using System.Collections;
+
 using System.Collections.Generic;
-using UnityEngine;
 
-public class CSPClientStateMachine : MonoBehaviour
+namespace ClientServerPrediction
 {
-    // Start is called before the first frame update
-    void Start()
+    public static class ClientStateMachine
     {
-        
-    }
+        public static void CorrectClient(ref Dictionary<uint, Input[]> inputBufferMap,
+                                         ref Dictionary<uint, State[]> stateBufferMap,
+                                         in Dictionary<uint, IStateful> stateMap,
+                                         in Dictionary<uint, IInputful> inputMap,
+                                         in StateMessage stateMessage)
+        {
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        }
+
+        public static void StoreState(ref Dictionary<uint, State[]> stateBufferMap,
+                                      in Dictionary<uint, IStateful> stateMap)
+        {
+
+        }
+
+        public static void StoreInput(ref Dictionary<uint, Input[]> inputBufferMap,
+                                      in Dictionary<uint, IInputful> inputMap)
+        {
+
+        }
+
+        public static void SendInputMessage(in Dictionary<uint, Input[]> inputBufferMap,
+                                            ref Queue<InputMessage> inputMessageQueue)
+        {
+
+        }
     }
 }

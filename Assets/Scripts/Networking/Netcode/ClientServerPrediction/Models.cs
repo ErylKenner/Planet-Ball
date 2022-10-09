@@ -14,4 +14,14 @@ namespace ClientServerPrediction
         public float rotation;
         public float angularVelocity;
     }
+
+    public struct InputMessage
+    {
+
+    }
+
+    public struct StateMessage
+    {
+
+    }
 }
