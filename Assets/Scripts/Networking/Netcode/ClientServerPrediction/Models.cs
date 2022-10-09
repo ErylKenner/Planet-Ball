@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace ClientServerPrediction
@@ -17,7 +18,9 @@ namespace ClientServerPrediction
 
     public class InputMessage
     {
-
+        public uint netId;
+        public uint startTick;
+        public List<Inputs> inputs;
     }
 
     public class StateMessage

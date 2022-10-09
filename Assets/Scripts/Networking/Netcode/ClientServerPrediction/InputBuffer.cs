@@ -1,8 +1,8 @@
-public struct InputPacket<T>
+public class InputPacket<T>
 {
     public T input;
-    public uint serverTick;
-    public uint clientTick;
+    public uint serverTick = 0;
+    public uint clientTick = 0;
 }
 public class InputBuffer<T>
 {
@@ -37,8 +37,9 @@ public class InputBuffer<T>
         lastProcessed = -1;
     }
 
-    public void Enqueue(InputPacket<T> inputPacket)
+    public void Enqueue(T input, uint clientTick)
     {
+        InputPacket<T> inputPacket = new InputPacket<T> { input = input, clientTick = clientTick };
         unprocessedCount++;
         buffer[(lastProcessed + unprocessedCount) % bufferSize] = inputPacket;
     }

@@ -26,11 +26,11 @@ public static class NetcodeServerSystem
                     // run through all relevant inputs, and step player forward
                     for (int i = (int)start_i; i < input_msg.inputs.Count; ++i)
                     {
-                        InputPacket<Inputs> inputPacket;
-                        inputPacket.input = input_msg.inputs[i];
-                        inputPacket.clientTick = input_msg.start_tick_number + (uint)i;
-                        inputPacket.serverTick = 0;
-                        netcodePlayer.server_input_buffer.Enqueue(inputPacket);
+                        //InputPacket<Inputs> inputPacket;
+                        //inputPacket.input = input_msg.inputs[i];
+                        //inputPacket.clientTick = input_msg.start_tick_number + (uint)i;
+                        //inputPacket.serverTick = 0;
+                        //netcodePlayer.server_input_buffer.Enqueue(inputPacket);
                     }
                 }
             }
