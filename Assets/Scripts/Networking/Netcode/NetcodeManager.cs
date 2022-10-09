@@ -8,6 +8,8 @@ using TMPro;
 using Unity.Profiling;
 using NetcodeData;
 
+// TODO: Convert sever logic to non-mono class
+
 public class NetcodeManager : NetworkBehaviour
 {
     #region Structs

@@ -6,6 +6,8 @@ using UnityEngine.InputSystem;
 using System.Linq;
 using NetcodeData;
 
+// TODO: Convert client logic into non-mono class
+
 public class NetcodePlayer : NetcodeObject
 {
 
