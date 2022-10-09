@@ -1,18 +1,12 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
-public class CSPStateMachine : MonoBehaviour
+namespace ClientServerPrediction
 {
-    // Start is called before the first frame update
-    void Start()
+    public static class StateMachine
     {
-        
-    }
+        public static void Run(Dictionary<uint, Input> inputMap, Dictionary<uint, IInputful> inputfulMap, IRunnable runnable, RunContext runContext)
+        {
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        }
     }
 }

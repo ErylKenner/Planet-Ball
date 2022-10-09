@@ -3,6 +3,6 @@ namespace ClientServerPrediction
 {
     public interface IRunnable
     {
-        public void Run(float dt);
+        public void Run(RunContext runContext);
     }
 }

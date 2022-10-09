@@ -24,4 +24,9 @@ namespace ClientServerPrediction
     {
 
     }
+
+    public struct RunContext
+    {
+
+    }
 }
