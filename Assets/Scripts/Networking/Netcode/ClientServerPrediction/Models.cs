@@ -2,30 +2,30 @@ using UnityEngine;
 
 namespace ClientServerPrediction
 {
-    public struct Input
+    public class Inputs
     {
-        public Vector2 movement;
+        public Vector2 movement = Vector2.zero;
     }
 
-    public struct State
+    public class State
     {
-        public Vector2 position;
-        public Vector2 velocity;
-        public float rotation;
-        public float angularVelocity;
+        public Vector2 position = Vector2.zero;
+        public Vector2 velocity = Vector2.zero;
+        public float rotation = 0f;
+        public float angularVelocity = 0f;
     }
 
-    public struct InputMessage
-    {
-
-    }
-
-    public struct StateMessage
+    public class InputMessage
     {
 
     }
 
-    public struct RunContext
+    public class StateMessage
+    {
+
+    }
+
+    public class RunContext
     {
 
     }

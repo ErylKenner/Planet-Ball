@@ -2,7 +2,7 @@
 namespace ClientServerPrediction {
     public interface IInputful
     {
-        public Input GetInput();
-        public void ApplyInput(Input input);
+        public Inputs GetInput();
+        public void ApplyInput(Inputs input);
     }
 }
