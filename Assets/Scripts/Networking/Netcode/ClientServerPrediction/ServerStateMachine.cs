@@ -46,10 +46,26 @@ namespace ClientServerPrediction
             }
         }
 
-        public static StateMessage CreateStateMessage(in Dictionary<uint, IStateful> stateMap,
-                                                      ref Dictionary<uint, InputBuffer<Inputs>> inputBufferMap)
+        public static StateMessage CreateStateMessage(ref Dictionary<uint, InputBuffer<Inputs>> inputBufferMap,
+                                                      in Dictionary<uint, IStateful> stateMap,
+                                                      uint serverTick)
         {
-            return new StateMessage();
+            StateMessage stateMessage = new StateMessage { serverTick = serverTick, stateContexts = new List<StateContext>() };
+
+            foreach (uint netId in stateMap.Keys)
+            {
+                // TODO: Test these conditionals
+                if(inputBufferMap.ContainsKey(netId) &&
+                   inputBufferMap[netId].BeenProcessed)
+                {
+                    stateMessage.stateContexts.Add(new StateContext { netId = netId,
+                                                                      lastProcessedClientTick = inputBufferMap[netId].LastProcessed().clientTick,
+                                                                      lastProcessedServerTick = inputBufferMap[netId].LastProcessed().serverTick,
+                                                                      state = stateMap[netId].GetState() });
+                }
+            }
+
+            return stateMessage;
         }
 
         public static void SendStateMessage(in StateMessage stateMessage,

@@ -229,4 +229,51 @@ public class TestServerStateMachine
     }
 
     #endregion
+
+    #region CreateStateMessage
+
+    /// <summary>
+    /// GIVEN: InputBuffer map with a processed Input, valid State map
+    /// WHEN: Server Tick is incrementeted and CreateStateMessage() is called
+    /// THEN: Returns default state of player
+    ///       Server tick references passed Server tick
+    ///       Last processed client tick reference input buffer
+    ///       Last processed server tick reference input buffer
+    /// </summary>
+    [Test]
+    public void TestCreateStateMessage()
+    {
+        uint mockNetId = 10;
+        uint bufferSize = 64;
+        uint mockServerTick = 30;
+        uint mockClientTick = 15;
+
+        Vector2 mockMovement = Vector2.up;
+
+        Inputs mockInputs = new Inputs { movement = mockMovement };
+
+        Dictionary<uint, InputBuffer<Inputs>> inputBufferMap = new Dictionary<uint, InputBuffer<Inputs>>();
+        InputBuffer<Inputs> inputBuffer = new InputBuffer<Inputs>(bufferSize);
+        inputBuffer.Enqueue(mockInputs, mockClientTick);
+        inputBuffer.Dequeue(mockServerTick);
+        inputBufferMap.Add(mockNetId, inputBuffer);
+        
+
+        Dictionary<uint, IStateful> stateMap = new Dictionary<uint, IStateful>();
+        MockPlayer mockPlayer = new MockPlayer();
+        stateMap.Add(mockNetId, mockPlayer);
+
+        uint newMockServerTick = mockServerTick + 1;
+
+        StateMessage stateMessage = ServerStateMachine.CreateStateMessage(ref inputBufferMap, in stateMap, newMockServerTick);
+        Dictionary<uint, StateContext> stateMessageMap = stateMessage.GetMap();
+
+
+        Assert.AreEqual(stateMessageMap[mockNetId].state.position, mockPlayer.GetPosition());
+        Assert.AreEqual(stateMessageMap[mockNetId].lastProcessedClientTick, mockClientTick);
+        Assert.AreEqual(stateMessageMap[mockNetId].lastProcessedServerTick, mockServerTick);
+        Assert.AreEqual(stateMessage.serverTick, newMockServerTick);
+    }
+
+    #endregion
 }

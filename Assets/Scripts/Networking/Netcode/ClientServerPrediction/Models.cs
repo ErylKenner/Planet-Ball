@@ -23,9 +23,35 @@ namespace ClientServerPrediction
         public List<Inputs> inputs;
     }
 
+    public class StateContext
+    {
+        public uint netId;
+
+        // Client tick n associated with input n
+        public uint lastProcessedClientTick;
+        // Server tick m associated with input m
+        public uint lastProcessedServerTick;
+
+
+        // This is the state of client state n + 1
+        public State state;
+    }
     public class StateMessage
     {
+        // This is the server tick m + 1
+        public uint serverTick;
+        public List<StateContext> stateContexts;
 
+        public Dictionary<uint, StateContext> GetMap()
+        {
+            Dictionary<uint, StateContext> map = new Dictionary<uint, StateContext>();
+            foreach(StateContext stateContext in stateContexts)
+            {
+                map.Add(stateContext.netId, stateContext);
+            }
+
+            return map;
+        }
     }
 
     public class RunContext
