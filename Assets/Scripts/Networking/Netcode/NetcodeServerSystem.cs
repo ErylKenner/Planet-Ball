@@ -16,7 +16,7 @@ public static class NetcodeServerSystem
 
                 // if that tick is greater than or equal to the current tick we're on, then it
                 // has inputs which are new
-                uint lastRecievedClientTick = netcodePlayer.server_input_buffer.Ready ? netcodePlayer.server_input_buffer.LastRecieved().clientTick : 0;
+                uint lastRecievedClientTick = netcodePlayer.server_input_buffer.BeenProcessed ? netcodePlayer.server_input_buffer.LastRecieved().clientTick : 0;
                 if (max_tick >= lastRecievedClientTick)
                 {
                     // there may be some inputs in the array that we've already had,
@@ -108,7 +108,7 @@ public static class NetcodeServerSystem
             {
                 NetcodePlayer player = (NetcodePlayer)netcodeObjects[i];
 
-                if (player.server_input_buffer.Ready)
+                if (player.server_input_buffer.BeenProcessed)
                 {
                     InputPacket<Inputs> inputPacket = player.server_input_buffer.LastProcessed();
                     stateMessage.lastProcessedClientTick = inputPacket.clientTick;

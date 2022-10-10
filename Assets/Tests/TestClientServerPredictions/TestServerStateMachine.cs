@@ -4,6 +4,7 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 using ClientServerPrediction;
+using MockModel;
 
 public class TestServerStateMachine
 {
@@ -111,7 +112,7 @@ public class TestServerStateMachine
     /// THEN: NetId of the message has been been added as a key in the InputBuffer map
     /// </summary>
     [Test]
-    public void TestProcessInputMessagesExistingNewNetId()
+    public void TestProcessInputMessagesNewNetId()
     {
         uint mockNetId = 10;
         uint bufferSize = 64;
@@ -130,6 +131,101 @@ public class TestServerStateMachine
         ServerStateMachine.ProcessInputMessages(ref inputQueue, ref inputBufferMap, bufferSize);
 
         Assert.True(inputBufferMap.ContainsKey(mockNetId));
+    }
+
+    #endregion
+
+    #region ApplyInput
+    /// <summary>
+    /// GIVEN: InputBuffer map with an unprocessed input, Input map with a mock player
+    /// WHEN: ApplyInput() is called
+    /// THEN: LastProcessed equal to the mock movement, clientTick, and serverTick
+    ///       Input was applied to the MockPlayer
+    /// </summary>
+    [Test]
+    public void TestApplyInput()
+    {
+        uint mockNetId = 10;
+        uint bufferSize = 64;
+        uint mockClientTick = 15;
+        uint mockServerTick = 30;
+        Vector2 mockMovement = Vector2.up;
+
+        Inputs mockInputs = new Inputs { movement = mockMovement };
+
+        Dictionary<uint, InputBuffer<Inputs>> inputBufferMap = new Dictionary<uint, InputBuffer<Inputs>>();
+        InputBuffer<Inputs> inputBuffer = new InputBuffer<Inputs>(bufferSize);
+        inputBuffer.Enqueue(mockInputs, mockClientTick);
+        inputBufferMap.Add(mockNetId, inputBuffer);
+
+        Dictionary<uint, IInputful> inputMap = new Dictionary<uint, IInputful>();
+        MockPlayer mockPlayer = new MockPlayer();
+        Vector2 initialPosition = mockPlayer.GetPosition();
+        inputMap.Add(mockNetId, mockPlayer);
+
+        ServerStateMachine.ApplyInput(ref inputBufferMap, ref inputMap, mockServerTick);
+
+        Assert.AreEqual(inputBuffer.LastProcessed().input.movement, mockMovement);
+        Assert.AreEqual(inputBuffer.LastProcessed().clientTick, mockClientTick);
+        Assert.AreEqual(inputBuffer.LastProcessed().serverTick, mockServerTick);
+        Assert.AreEqual(mockPlayer.GetPosition(), initialPosition + mockMovement);
+    }
+
+    /// <summary>
+    /// GIVEN: InputBuffer map with an unprocessed input, Input map missing that player
+    /// WHEN: ApplyInput() is called
+    /// THEN: Input is not Dequeued
+    /// </summary>
+    [Test]
+    public void TestApplyInputNoPlayer()
+    {
+        uint mockNetId = 10;
+        uint bufferSize = 64;
+        uint mockClientTick = 15;
+        uint mockServerTick = 30;
+        Vector2 mockMovement = Vector2.up;
+
+        Inputs mockInputs = new Inputs { movement = mockMovement };
+
+        Dictionary<uint, InputBuffer<Inputs>> inputBufferMap = new Dictionary<uint, InputBuffer<Inputs>>();
+        InputBuffer<Inputs> inputBuffer = new InputBuffer<Inputs>(bufferSize);
+        inputBuffer.Enqueue(mockInputs, mockClientTick);
+        inputBufferMap.Add(mockNetId, inputBuffer);
+
+        Dictionary<uint, IInputful> inputMap = new Dictionary<uint, IInputful>();
+
+        ServerStateMachine.ApplyInput(ref inputBufferMap, ref inputMap, mockServerTick);
+
+        Assert.True(!inputBuffer.BeenProcessed);
+    }
+
+    /// <summary>
+    /// GIVEN: InputBuffer map with an no unprocessed input, Input map with a mock player
+    /// WHEN: ApplyInput() is called
+    /// THEN: Input is not applied
+    /// </summary>
+    [Test]
+    public void TestApplyInputNoUnproccessedInput()
+    {
+        uint mockNetId = 10;
+        uint bufferSize = 64;
+        uint mockServerTick = 30;
+        Vector2 mockMovement = Vector2.up;
+
+        Inputs mockInputs = new Inputs { movement = mockMovement };
+
+        Dictionary<uint, InputBuffer<Inputs>> inputBufferMap = new Dictionary<uint, InputBuffer<Inputs>>();
+        InputBuffer<Inputs> inputBuffer = new InputBuffer<Inputs>(bufferSize);
+        inputBufferMap.Add(mockNetId, inputBuffer);
+
+        Dictionary<uint, IInputful> inputMap = new Dictionary<uint, IInputful>();
+        MockPlayer mockPlayer = new MockPlayer();
+        Vector2 initialPosition = mockPlayer.GetPosition();
+        inputMap.Add(mockNetId, mockPlayer);
+
+        ServerStateMachine.ApplyInput(ref inputBufferMap, ref inputMap, mockServerTick);
+
+        Assert.AreEqual(mockPlayer.GetPosition(), initialPosition);
     }
 
     #endregion

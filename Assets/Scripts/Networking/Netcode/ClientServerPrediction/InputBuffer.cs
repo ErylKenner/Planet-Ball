@@ -1,3 +1,5 @@
+using System;
+
 public class InputPacket<T>
 {
     public T input;
@@ -21,7 +23,7 @@ public class InputBuffer<T>
         }
     }
 
-    public bool Ready
+    public bool BeenProcessed
     {
         get
         {
@@ -46,6 +48,10 @@ public class InputBuffer<T>
 
     public InputPacket<T> Dequeue(uint serverTick)
     {
+        if(unprocessedCount == 0)
+        {
+            throw new InvalidOperationException("Input buffer has no unprocessed items");
+        }
 
         lastProcessed++;
         lastProcessed %= (int)bufferSize;

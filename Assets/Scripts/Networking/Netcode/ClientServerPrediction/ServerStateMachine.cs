@@ -19,7 +19,7 @@ namespace ClientServerPrediction
                 }
 
                 uint newestTick = inputMessage.startTick + (uint)inputMessage.inputs.Count - 1;
-                uint expectedTick = inputBufferMap[inputMessage.netId].Ready ? inputBufferMap[inputMessage.netId].LastRecieved().clientTick : newestTick;
+                uint expectedTick = inputBufferMap[inputMessage.netId].BeenProcessed ? inputBufferMap[inputMessage.netId].LastRecieved().clientTick : newestTick;
                 
 
                 if(newestTick >= expectedTick)
@@ -33,9 +33,17 @@ namespace ClientServerPrediction
         }
 
         public static void ApplyInput(ref Dictionary<uint, InputBuffer<Inputs>> inputBufferMap,
-                                      ref Dictionary<uint, IInputful> inputMap)
+                                      ref Dictionary<uint, IInputful> inputMap,
+                                      uint serverTick)
         {
-
+            foreach(uint id in inputBufferMap.Keys)
+            {
+                if(inputMap.ContainsKey(id) && inputBufferMap[id].Count > 0)
+                {
+                    InputPacket<Inputs> inputPacket = inputBufferMap[id].Dequeue(serverTick);
+                    inputMap[id].ApplyInput(inputPacket.input);
+                }
+            }
         }
 
         public static StateMessage CreateStateMessage(in Dictionary<uint, IStateful> stateMap,

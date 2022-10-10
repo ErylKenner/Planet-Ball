@@ -201,7 +201,7 @@ public class NetcodeManager : NetworkBehaviour
             playerTickMonitor = NetIdToPlayerTickCounter[playerTickMonitorIndex].Item2;
         }
 
-        if(netcodePlayer.server_input_buffer != null && netcodePlayer.server_input_buffer.Ready)
+        if(netcodePlayer.server_input_buffer != null && netcodePlayer.server_input_buffer.BeenProcessed)
         {
             playerTickMonitor.Sample(netcodePlayer.server_input_buffer.LastRecieved().clientTick % NetcodeManager.c_client_buffer_size);
         }
