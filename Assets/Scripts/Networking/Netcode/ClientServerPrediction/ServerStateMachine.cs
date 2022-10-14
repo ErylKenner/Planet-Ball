@@ -54,15 +54,24 @@ namespace ClientServerPrediction
 
             foreach (uint netId in stateMap.Keys)
             {
-                // TODO: Test these conditionals
-                if(inputBufferMap.ContainsKey(netId) &&
+                StateContext stateContext = new StateContext
+                {
+                    netId = netId,
+                    state = stateMap[netId].GetState()
+                };
+
+                if (inputBufferMap.ContainsKey(netId) &&
                    inputBufferMap[netId].BeenProcessed)
                 {
-                    stateMessage.stateContexts.Add(new StateContext { netId = netId,
-                                                                      lastProcessedClientTick = inputBufferMap[netId].LastProcessed().clientTick,
-                                                                      lastProcessedServerTick = inputBufferMap[netId].LastProcessed().serverTick,
-                                                                      state = stateMap[netId].GetState() });
+                    TickSync tickSync = new TickSync
+                    {
+                        lastProcessedClientTick = inputBufferMap[netId].LastProcessed().clientTick,
+                        lastProcessedServerTick = inputBufferMap[netId].LastProcessed().serverTick
+                    };
+                    stateContext.tickSync = tickSync;
                 }
+
+                stateMessage.stateContexts.Add(stateContext);
             }
 
             return stateMessage;
@@ -71,7 +80,7 @@ namespace ClientServerPrediction
         public static void SendStateMessage(in StateMessage stateMessage,
                                             ref Queue<StateMessage> stateQueue)
         {
-
+            stateQueue.Enqueue(stateMessage);
         }
     }
 }

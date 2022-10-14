@@ -23,15 +23,19 @@ namespace ClientServerPrediction
         public List<Inputs> inputs;
     }
 
+    public class TickSync
+    {
+        // Client tick n associated with input n
+        public uint lastProcessedClientTick = 0;
+        // Server tick m associated with input m
+        public uint lastProcessedServerTick = 0;
+    }
+
     public class StateContext
     {
         public uint netId;
 
-        // Client tick n associated with input n
-        public uint lastProcessedClientTick;
-        // Server tick m associated with input m
-        public uint lastProcessedServerTick;
-
+        public TickSync tickSync = null;
 
         // This is the state of client state n + 1
         public State state;
