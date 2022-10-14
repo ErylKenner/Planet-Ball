@@ -7,7 +7,22 @@ namespace ClientServerPrediction
     {
         public static StateMessage GetLatestStateMessage(ref Queue<StateMessage> stateQueue)
         {
-            return new StateMessage();
+            if(stateQueue.Count == 0)
+            {
+                return null;
+            }
+
+            StateMessage stateMessage = stateQueue.Dequeue();
+            while(stateQueue.Count > 0)
+            {
+                StateMessage currentStateMessage = stateQueue.Dequeue();
+                if(currentStateMessage.serverTick > stateMessage.serverTick)
+                {
+                    stateMessage = currentStateMessage;
+                }
+            }
+
+            return stateMessage;
         }
         public static void CorrectClient(ref Dictionary<uint, Inputs[]> inputBufferMap,
                                          ref Dictionary<uint, State[]> stateBufferMap,
