@@ -34,18 +34,31 @@ namespace ClientServerPrediction
         }
 
         public static void StoreState(ref Dictionary<uint, State[]> stateBufferMap,
-                                      in Dictionary<uint, IStateful> stateMap)
+                                      in Dictionary<uint, IStateful> stateMap,
+                                      uint bufferSlot)
         {
+            foreach (uint id in stateMap.Keys)
+            {
+                if (stateBufferMap.ContainsKey(id))
+                {
+                    if(bufferSlot >= stateBufferMap[id].Length)
+                    {
+                        throw new System.IndexOutOfRangeException($"Slot {bufferSlot} is out of range of {id}'s buffer of length {stateBufferMap[id].Length}");
+                    }
 
+                    stateBufferMap[id][bufferSlot] = stateMap[id].GetState();
+                }
+            }
         }
 
         public static void StoreInput(ref Dictionary<uint, Inputs[]> inputBufferMap,
-                                      in Dictionary<uint, IInputful> inputMap)
+                                      in Dictionary<uint, IInputful> inputMap,
+                                      uint bufferSlot)
         {
 
         }
 
-        public static InputMessage CreateInputMessage(in Dictionary<uint, Inputs[]> inputBufferMap)
+        public static InputMessage CreateInputMessage(in Dictionary<uint, Inputs[]> inputBufferMap, uint lastReceivedTick)
         {
             return new InputMessage();
         }
