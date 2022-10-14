@@ -55,7 +55,18 @@ namespace ClientServerPrediction
                                       in Dictionary<uint, IInputful> inputMap,
                                       uint bufferSlot)
         {
+            foreach (uint id in inputMap.Keys)
+            {
+                if (inputBufferMap.ContainsKey(id))
+                {
+                    if (bufferSlot >= inputBufferMap[id].Length)
+                    {
+                        throw new System.IndexOutOfRangeException($"Slot {bufferSlot} is out of range of {id}'s buffer of length {inputBufferMap[id].Length}");
+                    }
 
+                    inputBufferMap[id][bufferSlot] = inputMap[id].GetInput();
+                }
+            }
         }
 
         public static InputMessage CreateInputMessage(in Dictionary<uint, Inputs[]> inputBufferMap, uint lastReceivedTick)
