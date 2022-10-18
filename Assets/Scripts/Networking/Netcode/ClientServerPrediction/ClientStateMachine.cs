@@ -69,9 +69,22 @@ namespace ClientServerPrediction
             }
         }
 
-        public static InputMessage CreateInputMessage(in Dictionary<uint, Inputs[]> inputBufferMap, uint lastReceivedTick)
+        public static InputMessage CreateInputMessage(in Dictionary<uint, Inputs[]> inputBufferMap, uint lastReceivedTick, uint clientTick)
         {
-            return new InputMessage();
+            uint startTick = lastReceivedTick + 1;
+            InputMessage inputMessage = new InputMessage { startTick = startTick };
+
+            foreach(uint id in inputBufferMap.Keys)
+            {
+                InputContext inputContext = new InputContext { netId = id };
+                for(int index = (int)startTick; index <= clientTick; index++)
+                {
+                    inputContext.inputs.Add(inputBufferMap[id][index % inputBufferMap[id].Length]);
+                }
+                inputMessage.inputContexts.Add(inputContext);
+            }
+
+            return inputMessage;
         }
 
         public static void SendInputMessage(InputMessage inputMessage,

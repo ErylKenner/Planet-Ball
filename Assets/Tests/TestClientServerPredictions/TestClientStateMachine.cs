@@ -265,4 +265,66 @@ public class TestClientStateMachine
 
     }
     #endregion
+
+    #region CreateInputMessage
+
+    /// <summary>
+    /// GIVEN: Valid Input buffer map, valid last recieved tick, valid client tick (last recieved + 1)
+    /// WHEN: CreateInputMessage() is called
+    /// THEN: Returns input message with one player and one input, start tick is one after last recieved
+    /// </summary>
+    [Test]
+    public void TestCreateInputMessage()
+    {
+        uint mockNetId = 10;
+        uint mockBufferSize = 64;
+        uint mockLastRecievedTick = 15;
+        uint mockClientTick = 16;
+        Vector2 mockMovement = Vector2.up;
+        Dictionary<uint, Inputs[]> inputBufferMap = new Dictionary<uint, Inputs[]>();
+
+        Inputs[] inputBuffer = new Inputs[mockBufferSize];
+        inputBuffer[mockClientTick] = new Inputs { movement = mockMovement };
+        inputBufferMap.Add(mockNetId, inputBuffer);
+
+        InputMessage inputMessage = ClientStateMachine.CreateInputMessage(in inputBufferMap, mockLastRecievedTick, mockClientTick);
+        Dictionary<uint, InputContext> inputMessageMap = inputMessage.GetMap();
+
+        Assert.AreEqual(inputMessage.startTick, mockLastRecievedTick + 1);
+        Assert.AreEqual(inputMessage.inputContexts.Count, 1);
+        Assert.AreEqual(inputMessage.inputContexts[0].inputs.Count, 1);
+        Assert.AreEqual(inputMessageMap[mockNetId].inputs[0].movement, mockMovement);
+    }
+
+    /// <summary>
+    /// GIVEN: Valid Input buffer map, valid last recieved tick, valid client tick - goes around buffer
+    /// WHEN: CreateInputMessage() is called
+    /// THEN: Returns input message with one player and two inputs, handled fine
+    /// </summary>
+    [Test]
+    public void TestCreateInputMessageBufferWrap()
+    {
+        uint mockNetId = 10;
+        uint mockBufferSize = 16;
+        uint mockLastRecievedTick = 15;
+        uint mockClientTick = 17;
+        Vector2 mockMovement = Vector2.up;
+        Dictionary<uint, Inputs[]> inputBufferMap = new Dictionary<uint, Inputs[]>();
+
+        Inputs[] inputBuffer = new Inputs[mockBufferSize];
+        inputBuffer[(mockClientTick - 1) % inputBuffer.Length] = new Inputs { movement = mockMovement };
+        inputBuffer[mockClientTick % inputBuffer.Length] = new Inputs { movement = mockMovement };
+        inputBufferMap.Add(mockNetId, inputBuffer);
+
+        InputMessage inputMessage = ClientStateMachine.CreateInputMessage(in inputBufferMap, mockLastRecievedTick, mockClientTick);
+        Dictionary<uint, InputContext> inputMessageMap = inputMessage.GetMap();
+
+        Assert.AreEqual(inputMessage.startTick, mockLastRecievedTick + 1);
+        Assert.AreEqual(inputMessage.inputContexts.Count, 1);
+        Assert.AreEqual(inputMessage.inputContexts[0].inputs.Count, 2);
+        Assert.AreEqual(inputMessageMap[mockNetId].inputs[0].movement, mockMovement);
+        Assert.AreEqual(inputMessageMap[mockNetId].inputs[1].movement, mockMovement);
+    }
+
+    #endregion
 }

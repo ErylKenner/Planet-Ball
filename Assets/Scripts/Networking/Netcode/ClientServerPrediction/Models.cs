@@ -16,11 +16,27 @@ namespace ClientServerPrediction
         public float angularVelocity = 0f;
     }
 
-    public class InputMessage
+    public class InputContext
     {
         public uint netId;
+        public List<Inputs> inputs = new List<Inputs>();
+    }
+
+    public class InputMessage
+    {
+        public List<InputContext> inputContexts = new List<InputContext>();
         public uint startTick;
-        public List<Inputs> inputs;
+
+        public Dictionary<uint, InputContext> GetMap()
+        {
+            Dictionary<uint, InputContext> map = new Dictionary<uint, InputContext>();
+            foreach (InputContext inputContext in inputContexts)
+            {
+                map.Add(inputContext.netId, inputContext);
+            }
+
+            return map;
+        }
     }
 
     public class TickSync

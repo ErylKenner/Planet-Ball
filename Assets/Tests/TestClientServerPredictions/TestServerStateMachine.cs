@@ -25,7 +25,9 @@ public class TestServerStateMachine
         Inputs mockInputs = new Inputs { movement = mockMovement };
         List<Inputs> mockInputList = new List<Inputs> { mockInputs };
 
-        InputMessage inputMessage = new InputMessage { netId = mockNetId, startTick = mockStartTick, inputs = mockInputList };
+        InputMessage inputMessage = new InputMessage {  startTick = mockStartTick,  };
+        InputContext inputContext = new InputContext { netId = mockNetId, inputs = mockInputList };
+        inputMessage.inputContexts.Add(inputContext);
         Queue<InputMessage> inputQueue = new Queue<InputMessage>();
         inputQueue.Enqueue(inputMessage);
 
@@ -57,7 +59,9 @@ public class TestServerStateMachine
         Inputs mockInputsSecond = new Inputs { movement = mockMovementSecond };
         List<Inputs> mockInputList = new List<Inputs> { mockInputsFirst, mockInputsSecond };
 
-        InputMessage inputMessage = new InputMessage { netId = mockNetId, startTick = mockStartTick, inputs = mockInputList };
+        InputMessage inputMessage = new InputMessage { startTick = mockStartTick, };
+        InputContext inputContext = new InputContext { netId = mockNetId, inputs = mockInputList };
+        inputMessage.inputContexts.Add(inputContext);
         Queue<InputMessage> inputQueue = new Queue<InputMessage>();
         inputQueue.Enqueue(inputMessage);
 
@@ -88,7 +92,9 @@ public class TestServerStateMachine
         Inputs mockInputs = new Inputs { movement = mockMovement };
         List<Inputs> mockInputList = new List<Inputs> { mockInputs };
 
-        InputMessage inputMessage = new InputMessage { netId = mockNetId, startTick = mockStartTick, inputs = mockInputList };
+        InputMessage inputMessage = new InputMessage { startTick = mockStartTick, };
+        InputContext inputContext = new InputContext { netId = mockNetId, inputs = mockInputList };
+        inputMessage.inputContexts.Add(inputContext);
         Queue<InputMessage> inputQueue = new Queue<InputMessage>();
         inputQueue.Enqueue(inputMessage);
 
@@ -122,7 +128,9 @@ public class TestServerStateMachine
         Inputs mockInputs = new Inputs { movement = mockMovement };
         List<Inputs> mockInputList = new List<Inputs> { mockInputs };
 
-        InputMessage inputMessage = new InputMessage { netId = mockNetId, startTick = mockStartTick, inputs = mockInputList };
+        InputMessage inputMessage = new InputMessage { startTick = mockStartTick, };
+        InputContext inputContext = new InputContext { netId = mockNetId, inputs = mockInputList };
+        inputMessage.inputContexts.Add(inputContext);
         Queue<InputMessage> inputQueue = new Queue<InputMessage>();
         inputQueue.Enqueue(inputMessage);
 

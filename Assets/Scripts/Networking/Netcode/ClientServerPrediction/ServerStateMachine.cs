@@ -12,21 +12,25 @@ namespace ClientServerPrediction
             {
                 InputMessage inputMessage = inputQueue.Dequeue();
 
-                if(!inputBufferMap.ContainsKey(inputMessage.netId))
+                foreach (InputContext inputContext in inputMessage.inputContexts)
                 {
-                    InputBuffer<Inputs> inputBuffer = new InputBuffer<Inputs>(bufferSize);
-                    inputBufferMap.Add(inputMessage.netId, inputBuffer);
-                }
 
-                uint newestTick = inputMessage.startTick + (uint)inputMessage.inputs.Count - 1;
-                uint expectedTick = inputBufferMap[inputMessage.netId].BeenProcessed ? inputBufferMap[inputMessage.netId].LastRecieved().clientTick : newestTick;
-                
-
-                if(newestTick >= expectedTick)
-                {
-                    for(int index = (int)expectedTick; index <= newestTick; index++ )
+                    if (!inputBufferMap.ContainsKey(inputContext.netId))
                     {
-                        inputBufferMap[inputMessage.netId].Enqueue(inputMessage.inputs[index - (int)inputMessage.startTick], (uint)index);
+                        InputBuffer<Inputs> inputBuffer = new InputBuffer<Inputs>(bufferSize);
+                        inputBufferMap.Add(inputContext.netId, inputBuffer);
+                    }
+
+                    uint newestTick = inputMessage.startTick + (uint)inputContext.inputs.Count - 1;
+                    uint expectedTick = inputBufferMap[inputContext.netId].BeenProcessed ? inputBufferMap[inputContext.netId].LastRecieved().clientTick : newestTick;
+
+
+                    if (newestTick >= expectedTick)
+                    {
+                        for (int index = (int)expectedTick; index <= newestTick; index++)
+                        {
+                            inputBufferMap[inputContext.netId].Enqueue(inputContext.inputs[index - (int)inputMessage.startTick], (uint)index);
+                        }
                     }
                 }
             }
