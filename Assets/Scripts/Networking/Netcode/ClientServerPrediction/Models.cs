@@ -16,6 +16,11 @@ namespace ClientServerPrediction
         public float angularVelocity = 0f;
     }
 
+    public class StateError
+    {
+        public float positionDiff;
+    }
+
     public class InputContext
     {
         public uint netId;
@@ -60,7 +65,7 @@ namespace ClientServerPrediction
     {
         // This is the server tick m + 1
         public uint serverTick;
-        public List<StateContext> stateContexts;
+        public List<StateContext> stateContexts = new List<StateContext>();
 
         public Dictionary<uint, StateContext> GetMap()
         {
