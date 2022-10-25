@@ -316,6 +316,109 @@ public class TestClientStateMachine
         // The next input will be applied to this adjusted state
 
     }
+
+    /// <summary>
+    /// GIVEN: Client and server tick are greater than mockBufferSize
+    ///        Valid State buffer map, valid Stateful map
+    ///        Valid Input buffer map, valid Inputful map
+    ///        Valid StateMessage, different from stored state, valid StateError margin
+    /// WHEN: CorrectClient() is called
+    /// THEN: State is corrected, one input applied
+    ///       State buffer is updated
+    /// </summary>
+    [Test]
+    public void TestCorrectClientDoCorrectionApplyInputTickOutOfBounds()
+    {
+        uint mockBufferSize = 16;
+        uint mockNetId = 10;
+        Vector2 mockPosition = Vector2.up;
+        uint mockClientTick = 25;
+        uint mockServerTick = 20;
+
+        MockPlayer mockPlayer = new MockPlayer();
+
+        Dictionary<uint, IInputful> inputMap = new Dictionary<uint, IInputful>();
+        Dictionary<uint, IStateful> stateMap = new Dictionary<uint, IStateful>();
+
+        inputMap.Add(mockNetId, mockPlayer);
+        stateMap.Add(mockNetId, mockPlayer);
+
+        Dictionary<uint, Inputs[]> inputBufferMap = new Dictionary<uint, Inputs[]>();
+        Dictionary<uint, State[]> stateBufferMap = new Dictionary<uint, State[]>();
+
+        Inputs[] inputBuffer = new Inputs[mockBufferSize];
+        State[] stateBuffer = new State[mockBufferSize];
+
+        // Set initial position
+        mockPlayer.SetState(new State { position = mockPosition });
+
+        // Store the state at MCT
+        stateBuffer[mockClientTick % mockBufferSize] = mockPlayer.GetState();
+
+        // Store the input at MCT
+        inputBuffer[mockClientTick % mockBufferSize] = mockPlayer.GetInput();
+
+        // Apply the input
+        mockPlayer.ApplyInput(inputBuffer[mockClientTick % mockBufferSize]);
+        State originalState = mockPlayer.GetState();
+
+        // Store the state at MCT + 1
+        stateBuffer[(mockClientTick + 1) % mockBufferSize] = originalState;
+
+
+        // Store the input at MCT + 1
+        inputBuffer[(mockClientTick + 1) % mockBufferSize] = mockPlayer.GetInput();
+
+        // Apply the input
+        mockPlayer.ApplyInput(inputBuffer[mockClientTick % mockBufferSize]);
+
+        // Store the state at MCT + 2
+        stateBuffer[(mockClientTick + 2) % mockBufferSize] = mockPlayer.GetState();
+
+
+        Vector2 mockServerPosition = originalState.position * 0.75f;
+        State mockServerState = new State { position = mockServerPosition };
+
+        // Create the state message with MCT (last input processed)
+        StateContext mockStateContext = new StateContext
+        {
+            netId = mockNetId,
+            tickSync = new TickSync { lastProcessedClientTick = mockClientTick, lastProcessedServerTick = mockServerTick - 1 },
+            state = mockServerState
+        };
+
+        StateMessage stateMessage = new StateMessage { serverTick = mockServerTick };
+        stateMessage.stateContexts.Add(mockStateContext);
+
+        stateBufferMap.Add(mockNetId, stateBuffer);
+        inputBufferMap.Add(mockNetId, inputBuffer);
+        StateError stateError = new StateError { positionDiff = 0.01f };
+
+        uint lastRecievedClientTick = ClientStateMachine.CorrectClient(
+            ref inputBufferMap,
+            ref stateBufferMap,
+            ref inputMap,
+            ref stateMap,
+            in stateMessage,
+            in stateError,
+            new MockRunner(),
+            new RunContext(),
+            mockNetId,
+            mockClientTick + 2
+        );
+
+        // Last recieved tick is MCT + 1
+        Assert.AreEqual(lastRecievedClientTick, mockClientTick + 1);
+
+        // Position is set to the serverPosition + the input from MCT + 1
+        Assert.AreEqual(mockPlayer.GetState().position, mockServerPosition + inputBuffer[(mockClientTick + 1) % mockBufferSize].movement);
+
+        // State for the current tick has been saved
+        Assert.AreEqual(stateBuffer[(mockClientTick + 2) % mockBufferSize].position, mockServerPosition + inputBuffer[(mockClientTick + 1) % mockBufferSize].movement);
+
+        // The next input will be applied to this adjusted state
+
+    }
     #endregion
 
 

@@ -56,13 +56,13 @@ namespace ClientServerPrediction
             // inputLoss = serverTick - lastProcessedServerTick - 1
 
             // Compare state recieved with predicted state
-            if((stateBufferMap[netId][messageClientTick].position - messageMap[netId].state.position).magnitude > stateError.positionDiff) {
+            if((stateBufferMap[netId][messageClientTick % stateBufferMap[netId].Length].position - messageMap[netId].state.position).magnitude > stateError.positionDiff) {
                 // Do correction
                 // foreach StateContext
                 foreach (StateContext stateContext in stateMessage.stateContexts)
                 {
                     // Update the state buffer
-                    stateBufferMap[stateContext.netId][messageClientTick] = stateContext.state;
+                    stateBufferMap[stateContext.netId][messageClientTick % stateBufferMap[netId].Length] = stateContext.state;
                     // Set the Stateful state
                     stateMap[stateContext.netId].SetState(stateContext.state);
                 }
@@ -75,7 +75,7 @@ namespace ClientServerPrediction
                         if (stateContext.netId == netId)
                         {
                             // Apply input from input buffer
-                            inputMap[stateContext.netId].ApplyInput(inputBufferMap[stateContext.netId][i]);
+                            inputMap[stateContext.netId].ApplyInput(inputBufferMap[stateContext.netId][i % inputBufferMap[stateContext.netId].Length]);
                         }
                     }
 
@@ -86,7 +86,7 @@ namespace ClientServerPrediction
                     foreach (StateContext stateContext in stateMessage.stateContexts)
                     {
                         // Update the state buffer
-                        stateBufferMap[stateContext.netId][i + 1] = stateMap[stateContext.netId].GetState();
+                        stateBufferMap[stateContext.netId][(i + 1) % stateBufferMap[netId].Length] = stateMap[stateContext.netId].GetState();
                     }
 
                     }
