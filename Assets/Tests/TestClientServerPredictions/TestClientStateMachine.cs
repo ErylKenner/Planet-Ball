@@ -590,4 +590,21 @@ public class TestClientStateMachine
     }
 
     #endregion
+
+    #region SendInputMessage
+    /// <summary>
+    /// GIVEN: Valid inputMessage, valid inputMessageQueue
+    /// WHEN: SendInputMessage() is called
+    /// THEN: inputMessage is queued
+    /// </summary>
+    [Test]
+    public void TestSendInputMessage()
+    {
+        InputMessage inputMessage = new InputMessage { startTick = 20 };
+        Queue<InputMessage> inputMessageQueue = new Queue<InputMessage>();
+
+        ClientStateMachine.SendInputMessage(inputMessage, ref inputMessageQueue);
+        Assert.AreEqual(inputMessage, inputMessageQueue.Peek());
+    }
+    #endregion
 }

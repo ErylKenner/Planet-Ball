@@ -152,7 +152,7 @@ namespace ClientServerPrediction
         public static void SendInputMessage(InputMessage inputMessage,
                                             ref Queue<InputMessage> inputMessageQueue)
         {
-
+            inputMessageQueue.Enqueue(inputMessage);
         }
     }
 }
