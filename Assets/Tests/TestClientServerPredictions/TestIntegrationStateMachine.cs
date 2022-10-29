@@ -18,7 +18,7 @@ public class TestIntegrationStateMachine
     [Test]
     public void TestStateMachine()
     {
-        // Object
+        // Consts
         uint mockNetId = 10;
         uint mockBufferSize = 64;
         uint mockClientTick = 20;
@@ -28,21 +28,14 @@ public class TestIntegrationStateMachine
         MockPlayer mockServerPlayer = new MockPlayer();
         MockRunner mockRunner = new MockRunner();
 
-        Queue<InputMessage> inputMessageQueue = new Queue<InputMessage>();
+
+        // Client Objects
         Queue<StateMessage> stateMessageQueue = new Queue<StateMessage>();
-
-
         Dictionary<uint, IInputful> inputMap = new Dictionary<uint, IInputful>();
         Dictionary<uint, IStateful> stateMap = new Dictionary<uint, IStateful>();
 
         inputMap.Add(mockNetId, mockPlayer);
         stateMap.Add(mockNetId, mockPlayer);
-
-        Dictionary<uint, IInputful> serverInputMap = new Dictionary<uint, IInputful>();
-        Dictionary<uint, IStateful> serverStateMap = new Dictionary<uint, IStateful>();
-
-        serverInputMap.Add(mockNetId, mockServerPlayer);
-        serverStateMap.Add(mockNetId, mockServerPlayer);
 
         Dictionary<uint, Inputs[]> inputBufferMap = new Dictionary<uint, Inputs[]>();
         Dictionary<uint, State[]> stateBufferMap = new Dictionary<uint, State[]>();
@@ -52,6 +45,15 @@ public class TestIntegrationStateMachine
 
         stateBufferMap.Add(mockNetId, stateBuffer);
         inputBufferMap.Add(mockNetId, inputBuffer);
+
+
+        //Server Object
+        Queue<InputMessage> inputMessageQueue = new Queue<InputMessage>();
+        Dictionary<uint, IInputful> serverInputMap = new Dictionary<uint, IInputful>();
+        Dictionary<uint, IStateful> serverStateMap = new Dictionary<uint, IStateful>();
+
+        serverInputMap.Add(mockNetId, mockServerPlayer);
+        serverStateMap.Add(mockNetId, mockServerPlayer);
 
         Dictionary<uint, InputBuffer<Inputs>> serverInputBufferMap = new Dictionary<uint, InputBuffer<Inputs>>();
 
