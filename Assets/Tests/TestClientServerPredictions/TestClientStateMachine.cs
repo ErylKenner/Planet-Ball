@@ -499,34 +499,6 @@ public class TestClientStateMachine
 
     }
 
-    /// <summary>
-    /// GIVEN: Valid State buffer map, valid Stateful map, buffer slot larger than the buffer
-    /// WHEN: StoreState() is called
-    /// THEN: Throws IndexOutOfRangeException
-    /// </summary>
-    [Test]
-    public void TestStoreStateSlotOutOfRange()
-    {
-        uint mockBufferSize = 64;
-        uint mockNetId = 10;
-        Vector2 mockPosition = Vector2.up;
-        uint mockBufferSlot = 70;
-
-        State[] stateBuffer = new State[mockBufferSize];
-        Dictionary<uint, State[]> stateBufferMap = new Dictionary<uint, State[]>();
-        stateBufferMap.Add(mockNetId, stateBuffer);
-
-        MockPlayer mockPlayer = new MockPlayer();
-        mockPlayer.SetState(new State { position = mockPosition });
-
-        Dictionary<uint, IStateful> stateMap = new Dictionary<uint, IStateful>();
-        stateMap.Add(mockNetId, mockPlayer);
-
-        Assert.Throws<System.IndexOutOfRangeException>(() => 
-            ClientStateMachine.StoreState(ref stateBufferMap, in stateMap, mockBufferSlot)
-        );
-
-    }
     #endregion
 
     #region StoreInput
@@ -601,33 +573,6 @@ public class TestClientStateMachine
         ClientStateMachine.StoreInput(ref inputBufferMap, in inputMap, mockBufferSlot);
 
         Assert.False(inputBufferMap.ContainsKey(mockNetId));
-
-    }
-
-    /// <summary>
-    /// GIVEN: Valid Input buffer map, valid Inputful map, buffer slot larger than the buffer
-    /// WHEN: StoreInput() is called
-    /// THEN: Throws IndexOutOfRangeException
-    /// </summary>
-    [Test]
-    public void TestStoreInputSlotOutOfRange()
-    {
-        uint mockBufferSize = 64;
-        uint mockNetId = 10;
-        uint mockBufferSlot = 70;
-
-        Inputs[] inputBuffer = new Inputs[mockBufferSize];
-        Dictionary<uint, Inputs[]> inputBufferMap = new Dictionary<uint, Inputs[]>();
-        inputBufferMap.Add(mockNetId, inputBuffer);
-
-        MockPlayer mockPlayer = new MockPlayer();
-
-        Dictionary<uint, IInputful> inputMap = new Dictionary<uint, IInputful>();
-        inputMap.Add(mockNetId, mockPlayer);
-
-        Assert.Throws<System.IndexOutOfRangeException>(() =>
-            ClientStateMachine.StoreInput(ref inputBufferMap, in inputMap, mockBufferSlot)
-        );
 
     }
     #endregion
