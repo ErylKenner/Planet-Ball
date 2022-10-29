@@ -45,6 +45,7 @@ namespace ClientServerPrediction
                 if(inputMap.ContainsKey(id) && inputBufferMap[id].Count > 0)
                 {
                     InputPacket<Inputs> inputPacket = inputBufferMap[id].Dequeue(serverTick);
+                    // TODO: Integrate with StateMachine.Run?
                     inputMap[id].ApplyInput(inputPacket.input);
                 }
             }
