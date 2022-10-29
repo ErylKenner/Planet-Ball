@@ -212,7 +212,7 @@ public class PlayerPlanetController : NetworkBehaviour
         foreach (Planet cur in FindObjectsOfType<Planet>())
         {
             float dist = Vector2.Distance(cur.transform.position, body.position);
-            if (dist < shortestDistance && dist <= MAX_RADIUS)
+            if (dist < shortestDistance && dist <= MAX_RADIUS && dist <= cur.Radius)
             {
                 shortestDistance = dist;
                 closest = cur;

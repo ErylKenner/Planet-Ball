@@ -300,15 +300,23 @@ MonoBehaviour:
   IsTethered: 0
   IsWindTether: 0
   IsUnwindTether: 0
+  IsSpeedBoost: 0
+  IsHeavy: 0
   OrbitRadius: 0
   CenterPoint: {x: 0, y: 0}
   Speed: 12
+  CurSpeedBoostCooldown: 0
+  CurHeavyCooldown: 0
   WIND_TETHER_RATIO: 0.11
   MIN_RADIUS: 0.5
   MAX_RADIUS: 9
   MIN_SPEED: 12
   MAX_SPEED: 40
   SPEED_FALLOFF: 0.62
+  SPEED_BOOST_COOLDOWN: 10
+  HEAVY_COOLDOWN: 10
+  HEAVY_DURATION: 4
+  HEAVY_MASS: 20
 --- !u!114 &526718707672477060
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -322,13 +330,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Player: {fileID: 7641804893563888105}
-  DISABLED_TETHER_COLOR: {r: 0.5, g: 0.5, b: 0.5, a: 0.1}
+  DISABLED_TETHER_COLOR: {r: 0.5, g: 0.5, b: 0.5, a: 0.4745098}
   ENABLED_TETHER_COLOR: {r: 0.02352941, g: 0.02352941, b: 0.02352941, a: 1}
   SECTION_COUNT: 10
   PLAYER_HANDLE_TOWARD: 0
   PLAYER_HANDLE_SIDEWAYS: 0
-  PLANET_HANDLE_TOWARD: -0.8
-  PLANET_HANDLE_SIDEWAYS: 0.001
+  PLANET_HANDLE_TOWARD: -0.61
+  PLANET_HANDLE_SIDEWAYS: 0.01
 --- !u!1 &5594583912770767460
 GameObject:
   m_ObjectHideFlags: 0
