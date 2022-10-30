@@ -10,14 +10,14 @@ public class PlayerInputState
     public bool WindTether = false;
     public bool UnwindTether = false;
     public bool SpeedBoost = false;
-    public bool Heavy = false;
-    public PlayerInputState(bool attachTether, bool windTether, bool unwindTether, bool speedBoost, bool heavy)
+    public bool Kick = false;
+    public PlayerInputState(bool attachTether, bool windTether, bool unwindTether, bool speedBoost, bool kick)
     {
         AttachTether = attachTether;
         WindTether = windTether;
         UnwindTether = unwindTether;
         SpeedBoost = speedBoost;
-        Heavy = heavy;
+        Kick = kick;
     }
 }
 
@@ -34,31 +34,35 @@ public class PlayerPlanetController : NetworkBehaviour
     public bool IsWindTether = false;
     public bool IsUnwindTether = false;
     public bool IsSpeedBoost = false;
-    public bool IsHeavy = false;
+    public bool IsKick = false;
     public float OrbitRadius = 0;
     public Vector2 CenterPoint = Vector2.zero;
     public float Speed = 12.0f;
     public float CurSpeedBoostCooldown = 0f;
-    public float CurHeavyCooldown = 0f;
+    public float CurKickCooldown = 0f;
+    public float CurGas = 0f;
 
     // Const attributes - not state
     public float WIND_TETHER_RATIO = 0.11f;
     public float MIN_RADIUS = 0.5f;
     public float MAX_RADIUS = 9f;
     public float MIN_SPEED = 12f;
-    public float MAX_SPEED = 40f;
-    public float SPEED_FALLOFF = 0.62f;
-    public float SPEED_BOOST_COOLDOWN = 10f;
-    public float HEAVY_COOLDOWN = 10f;
-    public float HEAVY_DURATION = 4f;
-    public float HEAVY_MASS = 20f;
+    public float MAX_SPEED = 45f;
+    public float SPEED_FALLOFF = 0.8f;
+    public float SPEED_BOOST_RAMP = 0.5f;
+    public float SPEED_BOOST_COOLDOWN = 5f;
+    public float HEAVY_COOLDOWN = 0.5f;
+    public float HEAVY_DURATION = 1f;
+    public float HEAVY_MASS = 10f;
+    public float GAS_INCREASE_TIME = 30f;
+    public float GAS_DRAIN_TIME = 7f;
 
     // For testing. Input system callbacks set these which are then read in FixedUpdate
     private bool _attachTether = false;
     private bool _windTether = false;
     private bool _unwindTether = false;
     private bool _speedBoost = false;
-    private bool _heavy = false;
+    private bool _kick = false;
 
     private Rigidbody2D body;
 
@@ -80,7 +84,7 @@ public class PlayerPlanetController : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        PlayerInputState input = new PlayerInputState(_attachTether, _windTether, _unwindTether, _speedBoost, _heavy);
+        PlayerInputState input = new PlayerInputState(_attachTether, _windTether, _unwindTether, _speedBoost, _kick);
         PhysicsPreStep(input, Time.fixedDeltaTime);
     }
 
@@ -93,15 +97,16 @@ public class PlayerPlanetController : NetworkBehaviour
     private void SetStateFromInput(PlayerInputState input, float dt)
     {
         bool wasTethered = IsTethered;
+        bool wasSpeedBoost = IsSpeedBoost;
         IsTethered = (input == null && IsTethered) || (input != null && input.AttachTether);
         IsWindTether = (input == null && IsWindTether) || (input != null && input.WindTether);
         IsUnwindTether = (input == null && IsUnwindTether) || (input != null && input.UnwindTether);
         IsSpeedBoost = (input == null && IsSpeedBoost) || (input != null && input.SpeedBoost);
-        IsHeavy = (input == null && IsHeavy) || (input != null && input.Heavy);
+        IsKick = (input == null && IsKick) || (input != null && input.Kick);
 
         HandleTether(wasTethered, dt);
-        HandleSpeedBoost(dt);
-        HandleHeavy(dt);
+        HandleSpeedBoost(wasSpeedBoost, dt);
+        //HandleKick(dt);
     }
 
     private void HandleTether(bool wasTethered, float dt)
@@ -146,31 +151,58 @@ public class PlayerPlanetController : NetworkBehaviour
         OrbitRadius = Mathf.Clamp(OrbitRadius, MIN_RADIUS, MAX_RADIUS);
     }
 
-    private void HandleSpeedBoost(float dt)
+    private void HandleSpeedBoost(bool wasSpeedBoost, float dt)
     {
-        // Speed exponential falloff
-        Speed -= SPEED_FALLOFF * (Speed - MIN_SPEED + 1) * dt;
-        if (IsSpeedBoost && CurSpeedBoostCooldown <= 0f)
+        float gasDrainPerTick = dt / GAS_DRAIN_TIME;
+        if (IsSpeedBoost && CurSpeedBoostCooldown <= 0)
         {
-            CurSpeedBoostCooldown = SPEED_BOOST_COOLDOWN;
-            Speed = MAX_SPEED;
+            if (CurGas >= gasDrainPerTick)
+            {
+                if (!wasSpeedBoost)
+                {
+                    Speed = 2 * Speed;
+                }
+                // Apply speed boost while draining gas. Also reset cooldown value so that it's set once boost is released
+                Speed += SPEED_BOOST_RAMP * (Speed - MIN_SPEED + 1) * dt;
+                CurGas -= gasDrainPerTick;
+                //CurSpeedBoostCooldown = SPEED_BOOST_COOLDOWN;
+            }
+            else
+            {
+                // Gas is out, set cooldown
+                CurSpeedBoostCooldown = SPEED_BOOST_COOLDOWN;
+            }
         }
+        else if (wasSpeedBoost && !IsSpeedBoost && CurSpeedBoostCooldown <= 0)
+        {
+            // Speed boost just happened and was released this frame
+            CurSpeedBoostCooldown = SPEED_BOOST_COOLDOWN;
+        }
+        else
+        {
+            // Reduce cooldown
+            CurSpeedBoostCooldown = Mathf.Clamp(CurSpeedBoostCooldown - dt, 0, SPEED_BOOST_COOLDOWN);
+            // Speed exponential falloff
+            Speed -= SPEED_FALLOFF * (Speed - MIN_SPEED + 1) * dt;
+            //Increase gas
+            CurGas += dt / GAS_INCREASE_TIME;
+        }
+        CurGas = Mathf.Clamp(CurGas, 0, 1);
         Speed = Mathf.Clamp(Speed, MIN_SPEED, MAX_SPEED);
-        CurSpeedBoostCooldown = Mathf.Clamp(CurSpeedBoostCooldown - dt, 0, Mathf.Infinity);
     }
 
-    private void HandleHeavy(float dt)
+    private void HandleKick(float dt)
     {
-        if (IsHeavy && CurHeavyCooldown <= 0)
+        if (IsKick && CurKickCooldown <= 0)
         {
-            CurHeavyCooldown = HEAVY_COOLDOWN;
+            CurKickCooldown = HEAVY_COOLDOWN;
             body.mass = HEAVY_MASS;
         }
-        else if (CurHeavyCooldown <= HEAVY_COOLDOWN - HEAVY_DURATION)
+        else if (CurKickCooldown <= HEAVY_COOLDOWN - HEAVY_DURATION)
         {
             body.mass = 1;
         }
-        CurHeavyCooldown = Mathf.Clamp(CurHeavyCooldown - dt, 0, Mathf.Infinity);
+        CurKickCooldown = Mathf.Clamp(CurKickCooldown - dt, 0, Mathf.Infinity);
     }
 
     private void SetRigidBodyVelocity(float dt)
@@ -241,9 +273,9 @@ public class PlayerPlanetController : NetworkBehaviour
         _speedBoost = input.isPressed;
     }
 
-    public void OnHeavy(InputValue input)
+    public void OnKick(InputValue input)
     {
-        _heavy = input.isPressed;
+        _kick = input.isPressed;
     }
 
 }

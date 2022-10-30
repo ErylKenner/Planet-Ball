@@ -301,22 +301,26 @@ MonoBehaviour:
   IsWindTether: 0
   IsUnwindTether: 0
   IsSpeedBoost: 0
-  IsHeavy: 0
+  IsKick: 0
   OrbitRadius: 0
   CenterPoint: {x: 0, y: 0}
   Speed: 12
   CurSpeedBoostCooldown: 0
-  CurHeavyCooldown: 0
+  CurKickCooldown: 0
+  CurGas: 0
   WIND_TETHER_RATIO: 0.11
   MIN_RADIUS: 0.5
   MAX_RADIUS: 9
   MIN_SPEED: 12
-  MAX_SPEED: 35
-  SPEED_FALLOFF: 0.62
-  SPEED_BOOST_COOLDOWN: 10
-  HEAVY_COOLDOWN: 10
-  HEAVY_DURATION: 4
+  MAX_SPEED: 45
+  SPEED_FALLOFF: 0.8
+  SPEED_BOOST_RAMP: 0.5
+  SPEED_BOOST_COOLDOWN: 5
+  HEAVY_COOLDOWN: 0.5
+  HEAVY_DURATION: 1
   HEAVY_MASS: 10
+  GAS_INCREASE_TIME: 30
+  GAS_DRAIN_TIME: 7
 --- !u!114 &526718707672477060
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -330,7 +334,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Player: {fileID: 7641804893563888105}
-  DISABLED_TETHER_COLOR: {r: 0.5, g: 0.5, b: 0.5, a: 0.4745098}
+  DISABLED_TETHER_COLOR: {r: 0.5, g: 0.5, b: 0.5, a: 0.75686276}
   ENABLED_TETHER_COLOR: {r: 0.02352941, g: 0.02352941, b: 0.02352941, a: 1}
   SECTION_COUNT: 10
   PLAYER_HANDLE_TOWARD: 0
