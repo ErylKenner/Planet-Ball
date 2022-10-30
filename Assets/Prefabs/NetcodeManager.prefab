@@ -337,7 +337,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8371194678007894157}
   - component: {fileID: 8371194678007894159}
-  - component: {fileID: 8371194678007894156}
+  - component: {fileID: 4607829317046206451}
   m_Layer: 0
   m_Name: NetcodeManager
   m_TagString: Untagged
@@ -378,7 +378,7 @@ MonoBehaviour:
   visible: 0
   m_AssetId: 6516116c255b8c242afed73bbb6c7fb5
   hasSpawned: 0
---- !u!114 &8371194678007894156
+--- !u!114 &4607829317046206451
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -387,11 +387,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 8371194678007894154}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b7c476dd4484e3a498a165107085796b, type: 3}
+  m_Script: {fileID: 11500000, guid: b8104622cf1320e49b1342b7c6941f5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  server_snapshot_rate: 16
-  server_tick_number: 0
-  playerTick: {fileID: 0}
+  playerTrail: {fileID: 5594583912674202078, guid: feabaf7d67e71c94e8e9ea351a82382c, type: 3}
+  playerServerTrail: {fileID: 5594583912674202078, guid: f8c45d040565d4448a40e060b6169b1e, type: 3}
+  ball: {fileID: 0}

@@ -41,6 +41,11 @@ public class InputBuffer<T>
 
     public void Enqueue(T input, uint clientTick)
     {
+        if(BeenProcessed && buffer[(lastProcessed + unprocessedCount - 1) % bufferSize].clientTick == clientTick)
+        {
+            return;
+        }
+
         InputPacket<T> inputPacket = new InputPacket<T> { input = input, clientTick = clientTick };
         unprocessedCount++;
         buffer[(lastProcessed + unprocessedCount) % bufferSize] = inputPacket;

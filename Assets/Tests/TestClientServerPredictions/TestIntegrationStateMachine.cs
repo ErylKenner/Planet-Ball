@@ -89,7 +89,8 @@ public class TestIntegrationStateMachine
             mockRunner,
             new RunContext(),
             mockNetId,
-            mockClientTick
+            mockClientTick,
+            0
          );
 
         Assert.AreEqual(lastReceivedTick, mockClientTick);

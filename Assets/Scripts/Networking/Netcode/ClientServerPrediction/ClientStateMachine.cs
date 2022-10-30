@@ -1,5 +1,6 @@
 
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace ClientServerPrediction
 {
@@ -33,30 +34,44 @@ namespace ClientServerPrediction
                                          IRunnable simulation,
                                          RunContext runContext,
                                          uint netId,
-                                         uint clientTick)
+                                         uint clientTick,
+                                         uint lastReceivedTick)
         {
             Dictionary<uint, StateContext> messageMap = stateMessage.GetMap();
+
+            if(!messageMap.ContainsKey(netId))
+            {
+                return lastReceivedTick;
+            }
+
             // Grab the TickSync from the client netId
             TickSync tickSync = messageMap[netId].tickSync;
 
-            if (tickSync.lastProcessedClientTick <= tickSync.lastProcessedServerTick)
-            {
-                throw new System.InvalidOperationException($"Last processed client tick {tickSync.lastProcessedClientTick} must be greater than last processed server tick {tickSync.lastProcessedServerTick}");
-            }
+            //if(tickSync == null)
+            //{
+            //    return 0;
+            //}
+
+            //if (tickSync.lastProcessedClientTick <= tickSync.lastProcessedServerTick)
+            //{
+            //    throw new System.InvalidOperationException($"Last processed client tick {tickSync.lastProcessedClientTick} must be greater than last processed server tick {tickSync.lastProcessedServerTick}");
+            //}
 
             // Client offset = lastProcessedClientTick - lastProcessedServerTick
-            uint clientSyncOffset = tickSync.lastProcessedClientTick - tickSync.lastProcessedServerTick;
+            int clientSyncOffset = (int)tickSync.lastProcessedClientTick - (int)tickSync.lastProcessedServerTick;
             // Message Client tick = serverTick + clientOffset
-            uint messageClientTick = stateMessage.serverTick + clientSyncOffset;
+            uint messageClientTick = (uint)((int)stateMessage.serverTick + clientSyncOffset);
             // Assert serverTick > lastProcessedServerTick
             if(stateMessage.serverTick <= tickSync.lastProcessedServerTick)
             {
                 throw new System.InvalidOperationException($"Server tick {stateMessage.serverTick} must be greater than last processed {tickSync.lastProcessedServerTick}");
             }
-            // inputLoss = serverTick - lastProcessedServerTick - 1
+            uint inputLoss = stateMessage.serverTick - tickSync.lastProcessedServerTick - 1;
 
+            Vector2 diffVector = stateBufferMap[netId][messageClientTick % stateBufferMap[netId].Length].position - messageMap[netId].state.position;
             // Compare state recieved with predicted state
-            if((stateBufferMap[netId][messageClientTick % stateBufferMap[netId].Length].position - messageMap[netId].state.position).magnitude > stateError.positionDiff) {
+            if (diffVector.magnitude > stateError.positionDiff) {
+                Debug.Log($"Correcting {messageClientTick} to {clientTick} (Loss: {inputLoss}) (Offset: {diffVector} - {diffVector.magnitude})");
                 // Do correction
                 // foreach StateContext
                 foreach (StateContext stateContext in stateMessage.stateContexts)

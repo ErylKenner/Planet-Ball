@@ -123,7 +123,8 @@ public class TestClientStateMachine
             new MockRunner(),
             new RunContext(),
             mockNetId,
-            mockClientTick + 1
+            mockClientTick + 1,
+            0
         );
 
         // Last recieved tick is MCT + 1
@@ -206,7 +207,8 @@ public class TestClientStateMachine
             new MockRunner(),
             new RunContext(),
             mockNetId,
-            mockClientTick + 1
+            mockClientTick + 1,
+            0
         );
 
         // Last recieved tick is MCT + 1
@@ -301,7 +303,8 @@ public class TestClientStateMachine
             new MockRunner(),
             new RunContext(),
             mockNetId,
-            mockClientTick + 2
+            mockClientTick + 2,
+            0
         );
 
         // Last recieved tick is MCT + 1
@@ -404,7 +407,8 @@ public class TestClientStateMachine
             new MockRunner(),
             new RunContext(),
             mockNetId,
-            mockClientTick + 2
+            mockClientTick + 2,
+            0
         );
 
         // Last recieved tick is MCT + 1

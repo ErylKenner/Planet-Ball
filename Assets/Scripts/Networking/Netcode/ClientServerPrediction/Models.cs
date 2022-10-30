@@ -81,6 +81,6 @@ namespace ClientServerPrediction
 
     public class RunContext
     {
-
+        public float dt = 0;
     }
 }

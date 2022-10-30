@@ -76,7 +76,11 @@ namespace ClientServerPrediction
                     stateContext.tickSync = tickSync;
                 }
 
-                stateMessage.stateContexts.Add(stateContext);
+                if(!inputBufferMap.ContainsKey(netId) ||
+                   inputBufferMap[netId].BeenProcessed)
+                {
+                    stateMessage.stateContexts.Add(stateContext);
+                }
             }
 
             return stateMessage;

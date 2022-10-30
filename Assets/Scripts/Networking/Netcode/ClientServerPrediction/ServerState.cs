@@ -13,15 +13,27 @@ namespace ClientServerPrediction
         public Dictionary<uint, IStateful> serverStateMap = new Dictionary<uint, IStateful>();
         public Dictionary<uint, InputBuffer<Inputs>> serverInputBufferMap = new Dictionary<uint, InputBuffer<Inputs>>();
 
-        public void AddPlayer(IPlayerful player, uint netId)
+        public void AddInputful(IInputful player, uint netId)
         {
             serverInputMap.Add(netId, player);
-            AddObject(player, netId);
+            InputBuffer<Inputs> inputBuffer = new InputBuffer<Inputs>(bufferSize);
+            serverInputBufferMap.Add(netId, inputBuffer);
         }
 
-        public void AddObject(IStateful stateful, uint netId)
+        public void AddStateful(IStateful stateful, uint netId)
         {
             serverStateMap.Add(netId, stateful);
+        }
+
+        public void DeleteInputful(uint netId)
+        {
+            serverInputMap.Remove(netId);
+            serverInputBufferMap.Remove(netId);
+        }
+
+        public void DeleteStateful(uint netId)
+        {
+            serverStateMap.Remove(netId);
         }
         public StateMessage Tick(IRunnable runner, RunContext runContext)
         {

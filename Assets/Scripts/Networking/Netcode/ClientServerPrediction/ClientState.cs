@@ -15,31 +15,57 @@ namespace ClientServerPrediction
         public Dictionary<uint, Inputs[]> inputBufferMap = new Dictionary<uint, Inputs[]>();
         public Dictionary<uint, State[]> stateBufferMap = new Dictionary<uint, State[]>();
 
+        public uint? localNetId = null;
 
-        public void AddPlayer(IPlayerful player, uint netId)
+        // Debug objects
+        public Vector2 lastServerMessage = Vector2.zero;
+
+        public void AddInputful(IInputful player, uint netId, bool isLocal=false)
         {
+            if(isLocal)
+            {
+                localNetId = netId;
+            }
+
             inputMap.Add(netId, player);
             Inputs[] inputBuffer = new Inputs[bufferSize];
             inputBufferMap.Add(netId, inputBuffer);
-
-            AddObject(player, netId);
         }
 
-        public void AddObject(IStateful stateful, uint netId)
+        public void AddStateful(IStateful stateful, uint netId)
         {
             stateMap.Add(netId, stateful);
             State[] stateBuffer = new State[bufferSize];
             stateBufferMap.Add(netId, stateBuffer);
         }
 
-        public InputMessage Tick(IRunnable runner, RunContext runContext, uint playerNetId)
+        public void DeleteInputful(uint netId)
         {
+            stateMap.Remove(netId);
+            stateBufferMap.Remove(netId);
+        }
+
+        public void DeleteStateful(uint netId)
+        {
+            stateMap.Remove(netId);
+            stateBufferMap.Remove(netId);
+        }
+
+        public InputMessage Tick(IRunnable runner, RunContext runContext)
+        {
+            if(localNetId == null)
+            {
+                return null;
+            }
+
             StateMessage lastestStateMessage = ClientStateMachine.GetLatestStateMessage(ref stateMessageQueue);
             if(lastestStateMessage != null)
             {
-                StateError stateError = new StateError { positionDiff = 0.1f };
+                lastServerMessage = lastestStateMessage.GetMap()[(uint)localNetId].state.position;
 
-                uint lastReceivedTick = ClientStateMachine.CorrectClient(
+                StateError stateError = new StateError { positionDiff = 0.3f };
+
+                lastReceivedTick = ClientStateMachine.CorrectClient(
                     ref inputBufferMap,
                     ref stateBufferMap,
                     ref inputMap,
@@ -48,8 +74,9 @@ namespace ClientServerPrediction
                     in stateError,
                     runner,
                     runContext,
-                    playerNetId,
-                    tick
+                    (uint)localNetId,
+                    tick,
+                    lastReceivedTick
                  );
             }
 
