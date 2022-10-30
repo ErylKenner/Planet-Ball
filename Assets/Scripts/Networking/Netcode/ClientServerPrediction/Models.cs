@@ -50,6 +50,11 @@ namespace ClientServerPrediction
         public uint lastProcessedClientTick = 0;
         // Server tick m associated with input m
         public uint lastProcessedServerTick = 0;
+
+        public int ClientSyncOffset()
+        {
+            return (int)lastProcessedClientTick - (int)lastProcessedServerTick;
+        }
     }
 
     public class StateContext
@@ -76,6 +81,11 @@ namespace ClientServerPrediction
             }
 
             return map;
+        }
+
+        public uint MessageClientTick(uint netId)
+        {
+            return (uint)((int)serverTick + GetMap()[netId].tickSync?.ClientSyncOffset());
         }
     }
 

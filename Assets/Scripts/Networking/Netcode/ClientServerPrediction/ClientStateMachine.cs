@@ -6,7 +6,7 @@ namespace ClientServerPrediction
 {
     public static class ClientStateMachine
     {
-        public static StateMessage GetLatestStateMessage(ref Queue<StateMessage> stateQueue)
+        public static StateMessage GetLatestStateMessage(ref Queue<StateMessage> stateQueue, uint netId)
         {
             if(stateQueue.Count == 0)
             {
@@ -21,6 +21,11 @@ namespace ClientServerPrediction
                 {
                     stateMessage = currentStateMessage;
                 }
+            }
+
+            if(!stateMessage.GetMap().ContainsKey(netId))
+            {
+                return null;
             }
 
             return stateMessage;
@@ -41,11 +46,16 @@ namespace ClientServerPrediction
 
             if(!messageMap.ContainsKey(netId))
             {
-                return lastReceivedTick;
+                throw new System.InvalidOperationException($"stateMessage must contain a Context with the player NetId");
             }
 
             // Grab the TickSync from the client netId
             TickSync tickSync = messageMap[netId].tickSync;
+
+            if(tickSync == null)
+            {
+                throw new System.InvalidOperationException($"stateMessage must contain a Context with the player NetId and a non-null tickSync");
+            }
 
             //if(tickSync == null)
             //{
@@ -58,9 +68,8 @@ namespace ClientServerPrediction
             //}
 
             // Client offset = lastProcessedClientTick - lastProcessedServerTick
-            int clientSyncOffset = (int)tickSync.lastProcessedClientTick - (int)tickSync.lastProcessedServerTick;
             // Message Client tick = serverTick + clientOffset
-            uint messageClientTick = (uint)((int)stateMessage.serverTick + clientSyncOffset);
+            uint messageClientTick = stateMessage.MessageClientTick(netId);
             // Assert serverTick > lastProcessedServerTick
             if(stateMessage.serverTick <= tickSync.lastProcessedServerTick)
             {
@@ -107,7 +116,7 @@ namespace ClientServerPrediction
                     }
             }
 
-            return messageClientTick;
+            return messageClientTick - 1;
         }
 
         public static void StoreState(ref Dictionary<uint, State[]> stateBufferMap,

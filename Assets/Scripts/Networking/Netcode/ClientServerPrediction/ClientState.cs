@@ -58,7 +58,7 @@ namespace ClientServerPrediction
                 return null;
             }
 
-            StateMessage lastestStateMessage = ClientStateMachine.GetLatestStateMessage(ref stateMessageQueue);
+            StateMessage lastestStateMessage = ClientStateMachine.GetLatestStateMessage(ref stateMessageQueue, (uint)localNetId);
             if(lastestStateMessage != null)
             {
                 lastServerMessage = lastestStateMessage.GetMap()[(uint)localNetId].state.position;

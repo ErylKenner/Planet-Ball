@@ -74,7 +74,7 @@ public class TestIntegrationStateMachine
         ServerStateMachine.SendStateMessage(in stateMessage, ref stateMessageQueue);
 
         //Back to the Client
-        StateMessage lastestStateMessage = ClientStateMachine.GetLatestStateMessage(ref stateMessageQueue);
+        StateMessage lastestStateMessage = ClientStateMachine.GetLatestStateMessage(ref stateMessageQueue, mockNetId);
         StateError stateError = new StateError { positionDiff = 0.1f };
 
         State originalState = mockPlayer.GetState();
@@ -93,7 +93,7 @@ public class TestIntegrationStateMachine
             0
          );
 
-        Assert.AreEqual(lastReceivedTick, mockClientTick);
+        Assert.AreEqual(lastReceivedTick, mockClientTick - 1);
         Assert.AreEqual(originalState.position, mockPlayer.GetState().position);
 
 

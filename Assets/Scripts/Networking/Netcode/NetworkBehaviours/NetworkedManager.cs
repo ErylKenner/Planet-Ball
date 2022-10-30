@@ -49,8 +49,10 @@ public class NetworkedManager : NetworkBehaviour
             {
                 InputMessage inputMessage = client.Tick(runner, new RunContext { dt = dt });
 
-                Instantiate(playerServerTrail, client.lastServerMessage, Quaternion.identity);
-                Instantiate(playerTrail, ((NetworkedPlayer)client.stateMap[(uint)client.localNetId]).transform.position, Quaternion.identity);
+                GameObject serverTrail = Instantiate(playerServerTrail, client.lastServerMessage, Quaternion.identity);
+                serverTrail.name = $"Server {client.lastReceivedTick}";
+                GameObject clientTrail =  Instantiate(playerTrail, ((NetworkedPlayer)client.stateMap[(uint)client.localNetId]).transform.position, Quaternion.identity);
+                clientTrail.name = $"Client {client.tick}";
 
                 if (inputMessage != null)
                 {

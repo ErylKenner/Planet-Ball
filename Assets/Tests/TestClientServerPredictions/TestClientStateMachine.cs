@@ -18,9 +18,10 @@ public class TestClientStateMachine
     [Test]
     public void TestGetLatestStateMessageEmptyQueue()
     {
+        uint mockNetId = 10;
         Queue<StateMessage> stateMessages = new Queue<StateMessage>();
 
-        StateMessage stateMessage = ClientStateMachine.GetLatestStateMessage(ref stateMessages);
+        StateMessage stateMessage = ClientStateMachine.GetLatestStateMessage(ref stateMessages, mockNetId);
 
         Assert.AreEqual(stateMessage, null);
     }
@@ -33,17 +34,21 @@ public class TestClientStateMachine
     [Test]
     public void TestGetLatestStateMessage()
     {
+        uint mockNetId = 10;
         uint firstMockServerTick = 30;
         uint secondMockServerTick = 50;
         Queue<StateMessage> stateMessages = new Queue<StateMessage>();
+        StateContext stateContext = new StateContext { netId = mockNetId };
         StateMessage firstStateMessage = new StateMessage { serverTick = firstMockServerTick };
+        firstStateMessage.stateContexts.Add(stateContext);
         StateMessage secondStateMessage = new StateMessage { serverTick = secondMockServerTick };
+        secondStateMessage.stateContexts.Add(stateContext);
 
         stateMessages.Enqueue(secondStateMessage);
         stateMessages.Enqueue(firstStateMessage);
 
 
-        StateMessage stateMessage = ClientStateMachine.GetLatestStateMessage(ref stateMessages);
+        StateMessage stateMessage = ClientStateMachine.GetLatestStateMessage(ref stateMessages, mockNetId);
 
         Assert.AreEqual(stateMessage, secondStateMessage);
         Assert.AreEqual(stateMessages.Count, 0);
@@ -127,8 +132,8 @@ public class TestClientStateMachine
             0
         );
 
-        // Last recieved tick is MCT + 1
-        Assert.AreEqual(lastRecievedClientTick, mockClientTick + 1);
+        // Last recieved input is MCT
+        Assert.AreEqual(lastRecievedClientTick, mockClientTick);
         Assert.AreEqual(originalState.position, mockPlayer.GetState().position);
 
     }
@@ -211,8 +216,8 @@ public class TestClientStateMachine
             0
         );
 
-        // Last recieved tick is MCT + 1
-        Assert.AreEqual(lastRecievedClientTick, mockClientTick + 1);
+        // Last recieved input is MCT
+        Assert.AreEqual(lastRecievedClientTick, mockClientTick);
         Assert.AreEqual(mockPlayer.GetState().position, mockServerPosition);
 
     }
@@ -307,8 +312,8 @@ public class TestClientStateMachine
             0
         );
 
-        // Last recieved tick is MCT + 1
-        Assert.AreEqual(lastRecievedClientTick, mockClientTick + 1);
+        // Last recieved input is MCT
+        Assert.AreEqual(lastRecievedClientTick, mockClientTick);
 
         // Position is set to the serverPosition + the input from MCT + 1
         Assert.AreEqual(mockPlayer.GetState().position, mockServerPosition + inputBuffer[mockClientTick + 1].movement);
@@ -411,8 +416,8 @@ public class TestClientStateMachine
             0
         );
 
-        // Last recieved tick is MCT + 1
-        Assert.AreEqual(lastRecievedClientTick, mockClientTick + 1);
+        // Last recieved input is MCT
+        Assert.AreEqual(lastRecievedClientTick, mockClientTick);
 
         // Position is set to the serverPosition + the input from MCT + 1
         Assert.AreEqual(mockPlayer.GetState().position, mockServerPosition + inputBuffer[(mockClientTick + 1) % mockBufferSize].movement);

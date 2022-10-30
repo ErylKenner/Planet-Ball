@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace ClientServerPrediction
 {
@@ -15,6 +16,11 @@ namespace ClientServerPrediction
                 foreach (InputContext inputContext in inputMessage.inputContexts)
                 {
 
+                    if (inputContext.inputs.Count == 0)
+                    {
+                        continue;
+                    }
+
                     if (!inputBufferMap.ContainsKey(inputContext.netId))
                     {
                         InputBuffer<Inputs> inputBuffer = new InputBuffer<Inputs>(bufferSize);
@@ -29,6 +35,11 @@ namespace ClientServerPrediction
                     {
                         for (int index = (int)expectedTick; index <= newestTick; index++)
                         {
+                            if(index - (int)inputMessage.startTick < 0)
+                            {
+                                Debug.Log($"{index - (int)inputMessage.startTick}");
+                            }
+                            
                             inputBufferMap[inputContext.netId].Enqueue(inputContext.inputs[index - (int)inputMessage.startTick], (uint)index);
                         }
                     }

@@ -289,9 +289,8 @@ public class TestServerStateMachine
     /// <summary>
     /// GIVEN: Empty Input buffer map, valid State map
     /// WHEN: Server Tick is incrementeted and CreateStateMessage() is called
-    /// THEN: Returns default state of player
+    /// THEN: Player netId not in the state message
     ///       Server tick references passed Server tick
-    ///       TickSync is null
     /// </summary>
     [Test]
     public void TestCreateStateMessageNoPlayer()
@@ -318,17 +317,15 @@ public class TestServerStateMachine
         Dictionary<uint, StateContext> stateMessageMap = stateMessage.GetMap();
 
 
-        Assert.AreEqual(stateMessageMap[mockNetId].state.position, mockPlayer.GetPosition());
-        Assert.AreEqual(stateMessageMap[mockNetId].tickSync, null);
+        Assert.True(!stateMessageMap.ContainsKey(mockNetId));
         Assert.AreEqual(stateMessage.serverTick, newMockServerTick);
     }
 
     /// <summary>
     /// GIVEN: Input buffer map with no processed input, valid State map
     /// WHEN: Server Tick is incrementeted and CreateStateMessage() is called
-    /// THEN: Returns default state of player
+    /// THEN: Player netId not in the state message
     ///       Server tick references passed Server tick
-    ///       TickSync is null
     /// </summary>
     [Test]
     public void TestCreateStateMessageNotProcessed()
@@ -361,8 +358,7 @@ public class TestServerStateMachine
         Dictionary<uint, StateContext> stateMessageMap = stateMessage.GetMap();
 
 
-        Assert.AreEqual(stateMessageMap[mockNetId].state.position, mockPlayer.GetPosition());
-        Assert.AreEqual(stateMessageMap[mockNetId].tickSync, null);
+        Assert.True(!stateMessageMap.ContainsKey(mockNetId));
         Assert.AreEqual(stateMessage.serverTick, newMockServerTick);
     }
 
