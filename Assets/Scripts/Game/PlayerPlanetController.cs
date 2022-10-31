@@ -30,17 +30,19 @@ public class PlayerPlanetController : NetworkBehaviour
     //  - Vector2 velocity
     //  - float rotation
     //  - float angular velocity
-    public bool IsTethered = false;
-    public bool IsWindTether = false;
-    public bool IsUnwindTether = false;
-    public bool IsSpeedBoost = false;
-    public bool IsKick = false;
+    public bool InputIsTethered = false;
+    public bool InputIsWindTether = false;
+    public bool InputIsUnwindTether = false;
+    public bool InputIsSpeedBoost = false;
+    public bool InputIsKick = false;
     public float OrbitRadius = 0;
     public Vector2 CenterPoint = Vector2.zero;
     public float Speed = 12.0f;
     public float CurSpeedBoostCooldown = 0f;
     public float CurKickCooldown = 0f;
     public float CurGas = 0f;
+    public bool IsSpeedBoost = false;
+    public bool IsKick = false;
 
     // Const attributes - not state
     public float WIND_TETHER_RATIO = 0.11f;
@@ -96,31 +98,31 @@ public class PlayerPlanetController : NetworkBehaviour
 
     private void SetStateFromInput(PlayerInputState input, float dt)
     {
-        bool wasTethered = IsTethered;
-        bool wasSpeedBoost = IsSpeedBoost;
-        IsTethered = (input == null && IsTethered) || (input != null && input.AttachTether);
-        IsWindTether = (input == null && IsWindTether) || (input != null && input.WindTether);
-        IsUnwindTether = (input == null && IsUnwindTether) || (input != null && input.UnwindTether);
-        IsSpeedBoost = (input == null && IsSpeedBoost) || (input != null && input.SpeedBoost);
-        IsKick = (input == null && IsKick) || (input != null && input.Kick);
+        bool wasInputTethered = InputIsTethered;
+        bool wasInputSpeedBoost = InputIsSpeedBoost;
+        InputIsTethered = (input == null && InputIsTethered) || (input != null && input.AttachTether);
+        InputIsWindTether = (input == null && InputIsWindTether) || (input != null && input.WindTether);
+        InputIsUnwindTether = (input == null && InputIsUnwindTether) || (input != null && input.UnwindTether);
+        InputIsSpeedBoost = (input == null && InputIsSpeedBoost) || (input != null && input.SpeedBoost);
+        InputIsKick = (input == null && InputIsKick) || (input != null && input.Kick);
 
-        HandleTether(wasTethered, dt);
-        HandleSpeedBoost(wasSpeedBoost, dt);
+        HandleTether(wasInputTethered, dt);
+        HandleSpeedBoost(wasInputSpeedBoost, dt);
         //HandleKick(dt);
     }
 
-    private void HandleTether(bool wasTethered, float dt)
+    private void HandleTether(bool wasInputTethered, float dt)
     {
-        if (IsTethered)
+        if (InputIsTethered)
         {
-            if (!wasTethered)
+            if (!wasInputTethered)
             {
                 // This is the first tick where the tether is attached. Find the nearest planet to attach to
                 Planet nearestPlanet = NearestPlanet();
                 if (nearestPlanet == null)
                 {
                     // No Planet could be tethered. Set IsTethered to false and try again next tick
-                    IsTethered = false;
+                    InputIsTethered = false;
                     OrbitRadius = 0;
                 }
                 else
@@ -129,13 +131,13 @@ public class PlayerPlanetController : NetworkBehaviour
                     OrbitRadius = Vector2.Distance(body.position, CenterPoint);
                 }
             }
-            if (IsWindTether)
+            if (InputIsWindTether)
             {
                 // Wind in the same orbit shape regardless of speed via exponential falloff of the radius
                 float windRate = WIND_TETHER_RATIO * OrbitRadius * Speed;
                 OrbitRadius -= windRate * dt;
             }
-            if (IsUnwindTether)
+            if (InputIsUnwindTether)
             {
                 // Unwind in the same orbit shape regardless of speed via exponential falloff of the radius
                 float windRate = WIND_TETHER_RATIO * OrbitRadius * Speed;
@@ -151,32 +153,25 @@ public class PlayerPlanetController : NetworkBehaviour
         OrbitRadius = Mathf.Clamp(OrbitRadius, MIN_RADIUS, MAX_RADIUS);
     }
 
-    private void HandleSpeedBoost(bool wasSpeedBoost, float dt)
+    private void HandleSpeedBoost(bool wasInputSpeedBoost, float dt)
     {
         float gasDrainPerTick = dt / GAS_DRAIN_TIME;
-        if (IsSpeedBoost && CurSpeedBoostCooldown <= 0)
+        if (InputIsSpeedBoost && CurSpeedBoostCooldown <= 0 && CurGas >= gasDrainPerTick)
         {
-            if (CurGas >= gasDrainPerTick)
+            if (!IsSpeedBoost)
             {
-                if (!wasSpeedBoost)
-                {
-                    Speed = 2 * Speed;
-                }
-                // Apply speed boost while draining gas. Also reset cooldown value so that it's set once boost is released
-                Speed += SPEED_BOOST_RAMP * (Speed - MIN_SPEED + 1) * dt;
-                CurGas -= gasDrainPerTick;
-                //CurSpeedBoostCooldown = SPEED_BOOST_COOLDOWN;
+                // This is the first frame of speed boost
+                Speed = 2 * Speed;
             }
-            else
-            {
-                // Gas is out, set cooldown
-                CurSpeedBoostCooldown = SPEED_BOOST_COOLDOWN;
-            }
+            // Apply speed boost while draining gas. Also reset cooldown value so that it's set once boost is released
+            Speed += SPEED_BOOST_RAMP * (Speed - MIN_SPEED + 1) * dt;
+            CurGas -= gasDrainPerTick;
+            IsSpeedBoost = true;
         }
-        else if (wasSpeedBoost && !IsSpeedBoost && CurSpeedBoostCooldown <= 0)
+        else if (IsSpeedBoost)
         {
-            // Speed boost just happened and was released this frame
             CurSpeedBoostCooldown = SPEED_BOOST_COOLDOWN;
+            IsSpeedBoost = false;
         }
         else
         {
@@ -193,7 +188,7 @@ public class PlayerPlanetController : NetworkBehaviour
 
     private void HandleKick(float dt)
     {
-        if (IsKick && CurKickCooldown <= 0)
+        if (InputIsKick && CurKickCooldown <= 0)
         {
             CurKickCooldown = HEAVY_COOLDOWN;
             body.mass = HEAVY_MASS;
@@ -207,7 +202,7 @@ public class PlayerPlanetController : NetworkBehaviour
 
     private void SetRigidBodyVelocity(float dt)
     {
-        if (!IsTethered)
+        if (!InputIsTethered)
         {
             body.velocity = Speed * body.velocity.normalized;
             return;
