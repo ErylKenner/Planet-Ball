@@ -28,19 +28,25 @@ namespace ClientServerPrediction
                     }
 
                     uint newestTick = inputMessage.startTick + (uint)inputContext.inputs.Count - 1;
-                    uint expectedTick = inputBufferMap[inputContext.netId].BeenProcessed ? inputBufferMap[inputContext.netId].LastRecieved().clientTick : newestTick;
+                    Debug.Log($"Got: {inputContext.netId} {newestTick}");
+                    uint expectedTick = inputBufferMap[inputContext.netId].BeenProcessed ? inputBufferMap[inputContext.netId].LastProcessed().clientTick + 1 : newestTick;
 
 
                     if (newestTick >= expectedTick)
                     {
                         for (int index = (int)expectedTick; index <= newestTick; index++)
                         {
-                            if(index - (int)inputMessage.startTick < 0)
-                            {
-                                Debug.Log($"{index - (int)inputMessage.startTick}");
-                            }
+
+                            int packageTick = index - (int)inputMessage.startTick;
+
                             
-                            inputBufferMap[inputContext.netId].Enqueue(inputContext.inputs[index - (int)inputMessage.startTick], (uint)index);
+
+                            if (inputBufferMap[inputContext.netId].Count == 0 || inputBufferMap[inputContext.netId].LastRecieved().clientTick < index)
+                            {
+                                Debug.Log($"Queuing: {index}");
+                                inputBufferMap[inputContext.netId].Enqueue(inputContext.inputs[packageTick], (uint)index);
+                            }
+
                         }
                     }
                 }
@@ -51,11 +57,19 @@ namespace ClientServerPrediction
                                       ref Dictionary<uint, IInputful> inputMap,
                                       uint serverTick)
         {
+            Debug.Log("Applying Tick");
             foreach(uint id in inputBufferMap.Keys)
             {
                 if(inputMap.ContainsKey(id) && inputBufferMap[id].Count > 0)
                 {
                     InputPacket<Inputs> inputPacket = inputBufferMap[id].Dequeue(serverTick);
+                    //if(inputBufferMap[id].Count > 0)
+                    //{
+                    //    Debug.Log($"{ inputBufferMap[id].Count}");
+                    //}
+
+                    //Debug.Log($"Applying: {inputPacket.clientTick} {inputBufferMap[id].Count}");
+
                     // TODO: Integrate with StateMachine.Run?
                     inputMap[id].ApplyInput(inputPacket.input);
                 }

@@ -461,6 +461,10 @@ PrefabInstance:
       propertyPath: frameAverage
       value: 2000
       objectReference: {fileID: 0}
+    - target: {fileID: 2016825845, guid: 6516116c255b8c242afed73bbb6c7fb5, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4607829317046206451, guid: 6516116c255b8c242afed73bbb6c7fb5, type: 3}
       propertyPath: ball
       value: 

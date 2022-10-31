@@ -42,12 +42,12 @@ public class NetworkedManager : NetworkBehaviour
         float dt = Time.fixedDeltaTime;
         timer += Time.deltaTime;
 
-        if (timer >= Time.fixedDeltaTime)
+        while (timer >= Time.fixedDeltaTime)
         {
-            timer = 0;
+            timer -= Time.fixedDeltaTime;
             if (isClient)
             {
-                InputMessage inputMessage = client.Tick(runner, new RunContext { dt = dt });
+                InputMessage inputMessage = client.Tick(runner, new RunContext { dt = dt }, isClientOnly);
 
                 GameObject serverTrail = Instantiate(playerServerTrail, client.lastServerMessage, Quaternion.identity);
                 serverTrail.name = $"Server {client.lastReceivedTick}";

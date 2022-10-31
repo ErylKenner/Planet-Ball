@@ -1,5 +1,6 @@
 
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace ClientServerPrediction
@@ -77,10 +78,28 @@ namespace ClientServerPrediction
             }
             uint inputLoss = stateMessage.serverTick - tickSync.lastProcessedServerTick - 1;
 
-            Vector2 diffVector = stateBufferMap[netId][messageClientTick % stateBufferMap[netId].Length].position - messageMap[netId].state.position;
+            Dictionary<uint, float> errors = new Dictionary<uint, float>();
+
+            foreach(uint currentNetId in messageMap.Keys)
+            {
+                State[] stateBuffer = stateBufferMap[currentNetId];
+                int stateBufferIndex = (int)messageClientTick % stateBuffer.Length;
+
+                Vector2 stateBufferPosition = stateBuffer[stateBufferIndex].position;
+                State messageState = messageMap[currentNetId].state;
+                Vector2 messagePosition = messageState.position;
+                Vector2 diffVector = stateBufferPosition - messagePosition;
+                errors.Add(currentNetId, diffVector.magnitude);
+            }
+
+            float positionDiff = stateError.positionDiff;
+
+            List<uint> keyList = errors.Keys.ToList();
+            int offendingNetIdIndex = keyList.FindIndex(key => errors[key] > positionDiff);
+
             // Compare state recieved with predicted state
-            if (diffVector.magnitude > stateError.positionDiff) {
-                Debug.Log($"Correcting {messageClientTick} to {clientTick} (Loss: {inputLoss}) (Offset: {diffVector} - {diffVector.magnitude})");
+            if (offendingNetIdIndex != -1) {
+                Debug.Log($"Correcting {messageClientTick} to {clientTick} (Loss: {inputLoss}) (Offset: {errors[keyList[offendingNetIdIndex]]})");
                 // Do correction
                 // foreach StateContext
                 foreach (StateContext stateContext in stateMessage.stateContexts)
