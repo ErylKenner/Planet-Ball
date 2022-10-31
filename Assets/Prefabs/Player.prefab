@@ -530,32 +530,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  InputIsTethered: 0
-  InputIsWindTether: 0
-  InputIsUnwindTether: 0
-  InputIsSpeedBoost: 0
-  InputIsKick: 0
-  OrbitRadius: 0
-  CenterPoint: {x: 0, y: 0}
-  Speed: 12
-  CurSpeedBoostCooldown: 0
-  CurKickCooldown: 0
-  CurGas: 0
-  IsSpeedBoost: 0
-  IsKick: 0
   WIND_TETHER_RATIO: 0.11
   MIN_RADIUS: 0.5
   MAX_RADIUS: 9
   MIN_SPEED: 12
   MAX_SPEED: 35
-  SPEED_FALLOFF: 0.8
+  SPEED_FALLOFF: 0.85
   SPEED_BOOST_RAMP: 0.4
-  SPEED_BOOST_COOLDOWN: 4
+  SPEED_BOOST_COOLDOWN: 2
   HEAVY_COOLDOWN: 0.5
   HEAVY_DURATION: 1
   HEAVY_MASS: 10
   GAS_INCREASE_TIME: 20
   GAS_DRAIN_TIME: 3
+  BOOST_SPEED_MINIMUM: 20
 --- !u!114 &526718707672477060
 MonoBehaviour:
   m_ObjectHideFlags: 0

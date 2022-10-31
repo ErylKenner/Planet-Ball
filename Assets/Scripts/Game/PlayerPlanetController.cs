@@ -19,12 +19,13 @@ public class PlayerPlanetController : NetworkBehaviour
     public float MAX_SPEED = 45f;
     public float SPEED_FALLOFF = 0.8f;
     public float SPEED_BOOST_RAMP = 0.5f;
-    public float SPEED_BOOST_COOLDOWN = 5f;
+    public float SPEED_BOOST_COOLDOWN = 1f;
     public float HEAVY_COOLDOWN = 0.5f;
     public float HEAVY_DURATION = 1f;
     public float HEAVY_MASS = 10f;
     public float GAS_INCREASE_TIME = 30f;
     public float GAS_DRAIN_TIME = 7f;
+    public float BOOST_SPEED_MINIMUM = 25f;
 
     // For testing. Input system callbacks set these which are then read in FixedUpdate
     private bool _attachTether = false;
@@ -136,32 +137,39 @@ public class PlayerPlanetController : NetworkBehaviour
     private void HandleSpeedBoost(bool wasInputSpeedBoost, float dt)
     {
         float gasDrainPerTick = dt / GAS_DRAIN_TIME;
-        if (playerState.InputIsSpeedBoost && playerState.CurSpeedBoostCooldown <= 0 && playerState.CurGas >= gasDrainPerTick)
+        bool isBoosting = playerState.InputIsSpeedBoost && playerState.CurGas >= gasDrainPerTick;
+        if (isBoosting)
         {
-            if (!playerState.IsSpeedBoost)
+            if (playerState.Speed < BOOST_SPEED_MINIMUM)
             {
                 // This is the first frame of speed boost
-                playerState.Speed = 2 * playerState.Speed;
+                playerState.Speed = BOOST_SPEED_MINIMUM;
             }
+
             // Apply speed boost while draining gas. Also reset cooldown value so that it's set once boost is released
             playerState.Speed += SPEED_BOOST_RAMP * (playerState.Speed - MIN_SPEED + 1) * dt;
             playerState.CurGas -= gasDrainPerTick;
             playerState.IsSpeedBoost = true;
         }
-        else if (playerState.IsSpeedBoost)
-        {
-            playerState.CurSpeedBoostCooldown = SPEED_BOOST_COOLDOWN;
-            playerState.IsSpeedBoost = false;
-        }
         else
         {
-            // Reduce cooldown
-            playerState.CurSpeedBoostCooldown = Mathf.Clamp(playerState.CurSpeedBoostCooldown - dt, 0, SPEED_BOOST_COOLDOWN);
             // Speed exponential falloff
             playerState.Speed -= SPEED_FALLOFF * (playerState.Speed - MIN_SPEED + 1) * dt;
-            //Increase gas
-            playerState.CurGas += dt / GAS_INCREASE_TIME;
+            playerState.IsSpeedBoost = false;
+            if (playerState.CurSpeedBoostCooldown <= 0)
+            {
+                //Increase gas
+                playerState.CurGas += dt / GAS_INCREASE_TIME;
+            }
         }
+
+        // If out of gas then don't regen gas for a bit
+        if (playerState.CurGas <= 0 && playerState.CurSpeedBoostCooldown <= 0)
+        {
+            playerState.CurSpeedBoostCooldown = SPEED_BOOST_COOLDOWN;
+        }
+        
+        playerState.CurSpeedBoostCooldown = Mathf.Clamp(playerState.CurSpeedBoostCooldown - dt, 0, SPEED_BOOST_COOLDOWN);
         playerState.CurGas = Mathf.Clamp(playerState.CurGas, 0, 1);
         playerState.Speed = Mathf.Clamp(playerState.Speed, MIN_SPEED, MAX_SPEED);
     }
