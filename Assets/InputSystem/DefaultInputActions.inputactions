@@ -42,7 +42,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Heavy",
+                    "name": "Kick",
                     "type": "PassThrough",
                     "id": "cc18515c-68d9-4b0c-a8ca-f6b9877462df",
                     "expectedControlType": "Button",
@@ -147,7 +147,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
-                    "action": "Heavy",
+                    "action": "Kick",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -158,7 +158,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
-                    "action": "Heavy",
+                    "action": "Kick",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
