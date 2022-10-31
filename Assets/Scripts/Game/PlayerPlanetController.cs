@@ -3,46 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 using UnityEngine.InputSystem;
+using ClientServerPrediction;
 
-public class PlayerInputState
-{
-    public bool AttachTether = false;
-    public bool WindTether = false;
-    public bool UnwindTether = false;
-    public bool SpeedBoost = false;
-    public bool Kick = false;
-    public PlayerInputState(bool attachTether, bool windTether, bool unwindTether, bool speedBoost, bool kick)
-    {
-        AttachTether = attachTether;
-        WindTether = windTether;
-        UnwindTether = unwindTether;
-        SpeedBoost = speedBoost;
-        Kick = kick;
-    }
-}
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerPlanetController : NetworkBehaviour
 {
-    // ----- Player State Needed for NetcodeManager Clientside-prediction Rewind -----
-    // Other required state included in RigidBody2D:
-    //  - Vector2 position
-    //  - Vector2 velocity
-    //  - float rotation
-    //  - float angular velocity
-    public bool InputIsTethered = false;
-    public bool InputIsWindTether = false;
-    public bool InputIsUnwindTether = false;
-    public bool InputIsSpeedBoost = false;
-    public bool InputIsKick = false;
-    public float OrbitRadius = 0;
-    public Vector2 CenterPoint = Vector2.zero;
-    public float Speed = 12.0f;
-    public float CurSpeedBoostCooldown = 0f;
-    public float CurKickCooldown = 0f;
-    public float CurGas = 0f;
-    public bool IsSpeedBoost = false;
-    public bool IsKick = false;
+    public PlayerState playerState = new PlayerState();
 
     // Const attributes - not state
     public float WIND_TETHER_RATIO = 0.11f;
@@ -69,6 +36,19 @@ public class PlayerPlanetController : NetworkBehaviour
     private Rigidbody2D body;
 
 
+    public Inputs GetInputs()
+    {
+        return new Inputs
+        {
+            AttachTether = _attachTether,
+            WindTether = _windTether,
+            UnwindTether = _unwindTether,
+            SpeedBoost = _speedBoost,
+            Kick = _kick
+        };
+    }
+
+
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
@@ -86,25 +66,25 @@ public class PlayerPlanetController : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        PlayerInputState input = new PlayerInputState(_attachTether, _windTether, _unwindTether, _speedBoost, _kick);
-        PhysicsPreStep(input, Time.fixedDeltaTime);
+        //PlayerInputState input = new PlayerInputState(_attachTether, _windTether, _unwindTether, _speedBoost, _kick);
+        //PhysicsPreStep(input, Time.fixedDeltaTime);
     }
 
-    public void PhysicsPreStep(PlayerInputState input, float dt)
+    public void ApplyInput(Inputs input, float dt)
     {
         SetStateFromInput(input, dt);
         SetRigidBodyVelocity(dt);
     }
 
-    private void SetStateFromInput(PlayerInputState input, float dt)
+    private void SetStateFromInput(Inputs input, float dt)
     {
-        bool wasInputTethered = InputIsTethered;
-        bool wasInputSpeedBoost = InputIsSpeedBoost;
-        InputIsTethered = (input == null && InputIsTethered) || (input != null && input.AttachTether);
-        InputIsWindTether = (input == null && InputIsWindTether) || (input != null && input.WindTether);
-        InputIsUnwindTether = (input == null && InputIsUnwindTether) || (input != null && input.UnwindTether);
-        InputIsSpeedBoost = (input == null && InputIsSpeedBoost) || (input != null && input.SpeedBoost);
-        InputIsKick = (input == null && InputIsKick) || (input != null && input.Kick);
+        bool wasInputTethered = playerState.InputIsTethered;
+        bool wasInputSpeedBoost = playerState.InputIsSpeedBoost;
+        playerState.InputIsTethered = (input == null && playerState.InputIsTethered) || (input != null && input.AttachTether);
+        playerState.InputIsWindTether = (input == null && playerState.InputIsWindTether) || (input != null && input.WindTether);
+        playerState.InputIsUnwindTether = (input == null && playerState.InputIsUnwindTether) || (input != null && input.UnwindTether);
+        playerState.InputIsSpeedBoost = (input == null && playerState.InputIsSpeedBoost) || (input != null && input.SpeedBoost);
+        playerState.InputIsKick = (input == null && playerState.InputIsKick) || (input != null && input.Kick);
 
         HandleTether(wasInputTethered, dt);
         HandleSpeedBoost(wasInputSpeedBoost, dt);
@@ -113,7 +93,7 @@ public class PlayerPlanetController : NetworkBehaviour
 
     private void HandleTether(bool wasInputTethered, float dt)
     {
-        if (InputIsTethered)
+        if (playerState.InputIsTethered)
         {
             if (!wasInputTethered)
             {
@@ -122,113 +102,113 @@ public class PlayerPlanetController : NetworkBehaviour
                 if (nearestPlanet == null)
                 {
                     // No Planet could be tethered. Set IsTethered to false and try again next tick
-                    InputIsTethered = false;
-                    OrbitRadius = 0;
+                    playerState.InputIsTethered = false;
+                    playerState.OrbitRadius = 0;
                 }
                 else
                 {
-                    CenterPoint = nearestPlanet.transform.position;
-                    OrbitRadius = Vector2.Distance(body.position, CenterPoint);
+                    playerState.CenterPoint = nearestPlanet.transform.position;
+                    playerState.OrbitRadius = Vector2.Distance(body.position, playerState.CenterPoint);
                 }
             }
-            if (InputIsWindTether)
+            if (playerState.InputIsWindTether)
             {
                 // Wind in the same orbit shape regardless of speed via exponential falloff of the radius
-                float windRate = WIND_TETHER_RATIO * OrbitRadius * Speed;
-                OrbitRadius -= windRate * dt;
+                float windRate = WIND_TETHER_RATIO * playerState.OrbitRadius * playerState.Speed;
+                playerState.OrbitRadius -= windRate * dt;
             }
-            if (InputIsUnwindTether)
+            if (playerState.InputIsUnwindTether)
             {
                 // Unwind in the same orbit shape regardless of speed via exponential falloff of the radius
-                float windRate = WIND_TETHER_RATIO * OrbitRadius * Speed;
+                float windRate = WIND_TETHER_RATIO * playerState.OrbitRadius * playerState.Speed;
                 // Double the unwind speed vs the wind speed since it feels better
-                OrbitRadius += 2 * windRate * dt;
+                playerState.OrbitRadius += 2 * windRate * dt;
             }
         }
         else
         {
-            CenterPoint = Vector2.zero;
-            OrbitRadius = 0;
+            playerState.CenterPoint = Vector2.zero;
+            playerState.OrbitRadius = 0;
         }
-        OrbitRadius = Mathf.Clamp(OrbitRadius, MIN_RADIUS, MAX_RADIUS);
+        playerState.OrbitRadius = Mathf.Clamp(playerState.OrbitRadius, MIN_RADIUS, MAX_RADIUS);
     }
 
     private void HandleSpeedBoost(bool wasInputSpeedBoost, float dt)
     {
         float gasDrainPerTick = dt / GAS_DRAIN_TIME;
-        if (InputIsSpeedBoost && CurSpeedBoostCooldown <= 0 && CurGas >= gasDrainPerTick)
+        if (playerState.InputIsSpeedBoost && playerState.CurSpeedBoostCooldown <= 0 && playerState.CurGas >= gasDrainPerTick)
         {
-            if (!IsSpeedBoost)
+            if (!playerState.IsSpeedBoost)
             {
                 // This is the first frame of speed boost
-                Speed = 2 * Speed;
+                playerState.Speed = 2 * playerState.Speed;
             }
             // Apply speed boost while draining gas. Also reset cooldown value so that it's set once boost is released
-            Speed += SPEED_BOOST_RAMP * (Speed - MIN_SPEED + 1) * dt;
-            CurGas -= gasDrainPerTick;
-            IsSpeedBoost = true;
+            playerState.Speed += SPEED_BOOST_RAMP * (playerState.Speed - MIN_SPEED + 1) * dt;
+            playerState.CurGas -= gasDrainPerTick;
+            playerState.IsSpeedBoost = true;
         }
-        else if (IsSpeedBoost)
+        else if (playerState.IsSpeedBoost)
         {
-            CurSpeedBoostCooldown = SPEED_BOOST_COOLDOWN;
-            IsSpeedBoost = false;
+            playerState.CurSpeedBoostCooldown = SPEED_BOOST_COOLDOWN;
+            playerState.IsSpeedBoost = false;
         }
         else
         {
             // Reduce cooldown
-            CurSpeedBoostCooldown = Mathf.Clamp(CurSpeedBoostCooldown - dt, 0, SPEED_BOOST_COOLDOWN);
+            playerState.CurSpeedBoostCooldown = Mathf.Clamp(playerState.CurSpeedBoostCooldown - dt, 0, SPEED_BOOST_COOLDOWN);
             // Speed exponential falloff
-            Speed -= SPEED_FALLOFF * (Speed - MIN_SPEED + 1) * dt;
+            playerState.Speed -= SPEED_FALLOFF * (playerState.Speed - MIN_SPEED + 1) * dt;
             //Increase gas
-            CurGas += dt / GAS_INCREASE_TIME;
+            playerState.CurGas += dt / GAS_INCREASE_TIME;
         }
-        CurGas = Mathf.Clamp(CurGas, 0, 1);
-        Speed = Mathf.Clamp(Speed, MIN_SPEED, MAX_SPEED);
+        playerState.CurGas = Mathf.Clamp(playerState.CurGas, 0, 1);
+        playerState.Speed = Mathf.Clamp(playerState.Speed, MIN_SPEED, MAX_SPEED);
     }
 
     private void HandleKick(float dt)
     {
-        if (InputIsKick && CurKickCooldown <= 0)
+        if (playerState.InputIsKick && playerState.CurKickCooldown <= 0)
         {
-            CurKickCooldown = HEAVY_COOLDOWN;
+            playerState.CurKickCooldown = HEAVY_COOLDOWN;
             body.mass = HEAVY_MASS;
         }
-        else if (CurKickCooldown <= HEAVY_COOLDOWN - HEAVY_DURATION)
+        else if (playerState.CurKickCooldown <= HEAVY_COOLDOWN - HEAVY_DURATION)
         {
             body.mass = 1;
         }
-        CurKickCooldown = Mathf.Clamp(CurKickCooldown - dt, 0, Mathf.Infinity);
+        playerState.CurKickCooldown = Mathf.Clamp(playerState.CurKickCooldown - dt, 0, Mathf.Infinity);
     }
 
     private void SetRigidBodyVelocity(float dt)
     {
-        if (!InputIsTethered)
+        if (!playerState.InputIsTethered)
         {
-            body.velocity = Speed * body.velocity.normalized;
+            body.velocity = playerState.Speed * body.velocity.normalized;
             return;
         }
-        Vector2 diff = body.position - CenterPoint;
+        Vector2 diff = body.position - playerState.CenterPoint;
         float rotationDirection = Mathf.Sign(Vector2.Dot(new Vector2(diff.y, -diff.x), body.velocity));
         if (rotationDirection == 0)
         {
             rotationDirection = 1;
         }
-        if (Mathf.Abs(diff.magnitude - OrbitRadius) > Speed * dt * 0.75f)
+        if (Mathf.Abs(diff.magnitude - playerState.OrbitRadius) > playerState.Speed * dt * 0.75f)
         {
             //Too large a distance to make in one step. Go towards new radius at 45 deg angle
             Vector2 tangentUnit = new Vector2(diff.y, -diff.x).normalized * rotationDirection;
-            Vector2 radialChangeUnit = (diff.normalized * OrbitRadius - diff).normalized; // TODO: Could this just be -diff.normalized ?
-            body.velocity = Speed * (tangentUnit + radialChangeUnit).normalized;
+            Vector2 radialChangeUnit = (diff.normalized * playerState.OrbitRadius - diff).normalized; // TODO: Could this just be -diff.normalized ?
+            body.velocity = playerState.Speed * (tangentUnit + radialChangeUnit).normalized;
         }
         else
         {
             //Can make the radius change. So, solve for the new angle
             float currentAngle = Mathf.Atan2(diff.y, diff.x);
-            float deltaAngle = (diff.magnitude * diff.magnitude + OrbitRadius * OrbitRadius - Mathf.Pow(Speed * dt, 2)) / (2 * diff.magnitude * OrbitRadius);
+            float deltaAngle = (diff.magnitude * diff.magnitude + playerState.OrbitRadius * playerState.OrbitRadius - Mathf.Pow(playerState.Speed * dt, 2)) / (2 * diff.magnitude * playerState.OrbitRadius);
             deltaAngle = Mathf.Acos(deltaAngle);
             float newAngle = currentAngle + deltaAngle * -rotationDirection;
-            Vector2 newPosition = CenterPoint + OrbitRadius * new Vector2(Mathf.Cos(newAngle), Mathf.Sin(newAngle));
-            body.velocity = Speed * (newPosition - body.position).normalized;
+            Vector2 newPosition = playerState.CenterPoint + playerState.OrbitRadius * new Vector2(Mathf.Cos(newAngle), Mathf.Sin(newAngle));
+            body.velocity = playerState.Speed * (newPosition - body.position).normalized;
         }
     }
 

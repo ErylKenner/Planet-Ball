@@ -10,7 +10,7 @@ public class NetworkedObject : NetworkBehaviour, IStateful
 {
     protected Rigidbody2D body;
 
-    public State GetState()
+    public virtual State GetState()
     {
         return new State
         {
@@ -21,7 +21,7 @@ public class NetworkedObject : NetworkBehaviour, IStateful
         };
     }
 
-    public void SetState(State state)
+    public virtual void SetState(State state)
     {
         body.position = state.position;
         body.velocity = state.velocity;

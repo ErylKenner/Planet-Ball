@@ -10,18 +10,34 @@ public class NetworkedPlayer : NetworkedObject, IInputful
 {
     private PlayerPlanetController playerController;
     private Vector2 movement;
+
+
+    public override State GetState() {
+        State ret = base.GetState();
+        ret.playerState = playerController.playerState;
+        return ret;
+    }
+
+    public override void SetState(State state)
+    {
+        base.SetState(state);
+        playerController.playerState = state.playerState;
+        // IF THIS BREAKS, WE MAY NEED TO DO A DEEPCOPY
+    }
+
+
+
+
     public void ApplyInput(Inputs input)
     {
+        playerController.ApplyInput(input, Time.fixedDeltaTime);
         //TODO: Fix this
         //playerController.Move(input.movement);
     }
 
     public Inputs GetInput()
     {
-        return new Inputs
-        {
-            movement = movement
-        };
+        return playerController.GetInputs();
     }
 
     protected void Start()

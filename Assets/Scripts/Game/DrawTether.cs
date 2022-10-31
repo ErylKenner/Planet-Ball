@@ -46,7 +46,7 @@ public class DrawTether : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Player.InputIsTethered)
+        if (Player.playerState.InputIsTethered)
         {
             DrawConnectedTether();
             return;
@@ -67,14 +67,14 @@ public class DrawTether : MonoBehaviour
         for (int i = 1; i < lineRenderer.positionCount - 1; ++i)
         {
             Vector2 A = Player.transform.position;
-            Vector2 D = Player.CenterPoint;
-            Vector2 B = (1 + PLAYER_HANDLE_TOWARD) * A - PLAYER_HANDLE_TOWARD * D - PLAYER_HANDLE_SIDEWAYS * Player.OrbitRadius * Player.GetComponent<Rigidbody2D>().velocity;
-            Vector2 C = (1 + PLANET_HANDLE_TOWARD) * D - PLANET_HANDLE_TOWARD * A - PLANET_HANDLE_SIDEWAYS * Player.OrbitRadius * Player.GetComponent<Rigidbody2D>().velocity;
+            Vector2 D = Player.playerState.CenterPoint;
+            Vector2 B = (1 + PLAYER_HANDLE_TOWARD) * A - PLAYER_HANDLE_TOWARD * D - PLAYER_HANDLE_SIDEWAYS * Player.playerState.OrbitRadius * Player.GetComponent<Rigidbody2D>().velocity;
+            Vector2 C = (1 + PLANET_HANDLE_TOWARD) * D - PLANET_HANDLE_TOWARD * A - PLANET_HANDLE_SIDEWAYS * Player.playerState.OrbitRadius * Player.GetComponent<Rigidbody2D>().velocity;
             float t = (float)i / (lineRenderer.positionCount - 2);
             Vector2 position = DeCasteljausAlgorithm(A, B, C, D, t);
             lineRenderer.SetPosition(i, position);
         }
-        lineRenderer.SetPosition(lineRenderer.positionCount - 1, Player.CenterPoint);
+        lineRenderer.SetPosition(lineRenderer.positionCount - 1, Player.playerState.CenterPoint);
     }
 
     private void DrawUnconnectedTether(Vector2 nearestPlanetPosition)

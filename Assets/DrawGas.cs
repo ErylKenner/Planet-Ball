@@ -19,7 +19,7 @@ public class DrawGas : MonoBehaviour
     void Update()
     {
         Vector2 sizeDelta = GasImage.GetComponent<RectTransform>().sizeDelta;
-        sizeDelta.y = Player.CurGas * originalHeight;
+        sizeDelta.y = Player.playerState.CurGas * originalHeight;
         GasImage.GetComponent<RectTransform>().sizeDelta = sizeDelta;
     }
 }

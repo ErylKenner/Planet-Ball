@@ -28,7 +28,7 @@ namespace ClientServerPrediction
                     }
 
                     uint newestTick = inputMessage.startTick + (uint)inputContext.inputs.Count - 1;
-                    Debug.Log($"Got: {inputContext.netId} {newestTick}");
+                    //Debug.Log($"Got: {inputContext.netId} {newestTick}");
                     uint expectedTick = inputBufferMap[inputContext.netId].BeenProcessed ? inputBufferMap[inputContext.netId].LastProcessed().clientTick + 1 : newestTick;
 
 
@@ -43,7 +43,7 @@ namespace ClientServerPrediction
 
                             if (inputBufferMap[inputContext.netId].Count == 0 || inputBufferMap[inputContext.netId].LastRecieved().clientTick < index)
                             {
-                                Debug.Log($"Queuing: {index}");
+                                //Debug.Log($"Queuing: {index}");
                                 inputBufferMap[inputContext.netId].Enqueue(inputContext.inputs[packageTick], (uint)index);
                             }
 
@@ -57,7 +57,7 @@ namespace ClientServerPrediction
                                       ref Dictionary<uint, IInputful> inputMap,
                                       uint serverTick)
         {
-            Debug.Log("Applying Tick");
+            //Debug.Log("Applying Tick");
             foreach(uint id in inputBufferMap.Keys)
             {
                 if(inputMap.ContainsKey(id) && inputBufferMap[id].Count > 0)
