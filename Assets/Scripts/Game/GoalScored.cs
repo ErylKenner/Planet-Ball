@@ -34,6 +34,9 @@ public class GoalScored : NetworkBehaviour
         Ball ball = other.GetComponent<Ball>();
         if (ball != null)
         {
+            // Disable 
+
+
             //RpcPrintName(Name);
             //ball.RpcReset();
             

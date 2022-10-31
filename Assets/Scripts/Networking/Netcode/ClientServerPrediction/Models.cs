@@ -6,6 +6,28 @@ namespace ClientServerPrediction
     public class Inputs
     {
         public Vector2 movement = Vector2.zero;
+        public bool AttachTether = false;
+        public bool WindTether = false;
+        public bool UnwindTether = false;
+        public bool SpeedBoost = false;
+        public bool Kick = false;
+    }
+
+    public class PlayerState
+    {
+        public bool InputIsTethered = false;
+        public bool InputIsWindTether = false;
+        public bool InputIsUnwindTether = false;
+        public bool InputIsSpeedBoost = false;
+        public bool InputIsKick = false;
+        public float OrbitRadius = 0;
+        public Vector2 CenterPoint = Vector2.zero;
+        public float Speed = 12.0f;
+        public float CurSpeedBoostCooldown = 0f;
+        public float CurKickCooldown = 0f;
+        public float CurGas = 0f;
+        public bool IsSpeedBoost = false;
+        public bool IsKick = false;
     }
 
     public class State
@@ -14,6 +36,7 @@ namespace ClientServerPrediction
         public Vector2 velocity = Vector2.zero;
         public float rotation = 0f;
         public float angularVelocity = 0f;
+        public PlayerState playerState = null;
     }
 
     public class StateError
