@@ -34,8 +34,8 @@ public class GoalScored : NetworkBehaviour
         Ball ball = other.GetComponent<Ball>();
         if (ball != null)
         {
-            RpcPrintName(Name);
-            ball.RpcReset();
+            //RpcPrintName(Name);
+            //ball.RpcReset();
             
             //Rigidbody2D rb = other.GetComponent<Rigidbody2D>();
             //rb.MovePosition(Vector2.zero);

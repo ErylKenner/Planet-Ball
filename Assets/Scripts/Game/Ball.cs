@@ -22,7 +22,7 @@ public class Ball : NetworkBehaviour
     {
         if (collision.transform.tag == "Player")
         {
-            CmdAssignNetworkAuthority(GetComponent<NetworkIdentity>(), collision.transform.GetComponent<NetworkIdentity>());
+            //CmdAssignNetworkAuthority(GetComponent<NetworkIdentity>(), collision.transform.GetComponent<NetworkIdentity>());
         }
     }
 
