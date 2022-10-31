@@ -224,14 +224,13 @@ GameObject:
   - component: {fileID: 2016825849}
   - component: {fileID: 2016825848}
   - component: {fileID: 2016825847}
-  - component: {fileID: 1814962997}
   m_Layer: 0
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2016825846
 RectTransform:
   m_ObjectHideFlags: 0
@@ -314,19 +313,6 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &1814962997
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2016825845}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cefe17a79fdf1e7429792801383578a1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  statsText: {fileID: 849537675}
 --- !u!1 &8371194678007894154
 GameObject:
   m_ObjectHideFlags: 0
@@ -394,4 +380,4 @@ MonoBehaviour:
   syncInterval: 0.1
   playerTrail: {fileID: 5594583912674202078, guid: feabaf7d67e71c94e8e9ea351a82382c, type: 3}
   playerServerTrail: {fileID: 5594583912674202078, guid: f8c45d040565d4448a40e060b6169b1e, type: 3}
-  ball: {fileID: 0}
+  ball: {fileID: 8605165315305927817, guid: 6067a35150c63724ab56faf3a63a4a5f, type: 3}
