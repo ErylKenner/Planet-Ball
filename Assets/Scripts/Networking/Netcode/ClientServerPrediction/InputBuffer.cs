@@ -76,4 +76,9 @@ public class InputBuffer<T>
     {
         return buffer[(lastProcessed + unprocessedCount) % bufferSize];
     }
+
+    public void Clear()
+    {
+        unprocessedCount = 0;
+    }
 }

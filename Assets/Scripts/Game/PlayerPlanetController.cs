@@ -9,6 +9,7 @@ using ClientServerPrediction;
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerPlanetController : NetworkBehaviour
 {
+    [SerializeField]
     public PlayerState playerState = new PlayerState();
 
     // Const attributes - not state

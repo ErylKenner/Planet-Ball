@@ -78,9 +78,10 @@ namespace ClientServerPrediction
 
         public static StateMessage CreateStateMessage(ref Dictionary<uint, InputBuffer<Inputs>> inputBufferMap,
                                                       in Dictionary<uint, IStateful> stateMap,
-                                                      uint serverTick)
+                                                      uint serverTick,
+                                                      bool frozen=false)
         {
-            StateMessage stateMessage = new StateMessage { serverTick = serverTick, stateContexts = new List<StateContext>() };
+            StateMessage stateMessage = new StateMessage { serverTick = serverTick, stateContexts = new List<StateContext>(), frozen = frozen };
 
             foreach (uint netId in stateMap.Keys)
             {
@@ -115,6 +116,19 @@ namespace ClientServerPrediction
                                             ref Queue<StateMessage> stateQueue)
         {
             stateQueue.Enqueue(stateMessage);
+        }
+
+        public static void SetState(ref Dictionary<uint, IStateful> statefulMap, in Dictionary<uint, State> stateMap)
+        {
+            foreach(uint netId in statefulMap.Keys)
+            {
+                if(stateMap.ContainsKey(netId))
+                {
+                    // TODO: Fix
+                    State state = new State { position = stateMap[netId].position, playerState = new PlayerState() };
+                    statefulMap[netId].SetState(state);
+                }
+            }
         }
     }
 }

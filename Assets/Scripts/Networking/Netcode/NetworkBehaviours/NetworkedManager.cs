@@ -17,7 +17,8 @@ public class NetworkedManager : NetworkBehaviour
 
     public Ball ball;
 
-    float timer;
+    float timer = 0;
+    float frozenTimer = 0;
 
 
     // Start is called before the first frame update
@@ -41,6 +42,15 @@ public class NetworkedManager : NetworkBehaviour
     {
         float dt = Time.fixedDeltaTime;
         timer += Time.deltaTime;
+        
+        if(frozenTimer > 0)
+        {
+            frozenTimer = Mathf.Clamp(frozenTimer - Time.deltaTime, 0, frozenTimer);
+            if(frozenTimer <= 0)
+            {
+                server.Freeze(false);
+            }
+        }
 
         while (timer >= Time.fixedDeltaTime)
         {
@@ -81,6 +91,19 @@ public class NetworkedManager : NetworkBehaviour
     void CmdSendInputMessage(InputMessage inputMessage)
     {
         server.inputMessageQueue.Enqueue(inputMessage);
+    }
+
+    public void ResetState()
+    {
+        float dt = Time.fixedDeltaTime;
+        // Reset all state objects to default -> sent to the clients as StateMessages (freeze)
+        server.ResetState(runner, new RunContext { dt = dt });
+        // Flush my input queue, input buffer
+        // Stop accepting new inputs
+        server.Freeze(true);
+        // Wait a second
+        frozenTimer = 3;
+        // Send an unfreeze RPC
     }
 
 }

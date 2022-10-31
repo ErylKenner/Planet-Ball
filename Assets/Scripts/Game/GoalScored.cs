@@ -34,6 +34,8 @@ public class GoalScored : NetworkBehaviour
         Ball ball = other.GetComponent<Ball>();
         if (ball != null)
         {
+
+            NetworkedManager.instance.ResetState();
             // Disable 
 
 

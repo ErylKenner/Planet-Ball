@@ -16,6 +16,7 @@ namespace ClientServerPrediction
         public Dictionary<uint, State[]> stateBufferMap = new Dictionary<uint, State[]>();
 
         public uint? localNetId = null;
+        public bool frozen = false;
 
         // Debug objects
         public Vector2 lastServerMessage = Vector2.zero;
@@ -63,8 +64,11 @@ namespace ClientServerPrediction
             if (isClientOnly)
             {
                 StateMessage lastestStateMessage = ClientStateMachine.GetLatestStateMessage(ref stateMessageQueue, (uint)localNetId);
+
                 if (lastestStateMessage != null)
                 {
+                    frozen = lastestStateMessage.frozen;
+
                     lastServerMessage = lastestStateMessage.GetMap()[(uint)localNetId].state.position;
 
                     StateError stateError = new StateError { positionDiff = 0.01f };
@@ -85,16 +89,25 @@ namespace ClientServerPrediction
                 }
             }
 
-            Dictionary<uint, Inputs> currentInputMap = ClientStateMachine.StoreInput(ref inputBufferMap, in inputMap, tick);
+            InputMessage inputMessage = null;
 
-            if(isClientOnly)
+            if (!frozen)
             {
-                StateMachine.Run(currentInputMap, ref inputMap, runner, runContext);
+                Dictionary<uint, Inputs> currentInputMap = ClientStateMachine.StoreInput(ref inputBufferMap, in inputMap, tick);
+
+                if (isClientOnly)
+                {
+                    StateMachine.Run(currentInputMap, ref inputMap, runner, runContext);
+                }
+
+                inputMessage = ClientStateMachine.CreateInputMessage(inputBufferMap, lastReceivedTick, tick);
+                tick++;
+                ClientStateMachine.StoreState(ref stateBufferMap, in stateMap, tick);
+            } else
+            {
+                tick++;
             }
-            
-            InputMessage inputMessage = ClientStateMachine.CreateInputMessage(inputBufferMap, lastReceivedTick, tick);
-            tick++;
-            ClientStateMachine.StoreState(ref stateBufferMap, in stateMap, tick);
+
             return inputMessage;
         }
     }
