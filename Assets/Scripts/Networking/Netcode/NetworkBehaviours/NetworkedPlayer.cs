@@ -12,7 +12,8 @@ public class NetworkedPlayer : NetworkedObject, IInputful
     private Vector2 movement;
     public void ApplyInput(Inputs input)
     {
-        playerController.Move(input.movement);
+        //TODO: Fix this
+        //playerController.Move(input.movement);
     }
 
     public Inputs GetInput()
