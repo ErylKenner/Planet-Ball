@@ -41,11 +41,8 @@ namespace ClientServerPrediction
         }
         public StateMessage Tick(IRunnable runner, RunContext runContext)
         {
-            if(!frozen)
-            {
-                ServerStateMachine.ProcessInputMessages(ref inputMessageQueue, ref serverInputBufferMap, bufferSize);
-                ServerStateMachine.ApplyInput(ref serverInputBufferMap, ref serverInputMap, tick);
-            }
+            ServerStateMachine.ProcessInputMessages(ref inputMessageQueue, ref serverInputBufferMap, bufferSize);
+            ServerStateMachine.ApplyInput(ref serverInputBufferMap, ref serverInputMap, tick, frozen);
 
             runner.Run(runContext);
             tick++;
@@ -60,11 +57,6 @@ namespace ClientServerPrediction
         public void Freeze(bool freeze)
         {
             frozen = freeze;
-            inputMessageQueue.Clear();
-            foreach (uint netId in serverInputBufferMap.Keys)
-            {
-                serverInputBufferMap[netId].Clear();
-            }
         }
     }
 }

@@ -109,16 +109,22 @@ namespace ClientServerPrediction
                     // Set the Stateful state
                     stateMap[stateContext.netId].SetState(stateContext.state);
                 }
+
+
                 // from messageClientTick -> clientTick
                 for (int i = (int)messageClientTick; i < clientTick; i++) {
-                    // foreach StateContext
-                    foreach (StateContext stateContext in stateMessage.stateContexts)
+
+                    if (!stateMessage.frozen)
                     {
-                        // Only apply future input to the player
-                        if (stateContext.netId == netId)
+                        // foreach StateContext
+                        foreach (StateContext stateContext in stateMessage.stateContexts)
                         {
-                            // Apply input from input buffer
-                            inputMap[stateContext.netId].ApplyInput(inputBufferMap[stateContext.netId][i % inputBufferMap[stateContext.netId].Length]);
+                            // Only apply future input to the player
+                            if (stateContext.netId == netId)
+                            {
+                                // Apply input from input buffer
+                                inputMap[stateContext.netId].ApplyInput(inputBufferMap[stateContext.netId][i % inputBufferMap[stateContext.netId].Length]);
+                            }
                         }
                     }
 
@@ -153,14 +159,15 @@ namespace ClientServerPrediction
 
         public static Dictionary<uint, Inputs> StoreInput(ref Dictionary<uint, Inputs[]> inputBufferMap,
                                       in Dictionary<uint, IInputful> inputMap,
-                                      uint clientTick)
+                                      uint clientTick,
+                                      bool frozen=false)
         {
             Dictionary<uint, Inputs> currentInputMap = new Dictionary<uint, Inputs>();
             foreach (uint id in inputMap.Keys)
             {
                 if (inputBufferMap.ContainsKey(id))
                 {
-                    Inputs currentInput = inputMap[id].GetInput();
+                    Inputs currentInput = frozen ? new Inputs() : inputMap[id].GetInput();
                     inputBufferMap[id][clientTick % inputBufferMap[id].Length] = currentInput;
                     currentInputMap.Add(id, currentInput);
                 }

@@ -30,7 +30,7 @@ public class NetworkedObject : NetworkBehaviour, IStateful
     }
 
 
-    protected void Start()
+    protected virtual void Start()
     {
         body = GetComponent<Rigidbody2D>();
         NetworkedManager.instance.client.AddStateful(this, netId);
@@ -38,7 +38,7 @@ public class NetworkedObject : NetworkBehaviour, IStateful
     }
 
 
-    protected void OnDestroy()
+    protected virtual void OnDestroy()
     {
         NetworkedManager.instance.client.DeleteStateful(netId);
         NetworkedManager.instance.server.DeleteStateful(netId);

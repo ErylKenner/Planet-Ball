@@ -40,7 +40,7 @@ public class NetworkedPlayer : NetworkedObject, IInputful
         return playerController.GetInputs();
     }
 
-    protected void Start()
+    protected override void Start()
     {
         playerController = GetComponent<PlayerPlanetController>();
         base.Start();
@@ -48,7 +48,7 @@ public class NetworkedPlayer : NetworkedObject, IInputful
         NetworkedManager.instance.server.AddInputful(this, netId);
     }
 
-    protected void OnDestroy()
+    protected override void OnDestroy()
     {
         base.OnDestroy();
         NetworkedManager.instance.client.DeleteInputful(netId);

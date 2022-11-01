@@ -12,6 +12,7 @@ public class NetworkedManager : NetworkBehaviour
 
     public GameObject playerTrail;
     public GameObject playerServerTrail;
+    public TMPro.TextMeshProUGUI text;
 
     public static NetworkedManager instance = null;
 
@@ -63,6 +64,8 @@ public class NetworkedManager : NetworkBehaviour
                 serverTrail.name = $"Server {client.lastReceivedTick}";
                 GameObject clientTrail =  Instantiate(playerTrail, ((NetworkedPlayer)client.stateMap[(uint)client.localNetId]).transform.position, Quaternion.identity);
                 clientTrail.name = $"Client {client.tick}";
+
+                text.text = $"{client.tick - client.lastReceivedTick}";
 
                 if (inputMessage != null)
                 {

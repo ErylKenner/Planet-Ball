@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace ClientServerPrediction
@@ -68,45 +69,48 @@ namespace ClientServerPrediction
                 if (lastestStateMessage != null)
                 {
                     frozen = lastestStateMessage.frozen;
+                    if (frozen)
+                    {
+                        ServerStateMachine.SetState(ref stateMap, lastestStateMessage.GetMap().ToDictionary(kp => kp.Key, kp => kp.Value.state));
+                        runner.Run(runContext);
+                        lastReceivedTick = lastestStateMessage.MessageClientTick((uint)localNetId);
 
-                    lastServerMessage = lastestStateMessage.GetMap()[(uint)localNetId].state.position;
+                        frozen = lastestStateMessage.frozen;
+                    } else
+                    {
+                        lastServerMessage = lastestStateMessage.GetMap()[(uint)localNetId].state.position;
 
-                    StateError stateError = new StateError { positionDiff = 0.01f };
+                        StateError stateError = new StateError { positionDiff = 0.01f };
 
-                    lastReceivedTick = ClientStateMachine.CorrectClient(
-                        ref inputBufferMap,
-                        ref stateBufferMap,
-                        ref inputMap,
-                        ref stateMap,
-                        in lastestStateMessage,
-                        in stateError,
-                        runner,
-                        runContext,
-                        (uint)localNetId,
-                        tick,
-                        lastReceivedTick
-                     );
+                        lastReceivedTick = ClientStateMachine.CorrectClient(
+                            ref inputBufferMap,
+                            ref stateBufferMap,
+                            ref inputMap,
+                            ref stateMap,
+                            in lastestStateMessage,
+                            in stateError,
+                            runner,
+                            runContext,
+                            (uint)localNetId,
+                            tick,
+                            lastReceivedTick
+                         );
+                    }
+
                 }
             }
 
-            InputMessage inputMessage = null;
 
-            if (!frozen)
+            Dictionary<uint, Inputs> currentInputMap = ClientStateMachine.StoreInput(ref inputBufferMap, in inputMap, tick, frozen);
+
+            if (isClientOnly)
             {
-                Dictionary<uint, Inputs> currentInputMap = ClientStateMachine.StoreInput(ref inputBufferMap, in inputMap, tick);
-
-                if (isClientOnly)
-                {
-                    StateMachine.Run(currentInputMap, ref inputMap, runner, runContext);
-                }
-
-                inputMessage = ClientStateMachine.CreateInputMessage(inputBufferMap, lastReceivedTick, tick);
-                tick++;
-                ClientStateMachine.StoreState(ref stateBufferMap, in stateMap, tick);
-            } else
-            {
-                tick++;
+                StateMachine.Run(currentInputMap, ref inputMap, runner, runContext);
             }
+
+            InputMessage inputMessage = ClientStateMachine.CreateInputMessage(in inputBufferMap, lastReceivedTick, tick);
+            tick++;
+            ClientStateMachine.StoreState(ref stateBufferMap, in stateMap, tick);
 
             return inputMessage;
         }
