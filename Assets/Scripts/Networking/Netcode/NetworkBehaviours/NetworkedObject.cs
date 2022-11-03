@@ -29,6 +29,11 @@ public class NetworkedObject : NetworkBehaviour, IStateful
         body.angularVelocity = state.angularVelocity;
     }
 
+    public virtual void PredictState(State state)
+    {
+
+    }
+
 
     protected virtual void Start()
     {

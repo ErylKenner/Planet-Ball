@@ -39,5 +39,10 @@ namespace MockModel
         {
             position = state.position;
         }
+
+        public void PredictState(State state)
+        {
+
+        }
     }
 }

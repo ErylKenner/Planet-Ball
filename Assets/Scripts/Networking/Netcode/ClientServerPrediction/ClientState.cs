@@ -105,7 +105,7 @@ namespace ClientServerPrediction
 
             if (isClientOnly)
             {
-                StateMachine.Run(currentInputMap, ref inputMap, runner, runContext);
+                StateMachine.Run(currentInputMap, ref inputMap, ref stateMap, runner, runContext);
             }
 
             InputMessage inputMessage = ClientStateMachine.CreateInputMessage(in inputBufferMap, lastReceivedTick, tick);
