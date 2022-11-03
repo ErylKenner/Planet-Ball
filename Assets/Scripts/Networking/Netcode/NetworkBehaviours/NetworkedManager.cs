@@ -96,17 +96,12 @@ public class NetworkedManager : NetworkBehaviour
         server.inputMessageQueue.Enqueue(inputMessage);
     }
 
-    public void ResetState()
+    public void ResetState(float freezeTime)
     {
+        // TODO: Pass in a Runcontext to get the dt
         float dt = Time.fixedDeltaTime;
-        // Reset all state objects to default -> sent to the clients as StateMessages (freeze)
         server.ResetState(runner, new RunContext { dt = dt });
-        // Flush my input queue, input buffer
-        // Stop accepting new inputs
         server.Freeze(true);
-        // Wait a second
-        frozenTimer = 3;
-        // Send an unfreeze RPC
+        frozenTimer = freezeTime;
     }
-
 }

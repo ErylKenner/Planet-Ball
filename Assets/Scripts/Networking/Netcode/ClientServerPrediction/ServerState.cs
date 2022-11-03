@@ -51,7 +51,7 @@ namespace ClientServerPrediction
 
         public void ResetState(IRunnable runner, RunContext runContext)
         {
-            ServerStateMachine.SetState(ref serverStateMap, in initialStateMap);
+            StateMachine.SetState(ref serverStateMap, in initialStateMap);
         }
 
         public void Freeze(bool freeze)

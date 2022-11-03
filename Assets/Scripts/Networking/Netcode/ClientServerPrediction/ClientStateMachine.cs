@@ -58,16 +58,6 @@ namespace ClientServerPrediction
                 throw new System.InvalidOperationException($"stateMessage must contain a Context with the player NetId and a non-null tickSync");
             }
 
-            //if(tickSync == null)
-            //{
-            //    return 0;
-            //}
-
-            //if (tickSync.lastProcessedClientTick <= tickSync.lastProcessedServerTick)
-            //{
-            //    throw new System.InvalidOperationException($"Last processed client tick {tickSync.lastProcessedClientTick} must be greater than last processed server tick {tickSync.lastProcessedServerTick}");
-            //}
-
             // Client offset = lastProcessedClientTick - lastProcessedServerTick
             // Message Client tick = serverTick + clientOffset
             uint messageClientTick = stateMessage.MessageClientTick(netId);
@@ -116,7 +106,6 @@ namespace ClientServerPrediction
 
                     if (!stateMessage.frozen)
                     {
-                        // foreach StateContext
                         foreach (StateContext stateContext in stateMessage.stateContexts)
                         {
                             // Only apply future input to the player

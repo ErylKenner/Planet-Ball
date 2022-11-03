@@ -71,7 +71,7 @@ namespace ClientServerPrediction
                     frozen = lastestStateMessage.frozen;
                     if (frozen)
                     {
-                        ServerStateMachine.SetState(ref stateMap, lastestStateMessage.GetMap().ToDictionary(kp => kp.Key, kp => kp.Value.state));
+                        StateMachine.SetState(ref stateMap, lastestStateMessage.GetMap().ToDictionary(kp => kp.Key, kp => kp.Value.state));
                         runner.Run(runContext);
                         lastReceivedTick = lastestStateMessage.MessageClientTick((uint)localNetId);
 

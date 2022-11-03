@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace ClientServerPrediction
 {
@@ -55,14 +54,6 @@ namespace ClientServerPrediction
                 if(inputMap.ContainsKey(id) && !inputBufferMap[id].IsEmpty)
                 {
                     InputPacket<Inputs> inputPacket = inputBufferMap[id].Dequeue(serverTick);
-                    //if(inputBufferMap[id].Count > 0)
-                    //{
-                    //    Debug.Log($"{ inputBufferMap[id].Count}");
-                    //}
-
-                    //Debug.Log($"Applying: {inputPacket.clientTick} {inputBufferMap[id].Count}");
-
-                    // TODO: Integrate with StateMachine.Run?
                     if(!frozen)
                     {
                         inputMap[id].ApplyInput(inputPacket.input);
@@ -111,19 +102,6 @@ namespace ClientServerPrediction
                                             ref Queue<StateMessage> stateQueue)
         {
             stateQueue.Enqueue(stateMessage);
-        }
-
-        public static void SetState(ref Dictionary<uint, IStateful> statefulMap, in Dictionary<uint, State> stateMap)
-        {
-            foreach(uint netId in statefulMap.Keys)
-            {
-                if(stateMap.ContainsKey(netId))
-                {
-                    // TODO: Fix
-                    State state = new State { position = stateMap[netId].position, playerState = new PlayerState() };
-                    statefulMap[netId].SetState(state);
-                }
-            }
         }
     }
 }

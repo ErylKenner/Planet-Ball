@@ -46,7 +46,6 @@ public class InputBuffer<T>
 
         if(clientTick > lastRecievedTick)
         {
-
             for(int i = lastRecievedTick + 1; i < clientTick; i++)
             {
                 buffer[i % bufferSize] = null;
@@ -71,6 +70,7 @@ public class InputBuffer<T>
         lastProcessed++;
         for (; lastProcessed <= lastRecievedTick; lastProcessed++)
         {
+            // TODO: Fix - could result in old data because we don't wipe the buffer on index wrap
             if(buffer[lastProcessed % bufferSize] != null)
             {
                 buffer[lastProcessed % bufferSize].serverTick = serverTick;
@@ -90,14 +90,5 @@ public class InputBuffer<T>
     public InputPacket<T> LastRecieved()
     {
         return buffer[lastRecievedTick % bufferSize];
-    }
-
-    public void Clear()
-    {
-        for (int i = lastProcessed + 1; i <= lastRecievedTick; i++)
-        {
-            buffer[i % bufferSize] = null;
-        }
-        lastRecievedTick = lastProcessed;
     }
 }
