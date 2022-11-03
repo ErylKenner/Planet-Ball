@@ -6,5 +6,7 @@ namespace ClientServerPrediction
         public void SetState(State state);
 
         public void PredictState(State state);
+
+        public void SmoothState(State oldState, State newState, RunContext runContext, StateError stateError);
     }
 }

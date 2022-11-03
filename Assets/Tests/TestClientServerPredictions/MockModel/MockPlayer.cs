@@ -44,5 +44,10 @@ namespace MockModel
         {
 
         }
+
+        public void SmoothState(State oldState, State newState, RunContext runContext, StateError stateError)
+        {
+
+        }
     }
 }

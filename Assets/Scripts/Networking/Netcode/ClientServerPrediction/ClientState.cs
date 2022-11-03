@@ -62,6 +62,9 @@ namespace ClientServerPrediction
                 return null;
             }
 
+            Dictionary<uint, State> statesBeforeCorrection = null;
+            StateError stateError = new StateError { positionDiff = 0.01f, snapDistance = 5f };
+
             if (isClientOnly)
             {
                 StateMessage lastestStateMessage = ClientStateMachine.GetLatestStateMessage(ref stateMessageQueue, (uint)localNetId);
@@ -80,13 +83,14 @@ namespace ClientServerPrediction
                     {
                         lastServerMessage = lastestStateMessage.GetMap()[(uint)localNetId].state.position;
 
-                        StateError stateError = new StateError { positionDiff = 0.01f };
+                        
 
                         lastReceivedTick = ClientStateMachine.CorrectClient(
                             ref inputBufferMap,
                             ref stateBufferMap,
                             ref inputMap,
                             ref stateMap,
+                            ref statesBeforeCorrection,
                             in lastestStateMessage,
                             in stateError,
                             runner,
@@ -111,6 +115,8 @@ namespace ClientServerPrediction
             InputMessage inputMessage = ClientStateMachine.CreateInputMessage(in inputBufferMap, lastReceivedTick, tick);
             tick++;
             ClientStateMachine.StoreState(ref stateBufferMap, in stateMap, tick);
+
+            ClientStateMachine.SmoothState(ref stateMap, in statesBeforeCorrection, runContext, stateError);
 
             return inputMessage;
         }

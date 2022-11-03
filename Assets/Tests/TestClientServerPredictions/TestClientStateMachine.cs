@@ -117,12 +117,14 @@ public class TestClientStateMachine
         stateBufferMap.Add(mockNetId, stateBuffer);
         inputBufferMap.Add(mockNetId, inputBuffer);
         StateError stateError = new StateError { positionDiff = 0.01f };
+        Dictionary<uint, State> statesBeforeCorrection = null;
 
         uint lastRecievedClientTick = ClientStateMachine.CorrectClient(
             ref inputBufferMap,
             ref stateBufferMap,
             ref inputMap,
             ref stateMap,
+            ref statesBeforeCorrection,
             in stateMessage,
             in stateError,
             new MockRunner(),
@@ -201,12 +203,14 @@ public class TestClientStateMachine
         stateBufferMap.Add(mockNetId, stateBuffer);
         inputBufferMap.Add(mockNetId, inputBuffer);
         StateError stateError = new StateError { positionDiff = 0.01f };
+        Dictionary<uint, State> statesBeforeCorrection = null;
 
         uint lastRecievedClientTick = ClientStateMachine.CorrectClient(
             ref inputBufferMap,
             ref stateBufferMap,
             ref inputMap,
             ref stateMap,
+            ref statesBeforeCorrection,
             in stateMessage,
             in stateError,
             new MockRunner(),
@@ -297,12 +301,14 @@ public class TestClientStateMachine
         stateBufferMap.Add(mockNetId, stateBuffer);
         inputBufferMap.Add(mockNetId, inputBuffer);
         StateError stateError = new StateError { positionDiff = 0.01f };
+        Dictionary<uint, State> statesBeforeCorrection = null;
 
         uint lastRecievedClientTick = ClientStateMachine.CorrectClient(
             ref inputBufferMap,
             ref stateBufferMap,
             ref inputMap,
             ref stateMap,
+            ref statesBeforeCorrection,
             in stateMessage,
             in stateError,
             new MockRunner(),
@@ -401,12 +407,14 @@ public class TestClientStateMachine
         stateBufferMap.Add(mockNetId, stateBuffer);
         inputBufferMap.Add(mockNetId, inputBuffer);
         StateError stateError = new StateError { positionDiff = 0.01f };
+        Dictionary<uint, State> statesBeforeCorrection = null;
 
         uint lastRecievedClientTick = ClientStateMachine.CorrectClient(
             ref inputBufferMap,
             ref stateBufferMap,
             ref inputMap,
             ref stateMap,
+            ref statesBeforeCorrection,
             in stateMessage,
             in stateError,
             new MockRunner(),

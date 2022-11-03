@@ -78,12 +78,14 @@ public class TestIntegrationStateMachine
         StateError stateError = new StateError { positionDiff = 0.1f };
 
         State originalState = mockPlayer.GetState();
+        Dictionary<uint, State> statesBeforeCorrection = null;
 
         uint lastReceivedTick = ClientStateMachine.CorrectClient(
             ref inputBufferMap,
             ref stateBufferMap,
             ref inputMap,
             ref stateMap,
+            ref statesBeforeCorrection,
             in lastestStateMessage,
             in stateError,
             mockRunner,
