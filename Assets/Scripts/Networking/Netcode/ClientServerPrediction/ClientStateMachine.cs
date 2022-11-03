@@ -113,6 +113,9 @@ namespace ClientServerPrediction
                             {
                                 // Apply input from input buffer
                                 inputMap[stateContext.netId].ApplyInput(inputBufferMap[stateContext.netId][i % inputBufferMap[stateContext.netId].Length]);
+                            } else
+                            {
+                                stateMap[stateContext.netId].PredictState(stateBufferMap[stateContext.netId][i % stateBufferMap[stateContext.netId].Length]);
                             }
                         }
                     }

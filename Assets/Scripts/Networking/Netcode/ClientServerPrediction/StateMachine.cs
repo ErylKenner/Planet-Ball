@@ -6,6 +6,7 @@ namespace ClientServerPrediction
     {
         public static void Run(in Dictionary<uint, Inputs> inputMap,
                                ref Dictionary<uint, IInputful> inputfulMap,
+                               ref Dictionary<uint, IStateful> statefulMap,
                                IRunnable runnable,
                                RunContext runContext)
         {
@@ -14,6 +15,14 @@ namespace ClientServerPrediction
                 if(inputMap.ContainsKey(netId))
                 {
                     inputfulMap[netId].ApplyInput(inputMap[netId]);
+                }
+            }
+
+            foreach(uint netId in statefulMap.Keys)
+            {
+                if(!inputfulMap.ContainsKey(netId))
+                {
+                    statefulMap[netId].PredictState(statefulMap[netId].GetState());
                 }
             }
 
