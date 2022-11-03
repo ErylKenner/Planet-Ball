@@ -365,7 +365,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
-  m_Radius: 0.46
+  m_Radius: 0.5
 --- !u!50 &7920176112070684410
 Rigidbody2D:
   serializedVersion: 4
@@ -383,7 +383,7 @@ Rigidbody2D:
   m_AngularDrag: 1.35
   m_GravityScale: 0
   m_Material: {fileID: 6200000, guid: 55fd3c7176a575b408658616a7579c99, type: 2}
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
@@ -539,14 +539,15 @@ MonoBehaviour:
     OrbitRadius: 0
     CenterPoint: {x: 0, y: 0}
     Speed: 12
+    RotatingClockwise: 1
     CurSpeedBoostCooldown: 0
     CurKickCooldown: 0
     CurGas: 0
     IsSpeedBoost: 0
     IsKick: 0
   WIND_TETHER_RATIO: 0.11
-  MIN_RADIUS: 0.5
-  MAX_RADIUS: 9
+  MIN_RADIUS: 1
+  MAX_RADIUS: 10
   MIN_SPEED: 12
   MAX_SPEED: 35
   SPEED_FALLOFF: 0.85

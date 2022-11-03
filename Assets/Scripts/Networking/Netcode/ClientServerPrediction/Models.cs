@@ -24,6 +24,7 @@ namespace ClientServerPrediction
         public float OrbitRadius = 0;
         public Vector2 CenterPoint = Vector2.zero;
         public float Speed = 12.0f;
+        public bool RotatingClockwise = true;
         public float CurSpeedBoostCooldown = 0f;
         public float CurKickCooldown = 0f;
         public float CurGas = 0f;

@@ -201,6 +201,7 @@ public class PlayerPlanetController : NetworkBehaviour
         {
             rotationDirection = 1;
         }
+        //rotationDirection = playerState.RotatingClockwise ? 1 : -1;
         if (Mathf.Abs(diff.magnitude - playerState.OrbitRadius) > playerState.Speed * dt * 0.75f)
         {
             //Too large a distance to make in one step. Go towards new radius at 45 deg angle
@@ -234,6 +235,17 @@ public class PlayerPlanetController : NetworkBehaviour
             }
         }
         return closest;
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        // TODO: Create both normnal and trigger colliders on walls. Players ignore normal colliders so that this function can handle wall collisions without phtysic autocorrecting overlap. We also then need to handle OnCollisionEnter2D for walls when not tethered.
+        if(collision.contactCount == 1 && playerState.InputIsTethered && collision.gameObject.tag == "Wall" || collision.gameObject.tag == "Goal")
+        {
+            Debug.Log("Here");
+            body.velocity = -body.velocity;
+        }
+        
     }
 
 
