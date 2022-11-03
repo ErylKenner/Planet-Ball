@@ -9,7 +9,6 @@ using UnityEngine.InputSystem;
 public class NetworkedPlayer : NetworkedObject, IInputful
 {
     private PlayerPlanetController playerController;
-    private Vector2 movement;
 
 
     public override State GetState() {
@@ -22,17 +21,23 @@ public class NetworkedPlayer : NetworkedObject, IInputful
     {
         base.SetState(state);
         playerController.playerState = state.playerState;
-        // IF THIS BREAKS, WE MAY NEED TO DO A DEEPCOPY
     }
 
-
-
+    public override void PredictState(State state)
+    {
+        base.PredictState(state);
+        Inputs previousInputs = Inputs.FromState(state);
+        if(previousInputs != null)
+        {
+            // TODO: Pass RunContext to PredictState
+            playerController.ApplyInput(previousInputs, Time.fixedDeltaTime);
+        }
+    }
 
     public void ApplyInput(Inputs input)
     {
+        // TODO: Pass RunContext to ApplyInput
         playerController.ApplyInput(input, Time.fixedDeltaTime);
-        //TODO: Fix this
-        //playerController.Move(input.movement);
     }
 
     public Inputs GetInput()
@@ -53,19 +58,5 @@ public class NetworkedPlayer : NetworkedObject, IInputful
         base.OnDestroy();
         NetworkedManager.instance.client.DeleteInputful(netId);
         NetworkedManager.instance.server.DeleteInputful(netId);
-    }
-
-
-    public void OnMove(InputValue axis)
-    {
-        if (axis.Get() == null)
-        {
-            movement = Vector2.zero;
-        }
-        else
-        {
-            movement = (Vector2)axis.Get();
-        }
-
     }
 }

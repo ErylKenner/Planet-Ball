@@ -39,5 +39,15 @@ namespace MockModel
         {
             position = state.position;
         }
+
+        public void PredictState(State state)
+        {
+
+        }
+
+        public void SmoothState(State oldState, State newState, RunContext runContext, StateError stateError)
+        {
+
+        }
     }
 }

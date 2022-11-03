@@ -59,7 +59,7 @@ public class TestIntegrationStateMachine
 
         // Client
         Dictionary<uint, Inputs> currentInputMap = ClientStateMachine.StoreInput(ref inputBufferMap, in inputMap, mockClientTick);
-        StateMachine.Run(currentInputMap, ref inputMap, mockRunner, new RunContext());
+        StateMachine.Run(currentInputMap, ref inputMap, ref stateMap, mockRunner, new RunContext());
         InputMessage inputMessage = ClientStateMachine.CreateInputMessage(inputBufferMap, mockClientTick - 1, mockClientTick);
         mockClientTick++;
         ClientStateMachine.StoreState(ref stateBufferMap, in stateMap, mockClientTick);
@@ -78,12 +78,14 @@ public class TestIntegrationStateMachine
         StateError stateError = new StateError { positionDiff = 0.1f };
 
         State originalState = mockPlayer.GetState();
+        Dictionary<uint, State> statesBeforeCorrection = null;
 
         uint lastReceivedTick = ClientStateMachine.CorrectClient(
             ref inputBufferMap,
             ref stateBufferMap,
             ref inputMap,
             ref stateMap,
+            ref statesBeforeCorrection,
             in lastestStateMessage,
             in stateError,
             mockRunner,

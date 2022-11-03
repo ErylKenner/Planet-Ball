@@ -35,6 +35,7 @@ namespace ClientServerPrediction
                                          ref Dictionary<uint, State[]> stateBufferMap,
                                          ref Dictionary<uint, IInputful> inputMap,
                                          ref Dictionary<uint, IStateful> stateMap,
+                                         ref Dictionary<uint, State> statesBeforeCorrection,
                                          in StateMessage stateMessage,
                                          in StateError stateError,
                                          IRunnable simulation,
@@ -89,11 +90,15 @@ namespace ClientServerPrediction
 
             // Compare state recieved with predicted state
             if (offendingNetIdIndex != -1) {
-                Debug.Log($"Correcting {messageClientTick} to {clientTick} (Loss: {inputLoss}) (Offset: {errors[keyList[offendingNetIdIndex]]})");
+                //Debug.Log($"Correcting {messageClientTick} to {clientTick} (Loss: {inputLoss}) (Offset: {errors[keyList[offendingNetIdIndex]]})");
+
+                // Save original state
+                statesBeforeCorrection = new Dictionary<uint, State>();
+
                 // Do correction
-                // foreach StateContext
                 foreach (StateContext stateContext in stateMessage.stateContexts)
                 {
+                    statesBeforeCorrection.Add(stateContext.netId, stateMap[stateContext.netId].GetState());
                     // Update the state buffer
                     stateBufferMap[stateContext.netId][messageClientTick % stateBufferMap[netId].Length] = stateContext.state;
                     // Set the Stateful state
@@ -113,6 +118,9 @@ namespace ClientServerPrediction
                             {
                                 // Apply input from input buffer
                                 inputMap[stateContext.netId].ApplyInput(inputBufferMap[stateContext.netId][i % inputBufferMap[stateContext.netId].Length]);
+                            } else
+                            {
+                                stateMap[stateContext.netId].PredictState(stateBufferMap[stateContext.netId][i % stateBufferMap[stateContext.netId].Length]);
                             }
                         }
                     }
@@ -127,8 +135,10 @@ namespace ClientServerPrediction
                         stateBufferMap[stateContext.netId][(i + 1) % stateBufferMap[netId].Length] = stateMap[stateContext.netId].GetState();
                     }
 
-                    }
+                }
             }
+
+
 
             return messageClientTick - 1;
         }
@@ -187,6 +197,17 @@ namespace ClientServerPrediction
                                             ref Queue<InputMessage> inputMessageQueue)
         {
             inputMessageQueue.Enqueue(inputMessage);
+        }
+
+        public static void SmoothState(ref Dictionary<uint, IStateful> stateMap, in Dictionary<uint, State> statesBeforeCorrection, RunContext runContext, StateError stateError)
+        {
+            foreach (uint currentNetId in stateMap.Keys)
+            {
+                State currentState = stateMap[currentNetId].GetState();
+                State stateBeforeCorrection = statesBeforeCorrection != null ? statesBeforeCorrection[currentNetId] : currentState;
+
+                stateMap[currentNetId].SmoothState(stateBeforeCorrection, currentState, runContext, stateError);
+            }
         }
     }
 }

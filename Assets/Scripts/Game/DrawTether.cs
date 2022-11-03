@@ -67,10 +67,10 @@ public class DrawTether : MonoBehaviour
     private void DrawConnectedTether()
     {
         lineRenderer.startColor = lineRenderer.endColor = ENABLED_TETHER_COLOR;
-        lineRenderer.SetPosition(0, Player.transform.position);
+        lineRenderer.SetPosition(0, transform.position);
         for (int i = 1; i < lineRenderer.positionCount - 1; ++i)
         {
-            Vector2 A = Player.transform.position;
+            Vector2 A = transform.position;
             Vector2 D = Player.playerState.CenterPoint;
             Vector2 B = (1 + PLAYER_HANDLE_TOWARD) * A - PLAYER_HANDLE_TOWARD * D - PLAYER_HANDLE_SIDEWAYS * Player.playerState.OrbitRadius * Player.GetComponent<Rigidbody2D>().velocity;
             Vector2 C = (1 + PLANET_HANDLE_TOWARD) * D - PLANET_HANDLE_TOWARD * A - PLANET_HANDLE_SIDEWAYS * Player.playerState.OrbitRadius * Player.GetComponent<Rigidbody2D>().velocity;
@@ -84,7 +84,7 @@ public class DrawTether : MonoBehaviour
     private void DrawUnconnectedTether(Vector2 nearestPlanetPosition)
     {
         lineRenderer.startColor = lineRenderer.endColor = DISABLED_TETHER_COLOR;
-        lineRenderer.SetPosition(0, Player.transform.position);
+        lineRenderer.SetPosition(0, transform.position);
         for (int i = 1; i < lineRenderer.positionCount; ++i)
         {
             lineRenderer.SetPosition(i, nearestPlanetPosition);

@@ -11,6 +11,23 @@ namespace ClientServerPrediction
         public bool UnwindTether = false;
         public bool SpeedBoost = false;
         public bool Kick = false;
+
+        public static Inputs FromState(State state)
+        {
+            if(state.playerState == null)
+            {
+                return null;
+            }
+
+            return new Inputs
+            {
+                AttachTether = state.playerState.InputIsTethered,
+                WindTether = state.playerState.InputIsWindTether,
+                UnwindTether = state.playerState.InputIsUnwindTether,
+                SpeedBoost = state.playerState.InputIsSpeedBoost,
+                Kick = state.playerState.InputIsKick,
+            };
+        }
     }
 
     [System.Serializable]
@@ -44,6 +61,8 @@ namespace ClientServerPrediction
     public class StateError
     {
         public float positionDiff;
+
+        public float snapDistance = 2f;
     }
 
     public class InputContext
