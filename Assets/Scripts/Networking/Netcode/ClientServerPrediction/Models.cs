@@ -60,6 +60,8 @@ namespace ClientServerPrediction
     public class StateError
     {
         public float positionDiff;
+
+        public float snapDistance = 2f;
     }
 
     public class InputContext
