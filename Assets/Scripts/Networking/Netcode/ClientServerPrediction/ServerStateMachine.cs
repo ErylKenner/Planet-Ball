@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace ClientServerPrediction
 {
@@ -28,26 +27,17 @@ namespace ClientServerPrediction
                     }
 
                     uint newestTick = inputMessage.startTick + (uint)inputContext.inputs.Count - 1;
-                    //Debug.Log($"Got: {inputContext.netId} {newestTick}");
-                    uint expectedTick = inputBufferMap[inputContext.netId].BeenProcessed ? inputBufferMap[inputContext.netId].LastProcessed().clientTick + 1 : newestTick;
+                    uint firstTick = inputMessage.startTick;
 
-
-                    if (newestTick >= expectedTick)
+                    if (!inputBufferMap[inputContext.netId].IsEmpty && inputBufferMap[inputContext.netId].LastRecieved().clientTick > firstTick)
                     {
-                        for (int index = (int)expectedTick; index <= newestTick; index++)
-                        {
+                        firstTick = inputBufferMap[inputContext.netId].LastRecieved().clientTick;
+                    }
 
-                            int packageTick = index - (int)inputMessage.startTick;
-
-                            
-
-                            if (inputBufferMap[inputContext.netId].Count == 0 || inputBufferMap[inputContext.netId].LastRecieved().clientTick < index)
-                            {
-                                //Debug.Log($"Queuing: {index}");
-                                inputBufferMap[inputContext.netId].Enqueue(inputContext.inputs[packageTick], (uint)index);
-                            }
-
-                        }
+                    for (int index = (int)firstTick; index <= newestTick; index++)
+                    {
+                        int packageTick = index - (int)inputMessage.startTick;
+                        inputBufferMap[inputContext.netId].Enqueue(inputContext.inputs[packageTick], (uint)index);
                     }
                 }
             }
@@ -55,32 +45,29 @@ namespace ClientServerPrediction
 
         public static void ApplyInput(ref Dictionary<uint, InputBuffer<Inputs>> inputBufferMap,
                                       ref Dictionary<uint, IInputful> inputMap,
-                                      uint serverTick)
+                                      uint serverTick,
+                                      bool frozen=false)
         {
             //Debug.Log("Applying Tick");
             foreach(uint id in inputBufferMap.Keys)
             {
-                if(inputMap.ContainsKey(id) && inputBufferMap[id].Count > 0)
+                if(inputMap.ContainsKey(id) && !inputBufferMap[id].IsEmpty)
                 {
                     InputPacket<Inputs> inputPacket = inputBufferMap[id].Dequeue(serverTick);
-                    //if(inputBufferMap[id].Count > 0)
-                    //{
-                    //    Debug.Log($"{ inputBufferMap[id].Count}");
-                    //}
-
-                    //Debug.Log($"Applying: {inputPacket.clientTick} {inputBufferMap[id].Count}");
-
-                    // TODO: Integrate with StateMachine.Run?
-                    inputMap[id].ApplyInput(inputPacket.input);
+                    if(!frozen)
+                    {
+                        inputMap[id].ApplyInput(inputPacket.input);
+                    }
                 }
             }
         }
 
         public static StateMessage CreateStateMessage(ref Dictionary<uint, InputBuffer<Inputs>> inputBufferMap,
                                                       in Dictionary<uint, IStateful> stateMap,
-                                                      uint serverTick)
+                                                      uint serverTick,
+                                                      bool frozen=false)
         {
-            StateMessage stateMessage = new StateMessage { serverTick = serverTick, stateContexts = new List<StateContext>() };
+            StateMessage stateMessage = new StateMessage { serverTick = serverTick, stateContexts = new List<StateContext>(), frozen = frozen };
 
             foreach (uint netId in stateMap.Keys)
             {

@@ -13,6 +13,9 @@ namespace ClientServerPrediction
         public Dictionary<uint, IStateful> serverStateMap = new Dictionary<uint, IStateful>();
         public Dictionary<uint, InputBuffer<Inputs>> serverInputBufferMap = new Dictionary<uint, InputBuffer<Inputs>>();
 
+        public Dictionary<uint, State> initialStateMap = new Dictionary<uint, State>();
+        public bool frozen = false;
+
         public void AddInputful(IInputful player, uint netId)
         {
             serverInputMap.Add(netId, player);
@@ -23,6 +26,7 @@ namespace ClientServerPrediction
         public void AddStateful(IStateful stateful, uint netId)
         {
             serverStateMap.Add(netId, stateful);
+            initialStateMap.Add(netId, stateful.GetState());
         }
 
         public void DeleteInputful(uint netId)
@@ -38,10 +42,21 @@ namespace ClientServerPrediction
         public StateMessage Tick(IRunnable runner, RunContext runContext)
         {
             ServerStateMachine.ProcessInputMessages(ref inputMessageQueue, ref serverInputBufferMap, bufferSize);
-            ServerStateMachine.ApplyInput(ref serverInputBufferMap, ref serverInputMap, tick);
+            ServerStateMachine.ApplyInput(ref serverInputBufferMap, ref serverInputMap, tick, frozen);
+
             runner.Run(runContext);
             tick++;
-            return ServerStateMachine.CreateStateMessage(ref serverInputBufferMap, serverStateMap, tick);
+            return ServerStateMachine.CreateStateMessage(ref serverInputBufferMap, serverStateMap, tick, frozen);
+        }
+
+        public void ResetState(IRunnable runner, RunContext runContext)
+        {
+            StateMachine.SetState(ref serverStateMap, in initialStateMap);
+        }
+
+        public void Freeze(bool freeze)
+        {
+            frozen = freeze;
         }
     }
 }

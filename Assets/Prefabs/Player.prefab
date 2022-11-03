@@ -530,6 +530,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  playerState:
+    InputIsTethered: 0
+    InputIsWindTether: 0
+    InputIsUnwindTether: 0
+    InputIsSpeedBoost: 0
+    InputIsKick: 0
+    OrbitRadius: 0
+    CenterPoint: {x: 0, y: 0}
+    Speed: 12
+    CurSpeedBoostCooldown: 0
+    CurKickCooldown: 0
+    CurGas: 0
+    IsSpeedBoost: 0
+    IsKick: 0
   WIND_TETHER_RATIO: 0.11
   MIN_RADIUS: 0.5
   MAX_RADIUS: 9
@@ -557,7 +571,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Player: {fileID: 7641804893563888105}
-  DISABLED_TETHER_COLOR: {r: 0.5, g: 0.5, b: 0.5, a: 0.75686276}
+  DISABLED_TETHER_COLOR: {r: 0.16862746, g: 0.19607843, b: 0.3019608, a: 1}
   ENABLED_TETHER_COLOR: {r: 0.02352941, g: 0.02352941, b: 0.02352941, a: 1}
   SECTION_COUNT: 10
   PLAYER_HANDLE_TOWARD: 0

@@ -8,18 +8,16 @@ public class InputPacket<T>
 }
 public class InputBuffer<T>
 {
-
-
     public readonly uint bufferSize;
     private InputPacket<T>[] buffer;
-    private uint unprocessedCount;
+    private int lastRecievedTick;
     private int lastProcessed;
 
-    public uint Count
+    public bool IsEmpty
     {
         get
         {
-            return unprocessedCount;
+            return lastRecievedTick == lastProcessed;
         }
     }
 
@@ -35,45 +33,62 @@ public class InputBuffer<T>
     {
         bufferSize = size;
         buffer = new InputPacket<T>[bufferSize];
-        unprocessedCount = 0;
+        lastRecievedTick = -1;
         lastProcessed = -1;
     }
 
     public void Enqueue(T input, uint clientTick)
     {
-        if(BeenProcessed && buffer[(lastProcessed + unprocessedCount) % bufferSize].clientTick == clientTick)
-        {
-            return;
-        }
 
         InputPacket<T> inputPacket = new InputPacket<T> { input = input, clientTick = clientTick };
-        unprocessedCount++;
-        buffer[(lastProcessed + unprocessedCount) % bufferSize] = inputPacket;
+        
+        buffer[clientTick % bufferSize] = inputPacket;
+
+        if(clientTick > lastRecievedTick)
+        {
+            for(int i = lastRecievedTick + 1; i < clientTick; i++)
+            {
+                buffer[i % bufferSize] = null;
+            }
+            lastRecievedTick = (int)clientTick;
+        }
     }
 
     public InputPacket<T> Dequeue(uint serverTick)
     {
-        if(unprocessedCount == 0)
+        if(lastProcessed >= lastRecievedTick)
         {
             throw new InvalidOperationException("Input buffer has no unprocessed items");
         }
 
+        if(lastProcessed == -1)
+        {
+            lastProcessed = lastRecievedTick - 1;
+        }
+
+        InputPacket<T> packet = null;
         lastProcessed++;
-        lastProcessed %= (int)bufferSize;
-        unprocessedCount--;
+        for (; lastProcessed <= lastRecievedTick; lastProcessed++)
+        {
+            // TODO: Fix - could result in old data because we don't wipe the buffer on index wrap
+            if(buffer[lastProcessed % bufferSize] != null)
+            {
+                buffer[lastProcessed % bufferSize].serverTick = serverTick;
+                packet = buffer[lastProcessed % bufferSize];
+                break;
+            }
+        }
 
-        buffer[lastProcessed].serverTick = serverTick;
-
-        return buffer[lastProcessed];
+        return packet;
     }
 
     public InputPacket<T> LastProcessed()
     {
-        return buffer[lastProcessed];
+        return buffer[lastProcessed % bufferSize];
     }
 
     public InputPacket<T> LastRecieved()
     {
-        return buffer[(lastProcessed + unprocessedCount) % bufferSize];
+        return buffer[lastRecievedTick % bufferSize];
     }
 }

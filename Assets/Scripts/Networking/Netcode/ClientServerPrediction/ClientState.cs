@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace ClientServerPrediction
@@ -16,6 +17,7 @@ namespace ClientServerPrediction
         public Dictionary<uint, State[]> stateBufferMap = new Dictionary<uint, State[]>();
 
         public uint? localNetId = null;
+        public bool frozen = false;
 
         // Debug objects
         public Vector2 lastServerMessage = Vector2.zero;
@@ -63,38 +65,53 @@ namespace ClientServerPrediction
             if (isClientOnly)
             {
                 StateMessage lastestStateMessage = ClientStateMachine.GetLatestStateMessage(ref stateMessageQueue, (uint)localNetId);
+
                 if (lastestStateMessage != null)
                 {
-                    lastServerMessage = lastestStateMessage.GetMap()[(uint)localNetId].state.position;
+                    frozen = lastestStateMessage.frozen;
+                    if (frozen)
+                    {
+                        StateMachine.SetState(ref stateMap, lastestStateMessage.GetMap().ToDictionary(kp => kp.Key, kp => kp.Value.state));
+                        runner.Run(runContext);
+                        lastReceivedTick = lastestStateMessage.MessageClientTick((uint)localNetId);
 
-                    StateError stateError = new StateError { positionDiff = 0.01f };
+                        frozen = lastestStateMessage.frozen;
+                    } else
+                    {
+                        lastServerMessage = lastestStateMessage.GetMap()[(uint)localNetId].state.position;
 
-                    lastReceivedTick = ClientStateMachine.CorrectClient(
-                        ref inputBufferMap,
-                        ref stateBufferMap,
-                        ref inputMap,
-                        ref stateMap,
-                        in lastestStateMessage,
-                        in stateError,
-                        runner,
-                        runContext,
-                        (uint)localNetId,
-                        tick,
-                        lastReceivedTick
-                     );
+                        StateError stateError = new StateError { positionDiff = 0.01f };
+
+                        lastReceivedTick = ClientStateMachine.CorrectClient(
+                            ref inputBufferMap,
+                            ref stateBufferMap,
+                            ref inputMap,
+                            ref stateMap,
+                            in lastestStateMessage,
+                            in stateError,
+                            runner,
+                            runContext,
+                            (uint)localNetId,
+                            tick,
+                            lastReceivedTick
+                         );
+                    }
+
                 }
             }
 
-            Dictionary<uint, Inputs> currentInputMap = ClientStateMachine.StoreInput(ref inputBufferMap, in inputMap, tick);
 
-            if(isClientOnly)
+            Dictionary<uint, Inputs> currentInputMap = ClientStateMachine.StoreInput(ref inputBufferMap, in inputMap, tick, frozen);
+
+            if (isClientOnly)
             {
                 StateMachine.Run(currentInputMap, ref inputMap, runner, runContext);
             }
-            
-            InputMessage inputMessage = ClientStateMachine.CreateInputMessage(inputBufferMap, lastReceivedTick, tick);
+
+            InputMessage inputMessage = ClientStateMachine.CreateInputMessage(in inputBufferMap, lastReceivedTick, tick);
             tick++;
             ClientStateMachine.StoreState(ref stateBufferMap, in stateMap, tick);
+
             return inputMessage;
         }
     }

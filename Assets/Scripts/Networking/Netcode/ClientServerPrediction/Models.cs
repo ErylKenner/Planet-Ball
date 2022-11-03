@@ -13,6 +13,7 @@ namespace ClientServerPrediction
         public bool Kick = false;
     }
 
+    [System.Serializable]
     public class PlayerState
     {
         public bool InputIsTethered = false;
@@ -94,6 +95,7 @@ namespace ClientServerPrediction
         // This is the server tick m + 1
         public uint serverTick;
         public List<StateContext> stateContexts = new List<StateContext>();
+        public bool frozen = false;
 
         public Dictionary<uint, StateContext> GetMap()
         {

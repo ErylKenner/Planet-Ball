@@ -12,12 +12,14 @@ public class NetworkedManager : NetworkBehaviour
 
     public GameObject playerTrail;
     public GameObject playerServerTrail;
+    public TMPro.TextMeshProUGUI text;
 
     public static NetworkedManager instance = null;
 
     public Ball ball;
 
-    float timer;
+    float timer = 0;
+    float frozenTimer = 0;
 
 
     // Start is called before the first frame update
@@ -41,6 +43,15 @@ public class NetworkedManager : NetworkBehaviour
     {
         float dt = Time.fixedDeltaTime;
         timer += Time.deltaTime;
+        
+        if(frozenTimer > 0)
+        {
+            frozenTimer = Mathf.Clamp(frozenTimer - Time.deltaTime, 0, frozenTimer);
+            if(frozenTimer <= 0)
+            {
+                server.Freeze(false);
+            }
+        }
 
         while (timer >= Time.fixedDeltaTime)
         {
@@ -53,6 +64,8 @@ public class NetworkedManager : NetworkBehaviour
                 serverTrail.name = $"Server {client.lastReceivedTick}";
                 GameObject clientTrail =  Instantiate(playerTrail, ((NetworkedPlayer)client.stateMap[(uint)client.localNetId]).transform.position, Quaternion.identity);
                 clientTrail.name = $"Client {client.tick}";
+
+                text.text = $"{client.tick - client.lastReceivedTick}";
 
                 if (inputMessage != null)
                 {
@@ -83,4 +96,12 @@ public class NetworkedManager : NetworkBehaviour
         server.inputMessageQueue.Enqueue(inputMessage);
     }
 
+    public void ResetState(float freezeTime)
+    {
+        // TODO: Pass in a Runcontext to get the dt
+        float dt = Time.fixedDeltaTime;
+        server.ResetState(runner, new RunContext { dt = dt });
+        server.Freeze(true);
+        frozenTimer = freezeTime;
+    }
 }

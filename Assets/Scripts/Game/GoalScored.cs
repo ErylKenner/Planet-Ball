@@ -6,22 +6,37 @@ using UnityEngine;
 public class GoalScored : NetworkBehaviour
 {
     public string Name;
-    // Start is called before the first frame update
+    public Color teamColor;
+    public TMPro.TextMeshProUGUI text;
+    public float FreezeTime = 3;
+
+    private float timer = 0;
     void Start()
     {
-        
+        text.gameObject.SetActive(false);
     }
 
-    // Update is called once per frame
     void Update()
     {
-        
+        if(timer > 0)
+        {
+            timer -= Time.deltaTime;
+            if(timer <= 0)
+            {
+                timer = 0;
+                text.gameObject.SetActive(false);
+            }
+        }
     }
 
     [ClientRpc]
-    public void RpcPrintName(string name)
+    public void RpcPlayerScored(string name)
     {
-        Debug.Log(Name);
+        Debug.Log(name);
+        text.color = teamColor;
+        text.gameObject.SetActive(true);
+        timer = FreezeTime;
+
     }
     
 
@@ -34,16 +49,8 @@ public class GoalScored : NetworkBehaviour
         Ball ball = other.GetComponent<Ball>();
         if (ball != null)
         {
-            // Disable 
-
-
-            //RpcPrintName(Name);
-            //ball.RpcReset();
-            
-            //Rigidbody2D rb = other.GetComponent<Rigidbody2D>();
-            //rb.MovePosition(Vector2.zero);
-            //rb.velocity = Vector2.zero;
-            //rb.angularVelocity = 0f;
+            NetworkedManager.instance.ResetState(FreezeTime);
+            RpcPlayerScored(Name);
         }
     }
 }
