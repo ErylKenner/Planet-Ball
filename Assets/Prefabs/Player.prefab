@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4673295070543229095}
   - component: {fileID: 1509141980795915110}
   - component: {fileID: 6286383356199010067}
-  m_Layer: 5
+  m_Layer: 7
   m_Name: Fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -87,7 +87,7 @@ GameObject:
   - component: {fileID: 5036930769946265740}
   - component: {fileID: 1110115383132844655}
   - component: {fileID: 6660738438740878584}
-  m_Layer: 5
+  m_Layer: 7
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -164,7 +164,7 @@ GameObject:
   - component: {fileID: 2522362105404507922}
   - component: {fileID: 1891960332144618862}
   - component: {fileID: 5539460250484339046}
-  m_Layer: 5
+  m_Layer: 7
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -262,7 +262,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5142953279873166205}
-  m_Layer: 5
+  m_Layer: 7
   m_Name: Gas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -307,7 +307,7 @@ GameObject:
   - component: {fileID: 7641804893563888105}
   - component: {fileID: 1017064400787661185}
   - component: {fileID: 7250059937621011907}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -444,7 +444,7 @@ MonoBehaviour:
     IsSpeedBoost: 0
     IsKick: 0
   WIND_TETHER_RATIO: 0.11
-  MIN_RADIUS: 0.5
+  MIN_RADIUS: 1
   MAX_RADIUS: 9
   MIN_SPEED: 12
   MAX_SPEED: 35
@@ -497,7 +497,7 @@ GameObject:
   - component: {fileID: 5594583912770767461}
   - component: {fileID: 4101798185480953454}
   - component: {fileID: 6625698636843384361}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -647,16 +647,32 @@ PrefabInstance:
     m_TransformParent: {fileID: 5594583912770767461}
     m_Modifications:
     - target: {fileID: 100000, guid: b451a052397f03c4f8a04d915d1c0492, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: b451a052397f03c4f8a04d915d1c0492, type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 100002, guid: b451a052397f03c4f8a04d915d1c0492, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 100002, guid: b451a052397f03c4f8a04d915d1c0492, type: 3}
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 100004, guid: b451a052397f03c4f8a04d915d1c0492, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 100006, guid: b451a052397f03c4f8a04d915d1c0492, type: 3}
       propertyPath: m_Name
       value: paintbucket_low
+      objectReference: {fileID: 0}
+    - target: {fileID: 100006, guid: b451a052397f03c4f8a04d915d1c0492, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 400006, guid: b451a052397f03c4f8a04d915d1c0492, type: 3}
       propertyPath: m_RootOrder
