@@ -236,6 +236,14 @@ public class PlayerPlanetController : NetworkBehaviour
         return closest;
     }
 
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if(collision.gameObject.tag == "Wall" && playerState.InputIsTethered)
+        {
+            body.velocity = -body.velocity;
+        }
+    }
+
 
     public void OnAttachTether(InputValue input)
     {
