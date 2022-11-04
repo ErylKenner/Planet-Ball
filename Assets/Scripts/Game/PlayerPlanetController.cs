@@ -237,15 +237,22 @@ public class PlayerPlanetController : NetworkBehaviour
         return closest;
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
         // TODO: Create both normnal and trigger colliders on walls. Players ignore normal colliders so that this function can handle wall collisions without phtysic autocorrecting overlap. We also then need to handle OnCollisionEnter2D for walls when not tethered.
-        if(collision.contactCount == 1 && playerState.InputIsTethered && collision.gameObject.tag == "Wall" || collision.gameObject.tag == "Goal")
+        if (collision.gameObject.tag == "Wall" || collision.gameObject.tag == "Goal")
         {
-            Debug.Log("Here");
-            body.velocity = -body.velocity;
-        }
-        
+            if (playerState.InputIsTethered)
+            {
+                body.velocity = -body.velocity;
+            }
+            else
+            {
+                Vector2 diff = body.position - collision.ClosestPoint(body.position);
+                body.velocity = playerState.Speed * Vector2.Reflect(body.velocity.normalized, diff.normalized);
+            }
+
+        } 
     }
 
 
