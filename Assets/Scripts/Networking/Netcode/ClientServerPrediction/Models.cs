@@ -87,7 +87,8 @@ namespace ClientServerPrediction
                 InputIsWindTether == playerState.InputIsWindTether &&
                 InputIsUnwindTether == playerState.InputIsUnwindTether &&
                 InputIsSpeedBoost == playerState.InputIsSpeedBoost &&
-                InputIsKick == playerState.InputIsKick
+                InputIsKick == playerState.InputIsKick &&
+                CenterPoint == playerState.CenterPoint
             );
         }
     }
@@ -103,18 +104,30 @@ namespace ClientServerPrediction
 
     public class StateError
     {
-        public float positionDiff;
+        public float positionDiff = 0.01f;
+        public float allowedRadiusDiff = 0.1f;
 
-        public float snapDistance = 2f;
+        public float snapDistance = 10f;
 
         public bool NeedsCorrection(State currentState, State desiredState)
         {
-            if (desiredState.playerState != null)
+            if (desiredState.playerState != null && currentState.playerState != null)
             {
+
                 if (!currentState.playerState.Equals(desiredState.playerState))
                 {
                     return true;
                 }
+
+                if (currentState.playerState.InputIsTethered && desiredState.playerState.InputIsTethered)
+                {
+                    float radiusDifference = Mathf.Abs(desiredState.playerState.OrbitRadius - currentState.playerState.OrbitRadius);
+                    if(radiusDifference > allowedRadiusDiff)
+                    {
+                        return true;
+                    }
+                }
+                
             }
 
             float positionDifference = Vector2.Distance(currentState.position, desiredState.position);

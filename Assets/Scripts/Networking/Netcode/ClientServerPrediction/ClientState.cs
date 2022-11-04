@@ -63,7 +63,7 @@ namespace ClientServerPrediction
             }
 
             Dictionary<uint, State> statesBeforeCorrection = null;
-            StateError stateError = new StateError { positionDiff = 0.01f, snapDistance = 5f };
+            StateError stateError = new StateError();
 
             if (isClientOnly)
             {

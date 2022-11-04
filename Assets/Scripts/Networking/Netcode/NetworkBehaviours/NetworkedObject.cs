@@ -45,7 +45,7 @@ public class NetworkedObject : NetworkBehaviour, IStateful
         if (distance < stateError.snapDistance && distance > 0)
         {
             // Gets t% of the way in one second
-            float t = 0.9999f;
+            float t = 0.99999f;
             model.transform.position = Vector2.Lerp(oldModelPosition, newState.position, 1 - Mathf.Pow(1 - t, runContext.dt));
         }
         else
