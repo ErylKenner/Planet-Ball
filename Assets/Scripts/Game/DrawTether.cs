@@ -49,7 +49,6 @@ public class DrawTether : MonoBehaviour
         if (!Player.isLocalPlayer && !Player.playerState.InputIsTethered)
         {
             lineRenderer.enabled = false;
-            //ClearTether();
             return;
         }
         lineRenderer.enabled = true;
@@ -93,14 +92,6 @@ public class DrawTether : MonoBehaviour
             lineRenderer.SetPosition(i, nearestPlanetPosition);
         }
         lineRenderer.SetPosition(lineRenderer.positionCount - 1, nearestPlanetPosition);
-    }
-
-    private void ClearTether()
-    {
-        for (int i = 0; i < lineRenderer.positionCount; ++i)
-        {
-            lineRenderer.SetPosition(i, 100000 * Vector2.right);
-        }
     }
 
 
