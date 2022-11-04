@@ -46,6 +46,50 @@ namespace ClientServerPrediction
         public float CurGas = 0f;
         public bool IsSpeedBoost = false;
         public bool IsKick = false;
+
+        public PlayerState() { }
+        public PlayerState(PlayerState other)
+        {
+            InputIsTethered = other.InputIsTethered;
+            InputIsWindTether = other.InputIsWindTether;
+            InputIsUnwindTether = other.InputIsUnwindTether;
+            InputIsSpeedBoost = other.InputIsSpeedBoost;
+            InputIsKick = other.InputIsKick;
+            OrbitRadius = other.OrbitRadius;
+            CenterPoint = other.CenterPoint;
+            Speed = other.Speed;
+            CurSpeedBoostCooldown = other.CurSpeedBoostCooldown;
+            CurKickCooldown = other.CurKickCooldown;
+            CurGas = other.CurGas;
+            IsSpeedBoost = other.IsSpeedBoost;
+            IsKick = other.IsKick;
+        }
+
+        public bool Equals(PlayerState playerState)
+        {
+            if (playerState is null)
+            {
+                return false;
+            }
+
+            if (Object.ReferenceEquals(this, playerState))
+            {
+                return true;
+            }
+
+            if (this.GetType() != playerState.GetType())
+            {
+                return false;
+            }
+
+            return (
+                InputIsTethered == playerState.InputIsTethered &&
+                InputIsWindTether == playerState.InputIsWindTether &&
+                InputIsUnwindTether == playerState.InputIsUnwindTether &&
+                InputIsSpeedBoost == playerState.InputIsSpeedBoost &&
+                InputIsKick == playerState.InputIsKick
+            );
+        }
     }
 
     public class State
@@ -62,6 +106,21 @@ namespace ClientServerPrediction
         public float positionDiff;
 
         public float snapDistance = 2f;
+
+        public bool NeedsCorrection(State currentState, State desiredState)
+        {
+            if (desiredState.playerState != null)
+            {
+                if (!currentState.playerState.Equals(desiredState.playerState))
+                {
+                    // TODO: There is a sync issue with the input storage
+                    return true;
+                }
+            }
+
+            float positionDifference = Vector2.Distance(currentState.position, desiredState.position);
+            return positionDifference > positionDiff;
+        }
     }
 
     public class InputContext

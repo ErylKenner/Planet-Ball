@@ -7,7 +7,7 @@ namespace ClientServerPrediction
 {
     public class ClientState
     {
-        public readonly uint bufferSize = 1024;
+        public readonly uint bufferSize = 256;
         public uint tick = 1;
         public uint lastReceivedTick = 0;
         public Queue<StateMessage> stateMessageQueue = new Queue<StateMessage>();
