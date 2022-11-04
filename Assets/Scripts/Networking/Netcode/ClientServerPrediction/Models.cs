@@ -113,7 +113,6 @@ namespace ClientServerPrediction
             {
                 if (!currentState.playerState.Equals(desiredState.playerState))
                 {
-                    // TODO: There is a sync issue with the input storage
                     return true;
                 }
             }
