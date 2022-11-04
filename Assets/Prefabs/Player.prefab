@@ -438,14 +438,13 @@ MonoBehaviour:
     OrbitRadius: 0
     CenterPoint: {x: 0, y: 0}
     Speed: 12
-    RotatingClockwise: 1
     CurSpeedBoostCooldown: 0
     CurKickCooldown: 0
     CurGas: 0
     IsSpeedBoost: 0
     IsKick: 0
   WIND_TETHER_RATIO: 0.11
-  MIN_RADIUS: 0.5
+  MIN_RADIUS: 1
   MAX_RADIUS: 9
   MIN_SPEED: 12
   MAX_SPEED: 35
