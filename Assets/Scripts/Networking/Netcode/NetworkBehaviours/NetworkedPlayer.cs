@@ -13,14 +13,14 @@ public class NetworkedPlayer : NetworkedObject, IInputful
 
     public override State GetState() {
         State ret = base.GetState();
-        ret.playerState = playerController.playerState;
+        ret.playerState = new PlayerState(playerController.playerState);
         return ret;
     }
 
     public override void SetState(State state)
     {
         base.SetState(state);
-        playerController.playerState = state.playerState;
+        playerController.playerState = new PlayerState(state.playerState);
     }
 
     public override void PredictState(State state)

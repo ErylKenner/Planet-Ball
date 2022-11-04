@@ -7,7 +7,7 @@ namespace ClientServerPrediction
 {
     public class ClientState
     {
-        public readonly uint bufferSize = 1024;
+        public readonly uint bufferSize = 256;
         public uint tick = 1;
         public uint lastReceivedTick = 0;
         public Queue<StateMessage> stateMessageQueue = new Queue<StateMessage>();
@@ -63,7 +63,7 @@ namespace ClientServerPrediction
             }
 
             Dictionary<uint, State> statesBeforeCorrection = null;
-            StateError stateError = new StateError { positionDiff = 0.01f, snapDistance = 5f };
+            StateError stateError = new StateError();
 
             if (isClientOnly)
             {

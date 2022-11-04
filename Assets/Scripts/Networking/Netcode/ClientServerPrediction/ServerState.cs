@@ -6,7 +6,7 @@ namespace ClientServerPrediction
 {
     public class ServerState
     {
-        public readonly uint bufferSize = 1024;
+        public readonly uint bufferSize = 256;
         public uint tick = 0;
         public Queue<InputMessage> inputMessageQueue = new Queue<InputMessage>();
         public Dictionary<uint, IInputful> serverInputMap = new Dictionary<uint, IInputful>();

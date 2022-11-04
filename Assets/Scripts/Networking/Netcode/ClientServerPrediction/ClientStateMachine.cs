@@ -69,28 +69,20 @@ namespace ClientServerPrediction
             }
             uint inputLoss = stateMessage.serverTick - tickSync.lastProcessedServerTick - 1;
 
-            Dictionary<uint, float> errors = new Dictionary<uint, float>();
+            Dictionary<uint, bool> needsCorrectionMap = new Dictionary<uint, bool>();
 
             foreach(uint currentNetId in messageMap.Keys)
             {
                 State[] stateBuffer = stateBufferMap[currentNetId];
                 int stateBufferIndex = (int)messageClientTick % stateBuffer.Length;
-
-                Vector2 stateBufferPosition = stateBuffer[stateBufferIndex].position;
+                State storedState = stateBuffer[stateBufferIndex];
                 State messageState = messageMap[currentNetId].state;
-                Vector2 messagePosition = messageState.position;
-                Vector2 diffVector = stateBufferPosition - messagePosition;
-                errors.Add(currentNetId, diffVector.magnitude);
+                needsCorrectionMap.Add(currentNetId, stateError.NeedsCorrection(storedState, messageState));
             }
 
-            float positionDiff = stateError.positionDiff;
-
-            List<uint> keyList = errors.Keys.ToList();
-            int offendingNetIdIndex = keyList.FindIndex(key => errors[key] > positionDiff);
-
             // Compare state recieved with predicted state
-            if (offendingNetIdIndex != -1) {
-                //Debug.Log($"Correcting {messageClientTick} to {clientTick} (Loss: {inputLoss}) (Offset: {errors[keyList[offendingNetIdIndex]]})");
+            if (needsCorrectionMap.Values.Any(needsCorrection => needsCorrection)) {
+                Debug.Log($"Correcting {messageClientTick} to {clientTick} (Loss: {inputLoss})");
 
                 // Save original state
                 statesBeforeCorrection = new Dictionary<uint, State>();
@@ -137,8 +129,6 @@ namespace ClientServerPrediction
 
                 }
             }
-
-
 
             return messageClientTick - 1;
         }

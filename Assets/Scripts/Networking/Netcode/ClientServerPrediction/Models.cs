@@ -46,6 +46,51 @@ namespace ClientServerPrediction
         public float CurGas = 0f;
         public bool IsSpeedBoost = false;
         public bool IsKick = false;
+
+        public PlayerState() { }
+        public PlayerState(PlayerState other)
+        {
+            InputIsTethered = other.InputIsTethered;
+            InputIsWindTether = other.InputIsWindTether;
+            InputIsUnwindTether = other.InputIsUnwindTether;
+            InputIsSpeedBoost = other.InputIsSpeedBoost;
+            InputIsKick = other.InputIsKick;
+            OrbitRadius = other.OrbitRadius;
+            CenterPoint = other.CenterPoint;
+            Speed = other.Speed;
+            CurSpeedBoostCooldown = other.CurSpeedBoostCooldown;
+            CurKickCooldown = other.CurKickCooldown;
+            CurGas = other.CurGas;
+            IsSpeedBoost = other.IsSpeedBoost;
+            IsKick = other.IsKick;
+        }
+
+        public bool Equals(PlayerState playerState)
+        {
+            if (playerState is null)
+            {
+                return false;
+            }
+
+            if (Object.ReferenceEquals(this, playerState))
+            {
+                return true;
+            }
+
+            if (this.GetType() != playerState.GetType())
+            {
+                return false;
+            }
+
+            return (
+                InputIsTethered == playerState.InputIsTethered &&
+                InputIsWindTether == playerState.InputIsWindTether &&
+                InputIsUnwindTether == playerState.InputIsUnwindTether &&
+                InputIsSpeedBoost == playerState.InputIsSpeedBoost &&
+                InputIsKick == playerState.InputIsKick &&
+                CenterPoint == playerState.CenterPoint
+            );
+        }
     }
 
     public class State
@@ -59,9 +104,35 @@ namespace ClientServerPrediction
 
     public class StateError
     {
-        public float positionDiff;
+        public float positionDiff = 0.01f;
+        public float allowedRadiusDiff = 0.1f;
 
-        public float snapDistance = 2f;
+        public float snapDistance = 10f;
+
+        public bool NeedsCorrection(State currentState, State desiredState)
+        {
+            if (desiredState.playerState != null && currentState.playerState != null)
+            {
+
+                if (!currentState.playerState.Equals(desiredState.playerState))
+                {
+                    return true;
+                }
+
+                if (currentState.playerState.InputIsTethered && desiredState.playerState.InputIsTethered)
+                {
+                    float radiusDifference = Mathf.Abs(desiredState.playerState.OrbitRadius - currentState.playerState.OrbitRadius);
+                    if(radiusDifference > allowedRadiusDiff)
+                    {
+                        return true;
+                    }
+                }
+                
+            }
+
+            float positionDifference = Vector2.Distance(currentState.position, desiredState.position);
+            return positionDifference > positionDiff;
+        }
     }
 
     public class InputContext
