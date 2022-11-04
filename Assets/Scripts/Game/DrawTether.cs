@@ -46,6 +46,12 @@ public class DrawTether : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!Player.isLocalPlayer && !Player.playerState.InputIsTethered)
+        {
+            lineRenderer.enabled = false;
+            return;
+        }
+        lineRenderer.enabled = true;
         if (Player.playerState.InputIsTethered)
         {
             DrawConnectedTether();
