@@ -12,20 +12,22 @@ public class PlayerPlanetController : NetworkBehaviour
     public PlayerState playerState = new PlayerState();
 
     // Const attributes - not state
-    public float WIND_TETHER_RATIO = 0.11f;
-    public float MIN_RADIUS = 0.5f;
+    public float WIND_TETHER_RATIO = 0.12f;
+    public float UNWIND_TETHER_RATIO = 0.29f;
+    public float MIN_RADIUS = 1f;
     public float MAX_RADIUS = 9f;
     public float MIN_SPEED = 12f;
-    public float MAX_SPEED = 45f;
-    public float SPEED_FALLOFF = 0.8f;
-    public float SPEED_BOOST_RAMP = 0.5f;
-    public float SPEED_BOOST_COOLDOWN = 1f;
+    public float MAX_SPEED = 35f;
+    public float SPEED_FALLOFF = 0.85f;
+    public float SPEED_BOOST_RAMP = 0.4f;
+    public float SPEED_BOOST_COOLDOWN = 2f;
     public float HEAVY_COOLDOWN = 0.5f;
     public float HEAVY_DURATION = 1f;
     public float HEAVY_MASS = 10f;
-    public float GAS_INCREASE_TIME = 30f;
-    public float GAS_DRAIN_TIME = 7f;
-    public float BOOST_SPEED_MINIMUM = 25f;
+    public float GAS_INCREASE_TIME = 20f;
+    public float GAS_DRAIN_TIME = 3f;
+    public float BOOST_SPEED_MINIMUM = 20f;
+    public float SPEED_MASS_MULTIPLIER = 0.5f;
 
     // For testing. Input system callbacks set these which are then read in FixedUpdate
     private bool _attachTether = false;
@@ -87,9 +89,18 @@ public class PlayerPlanetController : NetworkBehaviour
         playerState.InputIsSpeedBoost = (input == null && playerState.InputIsSpeedBoost) || (input != null && input.SpeedBoost);
         playerState.InputIsKick = (input == null && playerState.InputIsKick) || (input != null && input.Kick);
 
+
+        SetSpeed();
         HandleTether(wasInputTethered, dt);
         HandleSpeedBoost(wasInputSpeedBoost, dt);
         //HandleKick(dt);
+    }
+
+    private void SetSpeed()
+    {
+        playerState.Speed = Mathf.Clamp(body.velocity.magnitude, MIN_SPEED, MAX_SPEED);
+        float speedRatio = (playerState.Speed - MIN_SPEED) / (MAX_SPEED - MIN_SPEED);
+        body.mass = 1 + speedRatio * SPEED_MASS_MULTIPLIER;
     }
 
     private void HandleTether(bool wasInputTethered, float dt)
@@ -121,9 +132,8 @@ public class PlayerPlanetController : NetworkBehaviour
             if (playerState.InputIsUnwindTether)
             {
                 // Unwind in the same orbit shape regardless of speed via exponential falloff of the radius
-                float windRate = WIND_TETHER_RATIO * playerState.OrbitRadius * playerState.Speed;
-                // Double the unwind speed vs the wind speed since it feels better
-                playerState.OrbitRadius += 2 * windRate * dt;
+                float windRate = UNWIND_TETHER_RATIO * playerState.OrbitRadius * playerState.Speed;
+                playerState.OrbitRadius += windRate * dt;
             }
         }
         else
