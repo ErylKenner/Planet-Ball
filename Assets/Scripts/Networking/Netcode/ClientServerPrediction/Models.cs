@@ -46,6 +46,7 @@ namespace ClientServerPrediction
         public float CurGas = 0f;
         public bool IsSpeedBoost = false;
         public bool IsKick = false;
+        public Vector2 curPosition = Vector2.zero;
 
         public PlayerState() { }
         public PlayerState(PlayerState other)
@@ -63,6 +64,7 @@ namespace ClientServerPrediction
             CurGas = other.CurGas;
             IsSpeedBoost = other.IsSpeedBoost;
             IsKick = other.IsKick;
+            curPosition = other.curPosition;
         }
 
         public bool Equals(PlayerState playerState)
@@ -88,7 +90,8 @@ namespace ClientServerPrediction
                 InputIsUnwindTether == playerState.InputIsUnwindTether &&
                 InputIsSpeedBoost == playerState.InputIsSpeedBoost &&
                 InputIsKick == playerState.InputIsKick &&
-                CenterPoint == playerState.CenterPoint
+                CenterPoint == playerState.CenterPoint &&
+                curPosition == playerState.curPosition
             );
         }
     }

@@ -442,8 +442,9 @@ MonoBehaviour:
     CurGas: 0
     IsSpeedBoost: 0
     IsKick: 0
+    curPosition: {x: 0, y: 0}
   WIND_TETHER_RATIO: 0.11
-  UNWIND_TETHER_RATIO: 0.29
+  UNWIND_TETHER_RATIO: 0.22
   MIN_RADIUS: 1
   MAX_RADIUS: 9
   MIN_SPEED: 12

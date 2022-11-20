@@ -37,6 +37,7 @@ public class PlayerPlanetController : NetworkBehaviour
     private bool _kick = false;
 
     private Rigidbody2D body;
+    private float selfRadius = 0;
 
 
     public Inputs GetInputs()
@@ -55,6 +56,7 @@ public class PlayerPlanetController : NetworkBehaviour
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
+        selfRadius = GetComponent<CircleCollider2D>().radius;
     }
 
     // Start is called before the first frame update
@@ -94,6 +96,7 @@ public class PlayerPlanetController : NetworkBehaviour
         HandleTether(wasInputTethered, dt);
         HandleSpeedBoost(wasInputSpeedBoost, dt);
         //HandleKick(dt);
+        playerState.curPosition = body.position;
     }
 
     private void SetSpeed()
@@ -121,6 +124,9 @@ public class PlayerPlanetController : NetworkBehaviour
                 {
                     playerState.CenterPoint = nearestPlanet.transform.position;
                     playerState.OrbitRadius = Vector2.Distance(body.position, playerState.CenterPoint);
+                    PhysicsMaterial2D material = GetComponent<CircleCollider2D>().sharedMaterial;
+                    material.bounciness = 0;
+                    GetComponent<CircleCollider2D>().sharedMaterial = material;
                 }
             }
             if (playerState.InputIsWindTether)
@@ -140,6 +146,9 @@ public class PlayerPlanetController : NetworkBehaviour
         {
             playerState.CenterPoint = Vector2.zero;
             playerState.OrbitRadius = 0;
+            PhysicsMaterial2D material = GetComponent<CircleCollider2D>().sharedMaterial;
+            material.bounciness = 1;
+            GetComponent<CircleCollider2D>().sharedMaterial = material;
         }
         playerState.OrbitRadius = Mathf.Clamp(playerState.OrbitRadius, MIN_RADIUS, MAX_RADIUS);
     }
@@ -248,12 +257,28 @@ public class PlayerPlanetController : NetworkBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if(collision.gameObject.tag == "Wall" && playerState.InputIsTethered)
+        if (collision.gameObject.tag == "Ball")
         {
-            body.velocity = -body.velocity;
+            PhysicsMaterial2D material = GetComponent<CircleCollider2D>().sharedMaterial;
+            material.bounciness = 1;
+            GetComponent<CircleCollider2D>().sharedMaterial = material;
+        }
+        if ((collision.gameObject.tag == "Wall" || collision.gameObject.tag == "Goal") && playerState.InputIsTethered)
+        {
+            body.velocity = collision.relativeVelocity;
+            body.position = playerState.curPosition;
         }
     }
 
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.tag == "Ball")
+        {
+            PhysicsMaterial2D material = GetComponent<CircleCollider2D>().sharedMaterial;
+            material.bounciness = 0;
+            GetComponent<CircleCollider2D>().sharedMaterial = material;
+        }
+    }
 
     public void OnAttachTether(InputValue input)
     {
