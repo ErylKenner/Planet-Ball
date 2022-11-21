@@ -254,39 +254,43 @@ public class PlayerPlanetController : NetworkBehaviour
     {
         if (collision.gameObject.tag == "Ball")
         {
-            SetBounciness(1f);
             body.velocity = collision.relativeVelocity;
-        }
-        if (collision.gameObject.tag != "Wall" && collision.gameObject.tag != "Goal")
-        {
             return;
         }
-        playerState.WallCollisionCount += 1;
-        if (playerState.InputIsTethered)
+        if (collision.gameObject.tag == "Wall" || collision.gameObject.tag == "Goal")
         {
-            body.position = playerState.CurPosition;
-            if (playerState.WallCollisionCount == 1)
+            playerState.WallCollisionCount += 1;
+            if (playerState.InputIsTethered)
             {
-                body.velocity = collision.relativeVelocity;
+                // Reset position to what we set it in ApplyInput since there's no way to customize Unity's depenetration function
+                body.position = playerState.CurPosition;
+
+                // Only bounce backward if this is the only wall collision
+                if (playerState.WallCollisionCount == 1)
+                {
+                    body.velocity = collision.relativeVelocity;
+                }
+                else if (playerState.InputIsUnwindTether)
+                {
+                    // Hard set radius to prevent the target radius differing too much from the rendered radius.
+                    // Also add a small offset to the radius so that the collision exit trigger only happens once the player
+                    // intentionally stops tetering or winds the tether, and not because of Unity collision detection precision.
+                    playerState.OrbitRadius = 0.2f + Vector2.Distance(body.position, playerState.CenterPoint);
+                }
             }
-            else if (playerState.InputIsUnwindTether)
-            {
-                playerState.OrbitRadius = Vector2.Distance(body.position, playerState.CenterPoint) + 0.2f;
-            }
+            return;
         }
     }
 
     private void OnCollisionExit2D(Collision2D collision)
     {
-        if (collision.gameObject.tag == "Ball")
+        if (collision.gameObject.tag == "Wall" || collision.gameObject.tag == "Goal")
         {
-            SetBounciness(0f);
-        }
-        if (collision.gameObject.tag != "Wall" && collision.gameObject.tag != "Goal")
-        {
+            // Set bounciness to 1 to handle the case where we collided with 2+ walls at once and never got to bounce backward
+            SetBounciness(1f);
+            playerState.WallCollisionCount -= 1;
             return;
         }
-        playerState.WallCollisionCount -= 1;
     }
 
     public void OnAttachTether(InputValue input)
