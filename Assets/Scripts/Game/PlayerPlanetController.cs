@@ -37,7 +37,6 @@ public class PlayerPlanetController : NetworkBehaviour
     private bool _kick = false;
 
     private Rigidbody2D body;
-    private float selfRadius = 0;
 
 
     public Inputs GetInputs()
@@ -56,7 +55,6 @@ public class PlayerPlanetController : NetworkBehaviour
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
-        selfRadius = GetComponent<CircleCollider2D>().radius;
     }
 
     public void Start()
@@ -217,7 +215,6 @@ public class PlayerPlanetController : NetworkBehaviour
         {
             rotationDirection = 1;
         }
-        //float rotationDirection = playerState.Clockwise ? 1 : -1;
         if (Mathf.Abs(diff.magnitude - playerState.OrbitRadius) > playerState.Speed * dt * 0.75f)
         {
             //Too large a distance to make in one step. Go towards new radius at 45 deg angle
