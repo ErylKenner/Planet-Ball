@@ -46,7 +46,8 @@ namespace ClientServerPrediction
         public float CurGas = 0f;
         public bool IsSpeedBoost = false;
         public bool IsKick = false;
-        public Vector2 curPosition = Vector2.zero;
+        public Vector2 CurPosition = Vector2.zero;
+        public int WallCollisionCount = 0;
 
         public PlayerState() { }
         public PlayerState(PlayerState other)
@@ -64,7 +65,8 @@ namespace ClientServerPrediction
             CurGas = other.CurGas;
             IsSpeedBoost = other.IsSpeedBoost;
             IsKick = other.IsKick;
-            curPosition = other.curPosition;
+            CurPosition = other.CurPosition;
+            WallCollisionCount = other.WallCollisionCount;
         }
 
         public bool Equals(PlayerState playerState)
@@ -91,7 +93,8 @@ namespace ClientServerPrediction
                 InputIsSpeedBoost == playerState.InputIsSpeedBoost &&
                 InputIsKick == playerState.InputIsKick &&
                 CenterPoint == playerState.CenterPoint &&
-                curPosition == playerState.curPosition
+                CurPosition == playerState.CurPosition &&
+                WallCollisionCount == playerState.WallCollisionCount
             );
         }
     }
