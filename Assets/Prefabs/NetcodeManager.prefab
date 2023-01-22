@@ -59,7 +59,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.12156863}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -152,8 +152,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -379,9 +379,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  playerTrail: {fileID: 5594583912674202078, guid: feabaf7d67e71c94e8e9ea351a82382c, type: 3}
+  playerTrail: {fileID: 4188824480809200786, guid: 2c942a1eee8438e498097b64d6f86d1a, type: 3}
   playerServerTrail: {fileID: 5594583912674202078, guid: f8c45d040565d4448a40e060b6169b1e, type: 3}
-  text: {fileID: 0}
+  text: {fileID: 849537675}
   ball: {fileID: 8605165315305927817, guid: 6067a35150c63724ab56faf3a63a4a5f, type: 3}
 --- !u!114 &7448128260890044851
 MonoBehaviour:

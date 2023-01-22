@@ -15,7 +15,7 @@ public class Die : MonoBehaviour
     void Update()
     {
         timer += Time.deltaTime;
-        if(timer > 2)
+        if(timer > 0.2f)
         {
             Destroy(gameObject);
         }
