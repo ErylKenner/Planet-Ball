@@ -58,15 +58,15 @@ public class NetworkedObject : NetworkBehaviour, IStateful
     protected virtual void Start()
     {
         body = GetComponent<Rigidbody2D>();
-        NetworkedManager.instance.client.AddStateful(this, netId);
-        NetworkedManager.instance.server.AddStateful(this, netId);
+        NetworkedManager.instance?.client.AddStateful(this, netId);
+        NetworkedManager.instance?.server.AddStateful(this, netId);
     }
 
 
     protected virtual void OnDestroy()
     {
-        NetworkedManager.instance.client.DeleteStateful(netId);
-        NetworkedManager.instance.server.DeleteStateful(netId);
+        NetworkedManager.instance?.client.DeleteStateful(netId);
+        NetworkedManager.instance?.server.DeleteStateful(netId);
     }
 
 }

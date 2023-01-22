@@ -31,6 +31,7 @@ public class DrawTether : MonoBehaviour
     public float PLAYER_HANDLE_SIDEWAYS = 0.01f;
     public float PLANET_HANDLE_TOWARD = 0.01f;
     public float PLANET_HANDLE_SIDEWAYS = 0.01f;
+    public float LINE_Z = 1f;
 
     private LineRenderer lineRenderer;
 
@@ -69,7 +70,7 @@ public class DrawTether : MonoBehaviour
     private void DrawConnectedTether()
     {
         lineRenderer.startColor = lineRenderer.endColor = ENABLED_TETHER_COLOR;
-        lineRenderer.SetPosition(0, transform.position);
+        lineRenderer.SetPosition(0, new Vector3(transform.position.x, transform.position.y, LINE_Z));
         for (int i = 1; i < lineRenderer.positionCount - 1; ++i)
         {
             Vector2 A = transform.position;
@@ -78,43 +79,35 @@ public class DrawTether : MonoBehaviour
             Vector2 C = (1 + PLANET_HANDLE_TOWARD) * D - PLANET_HANDLE_TOWARD * A - PLANET_HANDLE_SIDEWAYS * Player.playerState.OrbitRadius * Player.GetComponent<Rigidbody2D>().velocity;
             float t = (float)i / (lineRenderer.positionCount - 2);
             Vector2 position = DeCasteljausAlgorithm(A, B, C, D, t);
-            lineRenderer.SetPosition(i, position);
+            lineRenderer.SetPosition(i, new Vector3(position.x, position.y, LINE_Z));
         }
-        lineRenderer.SetPosition(lineRenderer.positionCount - 1, Player.playerState.CenterPoint);
+        lineRenderer.SetPosition(lineRenderer.positionCount - 1, new Vector3(Player.playerState.CenterPoint.x, Player.playerState.CenterPoint.y, LINE_Z));
     }
 
     private void DrawUnconnectedTether(Vector2 nearestPlanetPosition)
     {
         lineRenderer.startColor = lineRenderer.endColor = DISABLED_TETHER_COLOR;
-        lineRenderer.SetPosition(0, transform.position);
+        lineRenderer.SetPosition(0, new Vector3(transform.position.x, transform.position.y, LINE_Z));
         for (int i = 1; i < lineRenderer.positionCount; ++i)
         {
-            lineRenderer.SetPosition(i, nearestPlanetPosition);
+            lineRenderer.SetPosition(i, new Vector3(nearestPlanetPosition.x, nearestPlanetPosition.y, LINE_Z));
         }
-        lineRenderer.SetPosition(lineRenderer.positionCount - 1, nearestPlanetPosition);
+        lineRenderer.SetPosition(lineRenderer.positionCount - 1, new Vector3(nearestPlanetPosition.x, nearestPlanetPosition.y, LINE_Z));
     }
 
 
-    private Vector3 DeCasteljausAlgorithm(Vector2 A, Vector2 B, Vector2 C, Vector2 D, float t)
+    private Vector2 DeCasteljausAlgorithm(Vector2 A, Vector2 B, Vector2 C, Vector2 D, float t)
     {
-        //Linear interpolation = lerp = (1 - t) * A + t * B
-        //Could use Vector3.Lerp(A, B, t)
-
-        //To make it faster
-        float oneMinusT = 1f - t;
-
         //Layer 1
-        Vector2 Q = oneMinusT * A + t * B;
-        Vector2 R = oneMinusT * B + t * C;
-        Vector2 S = oneMinusT * C + t * D;
+        Vector2 Q = (1f - t) * A + t * B;
+        Vector2 R = (1f - t) * B + t * C;
+        Vector2 S = (1f - t) * C + t * D;
 
         //Layer 2
-        Vector2 P = oneMinusT * Q + t * R;
-        Vector2 T = oneMinusT * R + t * S;
+        Vector2 P = (1f - t) * Q + t * R;
+        Vector2 T = (1f - t) * R + t * S;
 
         //Final interpolated position
-        Vector2 U = oneMinusT * P + t * T;
-
-        return U;
+        return (1f - t) * P + t * T;
     }
 }

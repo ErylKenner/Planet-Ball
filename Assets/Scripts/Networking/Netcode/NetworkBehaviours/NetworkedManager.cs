@@ -38,6 +38,14 @@ public class NetworkedManager : NetworkBehaviour
         Instantiate(ball);
     }
 
+    private void OnDestroy()
+    {
+        if (instance == this)
+        {
+            instance = null;
+        }
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -67,7 +75,7 @@ public class NetworkedManager : NetworkBehaviour
 
                 text.text = $"{client.tick - client.lastReceivedTick}";
 
-                if (inputMessage != null)
+                if (inputMessage != null && NetworkClient.ready)
                 {
                     CmdSendInputMessage(inputMessage);
                 }

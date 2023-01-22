@@ -324,6 +324,7 @@ GameObject:
   - component: {fileID: 8371194678007894157}
   - component: {fileID: 8371194678007894159}
   - component: {fileID: 4607829317046206451}
+  - component: {fileID: 7448128260890044851}
   m_Layer: 0
   m_Name: NetcodeManager
   m_TagString: Untagged
@@ -382,3 +383,23 @@ MonoBehaviour:
   playerServerTrail: {fileID: 5594583912674202078, guid: f8c45d040565d4448a40e060b6169b1e, type: 3}
   text: {fileID: 849537675}
   ball: {fileID: 8605165315305927817, guid: 6067a35150c63724ab56faf3a63a4a5f, type: 3}
+--- !u!114 &7448128260890044851
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8371194678007894154}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 433f2aed791075246a5cc9733601d465, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  WinningScore: 3
+  ScoreFreezeTime: 3
+  WinFreezeTime: 5
+  Team1score: 0
+  Team2score: 0
+  GameOver: 0
