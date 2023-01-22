@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using UnityEngine.SceneManagement;
 
 public class ScoreManager : NetworkBehaviour
 {
@@ -52,7 +53,9 @@ public class ScoreManager : NetworkBehaviour
             {
                 // Go back to main menu
                 Time.timeScale = 1;
-                NetworkManager.singleton.ServerChangeScene("RoomScene");
+                CustomRoomManager customRoomManager = FindObjectOfType<CustomRoomManager>();
+                customRoomManager.ServerChangeScene(customRoomManager.RoomScene);
+
                 Debug.Log("Go back to lobby");
             }
         }
