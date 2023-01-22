@@ -380,7 +380,7 @@ Rigidbody2D:
   m_AngularDrag: 1.35
   m_GravityScale: 0
   m_Material: {fileID: 6200000, guid: 55fd3c7176a575b408658616a7579c99, type: 2}
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
@@ -442,9 +442,12 @@ MonoBehaviour:
     CurGas: 0
     IsSpeedBoost: 0
     IsKick: 0
+    CurPosition: {x: 0, y: 0}
+    WallCollisionCount: 0
   WIND_TETHER_RATIO: 0.11
-  MIN_RADIUS: 1
-  MAX_RADIUS: 9
+  UNWIND_TETHER_RATIO: 0.22
+  MIN_RADIUS: 1.25
+  MAX_RADIUS: 7.5
   MIN_SPEED: 12
   MAX_SPEED: 35
   SPEED_FALLOFF: 0.85
@@ -456,6 +459,7 @@ MonoBehaviour:
   GAS_INCREASE_TIME: 20
   GAS_DRAIN_TIME: 3
   BOOST_SPEED_MINIMUM: 20
+  SPEED_MASS_MULTIPLIER: 0.5
 --- !u!114 &1017064400787661185
 MonoBehaviour:
   m_ObjectHideFlags: 0

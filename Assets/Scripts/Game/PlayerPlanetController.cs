@@ -12,20 +12,22 @@ public class PlayerPlanetController : NetworkBehaviour
     public PlayerState playerState = new PlayerState();
 
     // Const attributes - not state
-    public float WIND_TETHER_RATIO = 0.11f;
-    public float MIN_RADIUS = 0.5f;
+    public float WIND_TETHER_RATIO = 0.12f;
+    public float UNWIND_TETHER_RATIO = 0.29f;
+    public float MIN_RADIUS = 1f;
     public float MAX_RADIUS = 9f;
     public float MIN_SPEED = 12f;
-    public float MAX_SPEED = 45f;
-    public float SPEED_FALLOFF = 0.8f;
-    public float SPEED_BOOST_RAMP = 0.5f;
-    public float SPEED_BOOST_COOLDOWN = 1f;
+    public float MAX_SPEED = 35f;
+    public float SPEED_FALLOFF = 0.85f;
+    public float SPEED_BOOST_RAMP = 0.4f;
+    public float SPEED_BOOST_COOLDOWN = 2f;
     public float HEAVY_COOLDOWN = 0.5f;
     public float HEAVY_DURATION = 1f;
     public float HEAVY_MASS = 10f;
-    public float GAS_INCREASE_TIME = 30f;
-    public float GAS_DRAIN_TIME = 7f;
-    public float BOOST_SPEED_MINIMUM = 25f;
+    public float GAS_INCREASE_TIME = 20f;
+    public float GAS_DRAIN_TIME = 3f;
+    public float BOOST_SPEED_MINIMUM = 20f;
+    public float SPEED_MASS_MULTIPLIER = 0.5f;
 
     // For testing. Input system callbacks set these which are then read in FixedUpdate
     private bool _attachTether = false;
@@ -55,7 +57,6 @@ public class PlayerPlanetController : NetworkBehaviour
         body = GetComponent<Rigidbody2D>();
     }
 
-    // Start is called before the first frame update
     public void Start()
     {
         if (!isLocalPlayer)
@@ -63,12 +64,6 @@ public class PlayerPlanetController : NetworkBehaviour
             // Disable any components that we don't want to compute since they belong to other players
             GetComponent<PlayerInput>().enabled = false;
         }
-    }
-
-    private void FixedUpdate()
-    {
-        //PlayerInputState input = new PlayerInputState(_attachTether, _windTether, _unwindTether, _speedBoost, _kick);
-        //PhysicsPreStep(input, Time.fixedDeltaTime);
     }
 
     public void ApplyInput(Inputs input, float dt)
@@ -87,9 +82,27 @@ public class PlayerPlanetController : NetworkBehaviour
         playerState.InputIsSpeedBoost = (input == null && playerState.InputIsSpeedBoost) || (input != null && input.SpeedBoost);
         playerState.InputIsKick = (input == null && playerState.InputIsKick) || (input != null && input.Kick);
 
+
+        SetSpeedAndMass();
         HandleTether(wasInputTethered, dt);
         HandleSpeedBoost(wasInputSpeedBoost, dt);
         //HandleKick(dt);
+        playerState.CurPosition = body.position;
+    }
+
+    private void SetSpeedAndMass()
+    {
+        playerState.Speed = Mathf.Clamp(body.velocity.magnitude, MIN_SPEED, MAX_SPEED);
+        float speedRatio = (playerState.Speed - MIN_SPEED) / (MAX_SPEED - MIN_SPEED);
+        body.mass = 1 + speedRatio * SPEED_MASS_MULTIPLIER;
+    }
+
+    private void SetBounciness(float bounciness)
+    {
+        CircleCollider2D coll = GetComponent<CircleCollider2D>();
+        PhysicsMaterial2D material = coll.sharedMaterial;
+        material.bounciness = bounciness;
+        coll.sharedMaterial = material;
     }
 
     private void HandleTether(bool wasInputTethered, float dt)
@@ -110,6 +123,7 @@ public class PlayerPlanetController : NetworkBehaviour
                 {
                     playerState.CenterPoint = nearestPlanet.transform.position;
                     playerState.OrbitRadius = Vector2.Distance(body.position, playerState.CenterPoint);
+                    SetBounciness(0f);
                 }
             }
             if (playerState.InputIsWindTether)
@@ -118,18 +132,18 @@ public class PlayerPlanetController : NetworkBehaviour
                 float windRate = WIND_TETHER_RATIO * playerState.OrbitRadius * playerState.Speed;
                 playerState.OrbitRadius -= windRate * dt;
             }
-            if (playerState.InputIsUnwindTether)
+            if (playerState.InputIsUnwindTether && playerState.WallCollisionCount == 0)
             {
                 // Unwind in the same orbit shape regardless of speed via exponential falloff of the radius
-                float windRate = WIND_TETHER_RATIO * playerState.OrbitRadius * playerState.Speed;
-                // Double the unwind speed vs the wind speed since it feels better
-                playerState.OrbitRadius += 2 * windRate * dt;
+                float windRate = UNWIND_TETHER_RATIO * playerState.OrbitRadius * playerState.Speed;
+                playerState.OrbitRadius += windRate * dt;
             }
         }
         else
         {
             playerState.CenterPoint = Vector2.zero;
             playerState.OrbitRadius = 0;
+            SetBounciness(1f);
         }
         playerState.OrbitRadius = Mathf.Clamp(playerState.OrbitRadius, MIN_RADIUS, MAX_RADIUS);
     }
@@ -238,12 +252,46 @@ public class PlayerPlanetController : NetworkBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if(collision.gameObject.tag == "Wall" && playerState.InputIsTethered)
+        if (collision.gameObject.tag == "Ball")
         {
-            body.velocity = -body.velocity;
+            body.velocity = collision.relativeVelocity;
+            return;
+        }
+        if (collision.gameObject.tag == "Wall" || collision.gameObject.tag == "Goal")
+        {
+            playerState.WallCollisionCount += 1;
+            if (playerState.InputIsTethered)
+            {
+                // Reset position to what we set it in ApplyInput since there's no way to customize Unity's depenetration function
+                body.position = playerState.CurPosition;
+
+                // Only bounce backward if this is the only wall collision
+                if (playerState.WallCollisionCount == 1)
+                {
+                    body.velocity = collision.relativeVelocity;
+                }
+                else if (playerState.InputIsUnwindTether)
+                {
+                    // Hard set radius to prevent the target radius differing too much from the rendered radius.
+                    // Also add a small offset to the radius so that the collision exit trigger only happens once the player
+                    // intentionally stops tetering or winds the tether, and not because of Unity collision detection precision.
+                    playerState.OrbitRadius = 0.2f + Vector2.Distance(body.position, playerState.CenterPoint);
+                }
+            }
+            return;
         }
     }
 
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.tag == "Wall" || collision.gameObject.tag == "Goal")
+        {
+            // Set bounciness to 1 to handle the case where we collided with 2+ walls at once and never got to bounce backward
+            SetBounciness(1f);
+            playerState.WallCollisionCount -= 1;
+            return;
+        }
+    }
 
     public void OnAttachTether(InputValue input)
     {
