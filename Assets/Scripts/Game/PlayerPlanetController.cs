@@ -112,8 +112,8 @@ public class PlayerPlanetController : NetworkBehaviour
 
     private void HandleTether(bool wasInputTethered, float dt)
     {
-         if (playerState.InputIsTethered)
-         {
+        if (playerState.InputIsTethered)
+        {
             if (!wasInputTethered)
             {
                 // This is the first tick where the tether is attached. Find the nearest planet to attach to
