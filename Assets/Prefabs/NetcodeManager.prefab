@@ -400,6 +400,6 @@ MonoBehaviour:
   WinningScore: 3
   ScoreFreezeTime: 3
   WinFreezeTime: 5
-  Team1score: 0
-  Team2score: 0
+  Team1Score: 0
+  Team2Score: 0
   GameOver: 0
