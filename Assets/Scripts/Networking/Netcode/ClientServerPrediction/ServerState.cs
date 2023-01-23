@@ -49,9 +49,9 @@ namespace ClientServerPrediction
             return ServerStateMachine.CreateStateMessage(ref serverInputBufferMap, serverStateMap, tick, frozen);
         }
 
-        public void ResetState(IRunnable runner, RunContext runContext)
+        public void ResetState(IRunnable runner, RunContext runContext, in Dictionary<uint, Vector2> startPositions = null)
         {
-            StateMachine.SetState(ref serverStateMap, in initialStateMap);
+            StateMachine.SetState(ref serverStateMap, in initialStateMap, in startPositions);
         }
 
         public void Freeze(bool freeze)

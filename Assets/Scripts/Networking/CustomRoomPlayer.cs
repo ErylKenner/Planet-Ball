@@ -20,6 +20,9 @@ public class CustomRoomPlayer : NetworkRoomPlayer
     [SyncVar]
     public string Name;
 
+    [SyncVar]
+    public int TeamNumber;
+
     #region Start & Stop Callbacks
 
     /// <summary>
@@ -89,6 +92,8 @@ public class CustomRoomPlayer : NetworkRoomPlayer
         if(isLocalPlayer)
         {
             GetComponent<PlayerInput>().enabled = true;
+            gameObject.AddComponent<FindUIInputModule>();
+            
         } else
         {
             GetComponent<PlayerInput>().enabled = false;
@@ -157,6 +162,17 @@ public class CustomRoomPlayer : NetworkRoomPlayer
         {
             CmdChangeReadyState(!readyToBegin);
         }
+    }
+
+    public void ChangeTeam()
+    {
+        CommandChangeTeam();
+    }
+
+    [Command]
+    protected void CommandChangeTeam()
+    {
+        TeamNumber = (TeamNumber + 1) % 2;
     }
 
     private void Update()

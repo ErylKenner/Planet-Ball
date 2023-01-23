@@ -4,6 +4,7 @@ using kcp2k;
 using Mirror.FizzySteam;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
+using System.Collections.Generic;
 
 /*
 	Documentation: https://mirror-networking.gitbook.io/docs/components/network-room-manager
@@ -27,6 +28,8 @@ public class CustomRoomManager : NetworkRoomManager
 
     [Scene]
     public string MainMenuScene;
+
+    private HashSet<Transform> takenStartPositions = new HashSet<Transform>();
 
     public override void Awake()
     {
@@ -99,6 +102,10 @@ public class CustomRoomManager : NetworkRoomManager
     /// <param name="sceneName">Name of the new scene.</param>
     public override void OnRoomServerSceneChanged(string sceneName)
     {
+        if(sceneName == GameplayScene)
+        {
+            ResetTakenStartPositions();
+        }
     }
 
     /// <summary>
@@ -109,8 +116,18 @@ public class CustomRoomManager : NetworkRoomManager
     /// <returns>The new room-player object.</returns>
     public override GameObject OnRoomServerCreateRoomPlayer(NetworkConnectionToClient conn)
     {
-        return base.OnRoomServerCreateRoomPlayer(conn);
+        int teamNumber = numPlayers % 2;
+        GameObject roomPlayerGameObject = Instantiate(roomPlayerPrefab).gameObject;
+        var teamRoomPlayer = roomPlayerGameObject.GetComponent<CustomRoomPlayer>();
+        if(teamRoomPlayer)
+        {
+            teamRoomPlayer.TeamNumber = teamNumber;
+        }
+
+        return roomPlayerGameObject;
+        
     }
+
 
     /// <summary>
     /// This allows customization of the creation of the GamePlayer object on the server.
@@ -121,7 +138,53 @@ public class CustomRoomManager : NetworkRoomManager
     /// <returns>A new GamePlayer object.</returns>
     public override GameObject OnRoomServerCreateGamePlayer(NetworkConnectionToClient conn, GameObject roomPlayer)
     {
-        return base.OnRoomServerCreateGamePlayer(conn, roomPlayer);
+        CustomRoomPlayer customRoomPlayer = roomPlayer.GetComponent<CustomRoomPlayer>();
+        Transform startPosition;
+        if (!customRoomPlayer)
+        {
+            startPosition = GetStartPosition();
+        }
+        else
+        {
+            startPosition = GetStartPositionForPlayer(customRoomPlayer.TeamNumber);
+        }
+
+        GameObject playerObject = Instantiate(playerPrefab, startPosition.position, Quaternion.identity);
+        var playerTeam = playerObject.GetComponent<PlayerTeam>();
+        if (playerTeam)
+        {
+            playerTeam.TeamNumber = customRoomPlayer.TeamNumber;
+        }
+
+        return playerObject;
+    }
+
+    public void ResetTakenStartPositions()
+    {
+        takenStartPositions.Clear();
+    }
+
+    public Transform GetStartPositionForPlayer(int teamNumber)
+    {
+        Transform startPosition = null;
+        
+        List<Transform> teamSpawnPoints = startPositions.FindAll(transform =>
+        {
+            var teamNetworkStartPosition = transform.GetComponent<TeamNetworkStartPosition>();
+            return teamNetworkStartPosition != null && teamNetworkStartPosition.TeamNumber == teamNumber && !takenStartPositions.Contains(transform);
+        });
+
+        if (teamSpawnPoints.Count > 0)
+        {
+            startPosition = teamSpawnPoints[Random.Range(0, teamSpawnPoints.Count)];
+            takenStartPositions.Add(teamSpawnPoints[0]);
+        }
+        else
+        {
+            startPosition = GetStartPosition();
+        }
+
+        return startPosition;
     }
 
     /// <summary>

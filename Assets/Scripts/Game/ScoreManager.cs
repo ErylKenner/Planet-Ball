@@ -69,16 +69,18 @@ public class ScoreManager : NetworkBehaviour
             return;
         }
 
-        if (teamNumber == 1)
+        // TODO: Lookup team info from TeamManager
+
+        if (teamNumber == 0)
         {
             Team1Score += 1;
-        } else if(teamNumber == 2)
+        } else if(teamNumber == 1)
         {
             Team2Score += 1;
         }
         else
         {
-            Debug.Log("Invalid team number given: " + teamNumber);
+            Debug.LogError("Invalid team number given: " + teamNumber);
             return;
         }
 
@@ -96,11 +98,11 @@ public class ScoreManager : NetworkBehaviour
 
     public int GetTeamScore(int teamNumber)
     {
-        if (teamNumber == 1)
+        if (teamNumber == 0)
         {
             return Team1Score;
         }
-        else if (teamNumber == 2)
+        else if (teamNumber == 1)
         {
             return Team2Score;
         }
