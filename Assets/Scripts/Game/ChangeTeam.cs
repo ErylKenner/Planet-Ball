@@ -7,7 +7,6 @@ public class ChangeTeam : MonoBehaviour
 {
     public void ChangeMyTeam()
     {
-        Debug.Log("HELLO");
         var localPlayer = NetworkClient.localPlayer;
         var roomPlayer = localPlayer.GetComponent<CustomRoomPlayer>();
         if(roomPlayer)

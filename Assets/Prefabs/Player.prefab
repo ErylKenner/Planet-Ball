@@ -422,7 +422,9 @@ GameObject:
   - component: {fileID: 7641804893563888105}
   - component: {fileID: 1017064400787661185}
   - component: {fileID: 7250059937621011907}
+  - component: {fileID: 2735319212385618027}
   - component: {fileID: 8275665455161718903}
+  - component: {fileID: 8462119869747602090}
   m_Layer: 7
   m_Name: Player
   m_TagString: Player
@@ -610,7 +612,31 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   model: {fileID: 5594583912770767460}
+--- !u!114 &2735319212385618027
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5594583912674202078}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a751055a164a40d4c945c5b9c74334e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &8275665455161718903
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5594583912674202078}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe809ff8e477e6c4082730c8f74d79ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &8462119869747602090
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -622,7 +648,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d900b495dd3b20a4490f4106f6104219, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   playerMesh: {fileID: 6237741050395970700}
+  TeamNumber: -1
 --- !u!1 &5594583912770767460
 GameObject:
   m_ObjectHideFlags: 0
