@@ -46,6 +46,7 @@ namespace ClientServerPrediction
         public float CurGas = 0f;
         public bool IsSpeedBoost = false;
         public bool IsKick = false;
+        public float TetherDisabledDuration = 0f;
         public Vector2 CurPosition = Vector2.zero;
         public int WallCollisionCount = 0;
 
@@ -65,6 +66,7 @@ namespace ClientServerPrediction
             CurGas = other.CurGas;
             IsSpeedBoost = other.IsSpeedBoost;
             IsKick = other.IsKick;
+            TetherDisabledDuration = other.TetherDisabledDuration;
             CurPosition = other.CurPosition;
             WallCollisionCount = other.WallCollisionCount;
         }
