@@ -108,7 +108,19 @@ public class NetworkedManager : NetworkBehaviour
     {
         // TODO: Pass in a Runcontext to get the dt
         float dt = Time.fixedDeltaTime;
-        server.ResetState(runner, new RunContext { dt = dt });
+
+        var customRoomManager = FindObjectOfType<CustomRoomManager>();
+        customRoomManager.ResetTakenStartPositions();
+        var playerTeams = FindObjectsOfType<PlayerTeam>();
+
+        Dictionary<uint, Vector2> startPositions = new Dictionary<uint, Vector2>();
+        foreach(var playerTeam in playerTeams)
+        {
+            Transform startPosition = customRoomManager.GetStartPositionForPlayer(playerTeam.TeamNumber);
+            startPositions.Add(playerTeam.netId, startPosition.position);
+        }
+        
+        server.ResetState(runner, new RunContext { dt = dt }, in startPositions);
         server.Freeze(true);
         frozenTimer = freezeTime;
     }

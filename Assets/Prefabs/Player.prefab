@@ -422,6 +422,7 @@ GameObject:
   - component: {fileID: 7641804893563888105}
   - component: {fileID: 1017064400787661185}
   - component: {fileID: 7250059937621011907}
+  - component: {fileID: 8275665455161718903}
   m_Layer: 7
   m_Name: Player
   m_TagString: Player
@@ -609,6 +610,19 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   model: {fileID: 5594583912770767460}
+--- !u!114 &8275665455161718903
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5594583912674202078}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d900b495dd3b20a4490f4106f6104219, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerMesh: {fileID: 6237741050395970700}
 --- !u!1 &5594583912770767460
 GameObject:
   m_ObjectHideFlags: 0
@@ -840,5 +854,10 @@ PrefabInstance:
 --- !u!4 &436313081554747052 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7338618689535840697, guid: d57d6419728ca4fa486055a9b54eb326, type: 3}
+  m_PrefabInstance: {fileID: 7193966860788739861}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &6237741050395970700 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 3839022712555561881, guid: d57d6419728ca4fa486055a9b54eb326, type: 3}
   m_PrefabInstance: {fileID: 7193966860788739861}
   m_PrefabAsset: {fileID: 0}
