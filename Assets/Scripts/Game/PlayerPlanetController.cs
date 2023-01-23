@@ -9,6 +9,8 @@ using ClientServerPrediction;
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerPlanetController : NetworkBehaviour
 {
+    public GameObject PlayerShockwavePrefab;
+    public GameObject BallShockwavePrefab;
     public PlayerState playerState = new PlayerState();
 
     // Const attributes - not state
@@ -28,6 +30,7 @@ public class PlayerPlanetController : NetworkBehaviour
     public float GAS_DRAIN_TIME = 3f;
     public float BOOST_SPEED_MINIMUM = 20f;
     public float SPEED_MASS_MULTIPLIER = 0.5f;
+    public float TETHER_DISABLED_DURATION = 1f;
 
     // For testing. Input system callbacks set these which are then read in FixedUpdate
     private bool _attachTether = false;
@@ -74,9 +77,11 @@ public class PlayerPlanetController : NetworkBehaviour
 
     private void SetStateFromInput(Inputs input, float dt)
     {
+        playerState.TetherDisabledDuration = Mathf.Clamp(playerState.TetherDisabledDuration -= dt, 0f, Mathf.Infinity);
+
         bool wasInputTethered = playerState.InputIsTethered;
         bool wasInputSpeedBoost = playerState.InputIsSpeedBoost;
-        playerState.InputIsTethered = (input == null && playerState.InputIsTethered) || (input != null && input.AttachTether);
+        playerState.InputIsTethered = ((input == null && playerState.InputIsTethered) || (input != null && input.AttachTether)) && (playerState.TetherDisabledDuration <= 0f);
         playerState.InputIsWindTether = (input == null && playerState.InputIsWindTether) || (input != null && input.WindTether);
         playerState.InputIsUnwindTether = (input == null && playerState.InputIsUnwindTether) || (input != null && input.UnwindTether);
         playerState.InputIsSpeedBoost = (input == null && playerState.InputIsSpeedBoost) || (input != null && input.SpeedBoost);
@@ -255,7 +260,15 @@ public class PlayerPlanetController : NetworkBehaviour
         if (collision.gameObject.tag == "Ball")
         {
             body.velocity = collision.relativeVelocity;
+            Vector3 contactPoint = new Vector3(collision.GetContact(0).point.x, collision.GetContact(0).point.y, 0);
+            Instantiate(BallShockwavePrefab, contactPoint, Quaternion.identity);
             return;
+        }
+        if (collision.gameObject.tag == "Player")
+        {
+            Vector3 contactPoint = new Vector3(collision.GetContact(0).point.x, collision.GetContact(0).point.y, 0);
+            Instantiate(PlayerShockwavePrefab, contactPoint, Quaternion.identity);
+            playerState.TetherDisabledDuration = TETHER_DISABLED_DURATION;
         }
         if (collision.gameObject.tag == "Wall" || collision.gameObject.tag == "Goal")
         {

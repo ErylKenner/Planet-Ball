@@ -59,7 +59,7 @@ public class DrawTether : MonoBehaviour
             return;
         }
         Planet nearestPlanet = Player.NearestPlanet();
-        if (nearestPlanet != null)
+        if (nearestPlanet != null && Player.playerState.TetherDisabledDuration <= 0f)
         {
             DrawUnconnectedTether(nearestPlanet.transform.position);
             return;
