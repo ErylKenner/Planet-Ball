@@ -108,7 +108,7 @@
                 {
                     "name": "",
                     "id": "5c2bb0ab-88d5-4cf8-a965-5204f2c86d3e",
-                    "path": "<Gamepad>/leftStick/up",
+                    "path": "<Keyboard>/upArrow",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",

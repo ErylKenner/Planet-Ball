@@ -9,6 +9,7 @@ public class PlayerListItem : MonoBehaviour
     public GameObject NameGui;
     public GameObject ReadyGui;
     public GameObject RemoveGui;
+    public Image NamePanel;
 
     private CustomRoomPlayer player;
 
@@ -32,6 +33,7 @@ public class PlayerListItem : MonoBehaviour
             return;
         }
         NameGui.GetComponent<TMPro.TextMeshProUGUI>().text = player.Name;
+        NamePanel.color = ContextManager.instance.TeamManager.GetTeam(player.TeamNumber).TeamColor;
         ReadyGui.gameObject.SetActive(player.readyToBegin);
         if ((player.isServer && player.index > 0) || player.isServerOnly){
             RemoveGui.SetActive(true);

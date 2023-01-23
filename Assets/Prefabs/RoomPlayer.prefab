@@ -79,7 +79,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 
+  m_Text: Player
 --- !u!1 &5123957401559552803
 GameObject:
   m_ObjectHideFlags: 0
@@ -93,7 +93,6 @@ GameObject:
   - component: {fileID: 5123957401559552800}
   - component: {fileID: 5123957401559552807}
   - component: {fileID: 3051642857162482356}
-  - component: {fileID: 9046785060179961281}
   m_Layer: 0
   m_Name: RoomPlayer
   m_TagString: Untagged
@@ -157,6 +156,7 @@ MonoBehaviour:
   readyToBegin: 0
   index: 0
   Name: 
+  TeamNumber: 0
 --- !u!114 &5123957401559552807
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -252,15 +252,3 @@ MonoBehaviour:
   m_DefaultActionMap: UI
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
---- !u!114 &9046785060179961281
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5123957401559552803}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a751055a164a40d4c945c5b9c74334e4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

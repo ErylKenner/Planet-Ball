@@ -1827,7 +1827,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0726a1c1ee700ef4f98aa9d7f2f9bf11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TeamNumber: 1
+  TeamNumber: 0
 --- !u!114 &1748378654
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2130,7 +2130,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0726a1c1ee700ef4f98aa9d7f2f9bf11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TeamNumber: 2
+  TeamNumber: 1
 --- !u!114 &1897189315
 MonoBehaviour:
   m_ObjectHideFlags: 0
