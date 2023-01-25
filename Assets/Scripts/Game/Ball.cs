@@ -19,7 +19,12 @@ public class Ball : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        bool autoWin = ContextManager.instance.AdminManager.AutoWin;
+        bool serverFrozen = NetworkedManager.instance.server.frozen;
+        if(isServer && autoWin && !serverFrozen)
+        {
+            GetComponent<Rigidbody2D>().velocity = new Vector2(50f, 0);
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
