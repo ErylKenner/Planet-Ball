@@ -416,7 +416,7 @@ MonoBehaviour:
   text: {fileID: 849537675}
   ball: {fileID: 8605165315305927817, guid: 6067a35150c63724ab56faf3a63a4a5f, type: 3}
   TrailExpirationLength: 1
-  ServerDebug: 1
+  ServerDebug: 0
   TrailParent: {fileID: 384152616}
 --- !u!114 &7448128260890044851
 MonoBehaviour:

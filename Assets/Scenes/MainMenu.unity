@@ -1600,6 +1600,14 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -77.86967
       objectReference: {fileID: 0}
+    - target: {fileID: 7690547895590442529, guid: c8441de286e76434e9616c01ec7ea2a0, type: 3}
+      propertyPath: spawnPrefabs.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7690547895590442529, guid: c8441de286e76434e9616c01ec7ea2a0, type: 3}
+      propertyPath: spawnPrefabs.Array.data[0]
+      value: 
+      objectReference: {fileID: 5252395650210339418, guid: 6067a35150c63724ab56faf3a63a4a5f, type: 3}
     - target: {fileID: 8233737870352303776, guid: c8441de286e76434e9616c01ec7ea2a0, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
@@ -1846,10 +1854,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 988256559679732594, guid: e1339084668b95b429a8fbd964309362, type: 3}
-      propertyPath: AutoWin
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 6065759129471074328, guid: e1339084668b95b429a8fbd964309362, type: 3}
       propertyPath: m_RootOrder
       value: 7
@@ -1897,38 +1901,6 @@ PrefabInstance:
     - target: {fileID: 6065759129471074329, guid: e1339084668b95b429a8fbd964309362, type: 3}
       propertyPath: m_Name
       value: ContextManager
-      objectReference: {fileID: 0}
-    - target: {fileID: 6065759129471074330, guid: e1339084668b95b429a8fbd964309362, type: 3}
-      propertyPath: teams.Array.data[0].TeamColor.a
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6065759129471074330, guid: e1339084668b95b429a8fbd964309362, type: 3}
-      propertyPath: teams.Array.data[0].TeamColor.b
-      value: 0.15312389
-      objectReference: {fileID: 0}
-    - target: {fileID: 6065759129471074330, guid: e1339084668b95b429a8fbd964309362, type: 3}
-      propertyPath: teams.Array.data[0].TeamColor.g
-      value: 0.406606
-      objectReference: {fileID: 0}
-    - target: {fileID: 6065759129471074330, guid: e1339084668b95b429a8fbd964309362, type: 3}
-      propertyPath: teams.Array.data[0].TeamColor.r
-      value: 0.8773585
-      objectReference: {fileID: 0}
-    - target: {fileID: 6065759129471074330, guid: e1339084668b95b429a8fbd964309362, type: 3}
-      propertyPath: teams.Array.data[1].TeamColor.a
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6065759129471074330, guid: e1339084668b95b429a8fbd964309362, type: 3}
-      propertyPath: teams.Array.data[1].TeamColor.b
-      value: 0.9622642
-      objectReference: {fileID: 0}
-    - target: {fileID: 6065759129471074330, guid: e1339084668b95b429a8fbd964309362, type: 3}
-      propertyPath: teams.Array.data[1].TeamColor.g
-      value: 0.4653474
-      objectReference: {fileID: 0}
-    - target: {fileID: 6065759129471074330, guid: e1339084668b95b429a8fbd964309362, type: 3}
-      propertyPath: teams.Array.data[1].TeamColor.r
-      value: 0.34950158
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e1339084668b95b429a8fbd964309362, type: 3}

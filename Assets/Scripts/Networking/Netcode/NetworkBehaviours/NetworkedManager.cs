@@ -41,7 +41,12 @@ public class NetworkedManager : NetworkBehaviour
             return;
         }
 
-        Instantiate(ball);
+        if(isServer)
+        {
+            Ball ballObject = Instantiate(ball);
+            NetworkServer.Spawn(ballObject.gameObject);
+            FreezeServer(1f);
+        }   
     }
 
     private void OnDestroy()
@@ -63,12 +68,14 @@ public class NetworkedManager : NetworkBehaviour
             frozenTimer = Mathf.Clamp(frozenTimer - Time.deltaTime, 0, frozenTimer);
             if (frozenTimer <= 0)
             {
+                Debug.Log("Server resuming");
                 server.Freeze(false);
             }
         }
-
+        int tickCount = 0;
         while (timer >= Time.fixedDeltaTime)
         {
+            tickCount++;
             timer -= Time.fixedDeltaTime;
             if (isClient)
             {
@@ -104,6 +111,8 @@ public class NetworkedManager : NetworkBehaviour
                 }
             }
         }
+
+        //Debug.Log(tickCount);
     }
 
     [ClientRpc]
@@ -135,7 +144,13 @@ public class NetworkedManager : NetworkBehaviour
         }
 
         server.ResetState(runner, new RunContext { dt = dt }, in startPositions);
+        FreezeServer(freezeTime);
+    }
+
+    public void FreezeServer(float freezeTime)
+    {
         server.Freeze(true);
         frozenTimer = freezeTime;
+        Debug.Log($"Server freezing for {freezeTime}s");
     }
 }

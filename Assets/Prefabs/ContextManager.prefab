@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6065759129471074328}
   - component: {fileID: 6065759129471074330}
   - component: {fileID: 6065759129471074331}
+  - component: {fileID: 988256559679732594}
   m_Layer: 0
   m_Name: ContextManager
   m_TagString: Untagged
@@ -47,9 +48,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   teams:
   - TeamName: Orange
-    TeamColor: {r: 0, g: 0, b: 0, a: 0}
+    TeamColor: {r: 0.8773585, g: 0.406606, b: 0.15312389, a: 1}
   - TeamName: Blue
-    TeamColor: {r: 0, g: 0, b: 0, a: 0}
+    TeamColor: {r: 0.34950158, g: 0.4653474, b: 0.9622642, a: 1}
 --- !u!114 &6065759129471074331
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -63,3 +64,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TeamManager: {fileID: 0}
+  AdminManager: {fileID: 0}
+--- !u!114 &988256559679732594
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6065759129471074329}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8836e0df121adc48a91ae78941157ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AutoWin: 0
