@@ -18,6 +18,11 @@ public class NetworkedManager : NetworkBehaviour
 
     public Ball ball;
 
+    public float TrailExpirationLength = 0.2f;
+
+    public bool ServerDebug = false;
+    public Transform TrailParent;
+
     float timer = 0;
     float frozenTimer = 0;
 
@@ -25,10 +30,11 @@ public class NetworkedManager : NetworkBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if(instance == null)
+        if (instance == null)
         {
             instance = this;
-        } else
+        }
+        else
         {
             Debug.LogWarning("There can only be one NetworkedManager");
             Destroy(this.gameObject);
@@ -51,11 +57,11 @@ public class NetworkedManager : NetworkBehaviour
     {
         float dt = Time.fixedDeltaTime;
         timer += Time.deltaTime;
-        
-        if(frozenTimer > 0)
+
+        if (frozenTimer > 0)
         {
             frozenTimer = Mathf.Clamp(frozenTimer - Time.deltaTime, 0, frozenTimer);
-            if(frozenTimer <= 0)
+            if (frozenTimer <= 0)
             {
                 server.Freeze(false);
             }
@@ -68,10 +74,18 @@ public class NetworkedManager : NetworkBehaviour
             {
                 InputMessage inputMessage = client.Tick(runner, new RunContext { dt = dt }, isClientOnly);
 
-                //GameObject serverTrail = Instantiate(playerServerTrail, client.lastServerMessage, Quaternion.identity);
-                //serverTrail.name = $"Server {client.lastReceivedTick}";
-                GameObject clientTrail =  Instantiate(playerTrail, ((NetworkedPlayer)client.stateMap[(uint)client.localNetId]).transform.position, Quaternion.identity);
+                if (ServerDebug)
+                {
+                    GameObject serverTrail = Instantiate(playerServerTrail, client.lastServerMessage, Quaternion.identity);
+                    serverTrail.name = $"Server {client.lastReceivedTick}";
+                    serverTrail.transform.parent = TrailParent ? TrailParent : gameObject.transform;
+                    serverTrail.AddComponent<Die>().ExpirationDate = TrailExpirationLength;
+                }
+
+                GameObject clientTrail = Instantiate(playerTrail, ((NetworkedPlayer)client.stateMap[(uint)client.localNetId]).transform.position, Quaternion.identity);
                 clientTrail.name = $"Client {client.tick}";
+                clientTrail.transform.parent = TrailParent ? TrailParent : gameObject.transform;
+                clientTrail.AddComponent<Die>().ExpirationDate = TrailExpirationLength;
 
                 text.text = $"{client.tick - client.lastReceivedTick}";
 
@@ -114,12 +128,12 @@ public class NetworkedManager : NetworkBehaviour
         var playerTeams = FindObjectsOfType<PlayerTeam>();
 
         Dictionary<uint, Vector2> startPositions = new Dictionary<uint, Vector2>();
-        foreach(var playerTeam in playerTeams)
+        foreach (var playerTeam in playerTeams)
         {
             Transform startPosition = customRoomManager.GetStartPositionForPlayer(playerTeam.TeamNumber);
             startPositions.Add(playerTeam.netId, startPosition.position);
         }
-        
+
         server.ResetState(runner, new RunContext { dt = dt }, in startPositions);
         server.Freeze(true);
         frozenTimer = freezeTime;

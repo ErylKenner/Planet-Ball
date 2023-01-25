@@ -9,9 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5071500200585893176}
-  - component: {fileID: 6486606217204478397}
   m_Layer: 0
-  m_Name: AsterTrail
+  m_Name: AsterTrailServer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -33,18 +32,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6486606217204478397
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4188824480809200786}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1decf040c1c8fd40a45113f03d4f3d8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &2484977181800080038
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -52,6 +39,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 5071500200585893176}
     m_Modifications:
+    - target: {fileID: 1015945075444073679, guid: 543f85c367b24464098124fcc11a6955, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 3b3506501590f53438c76b5d6e438721, type: 2}
     - target: {fileID: 6123279987556253554, guid: 543f85c367b24464098124fcc11a6955, type: 3}
       propertyPath: m_Name
       value: Asteroid_5

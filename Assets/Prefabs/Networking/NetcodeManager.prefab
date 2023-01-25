@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &384152615
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 384152616}
+  m_Layer: 0
+  m_Name: TrailParent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &384152616
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 384152615}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8371194678007894157}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &555480598
 GameObject:
   m_ObjectHideFlags: 0
@@ -345,6 +376,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2016825846}
+  - {fileID: 384152616}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -380,9 +412,12 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   playerTrail: {fileID: 4188824480809200786, guid: 2c942a1eee8438e498097b64d6f86d1a, type: 3}
-  playerServerTrail: {fileID: 5594583912674202078, guid: f8c45d040565d4448a40e060b6169b1e, type: 3}
+  playerServerTrail: {fileID: 4188824480809200786, guid: 2f3cd94cbe62cab46baa87d577ae5354, type: 3}
   text: {fileID: 849537675}
   ball: {fileID: 8605165315305927817, guid: 6067a35150c63724ab56faf3a63a4a5f, type: 3}
+  TrailExpirationLength: 1
+  ServerDebug: 1
+  TrailParent: {fileID: 384152616}
 --- !u!114 &7448128260890044851
 MonoBehaviour:
   m_ObjectHideFlags: 0
