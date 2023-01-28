@@ -187,7 +187,7 @@ public class PlayerPlanetController : NetworkBehaviour
         {
             playerState.CurSpeedBoostCooldown = SPEED_BOOST_COOLDOWN;
         }
-        
+
         playerState.CurSpeedBoostCooldown = Mathf.Clamp(playerState.CurSpeedBoostCooldown - dt, 0, SPEED_BOOST_COOLDOWN);
         playerState.CurGas = Mathf.Clamp(playerState.CurGas, 0, 1);
         playerState.Speed = Mathf.Clamp(playerState.Speed, MIN_SPEED, MAX_SPEED);
@@ -261,14 +261,19 @@ public class PlayerPlanetController : NetworkBehaviour
         {
             body.velocity = collision.relativeVelocity;
             Vector3 contactPoint = new Vector3(collision.GetContact(0).point.x, collision.GetContact(0).point.y, 0);
-            Instantiate(BallShockwavePrefab, contactPoint, Quaternion.identity);
+            GameObject shockwave = Instantiate(BallShockwavePrefab, contactPoint, Quaternion.identity);
+            float magnitude = 1 + 0.5f * Mathf.Pow((collision.relativeVelocity.magnitude - MIN_SPEED) / (MAX_SPEED - MIN_SPEED), 2);
+            shockwave.GetComponent<Shockwave>().SetMagnitude(magnitude);
             return;
         }
         if (collision.gameObject.tag == "Player")
         {
             Vector3 contactPoint = new Vector3(collision.GetContact(0).point.x, collision.GetContact(0).point.y, 0);
-            Instantiate(PlayerShockwavePrefab, contactPoint, Quaternion.identity);
+            GameObject shockwave = Instantiate(PlayerShockwavePrefab, contactPoint, Quaternion.identity);
+            float magnitude = 1 + 0.5f * Mathf.Pow((collision.relativeVelocity.magnitude - MIN_SPEED) / (MAX_SPEED - MIN_SPEED), 2);
+            shockwave.GetComponent<Shockwave>().SetMagnitude(magnitude);
             playerState.TetherDisabledDuration = TETHER_DISABLED_DURATION;
+            return;
         }
         if (collision.gameObject.tag == "Wall" || collision.gameObject.tag == "Goal")
         {

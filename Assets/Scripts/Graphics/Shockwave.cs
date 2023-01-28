@@ -5,28 +5,39 @@ using UnityEngine;
 [RequireComponent(typeof(SpriteRenderer))]
 public class Shockwave : MonoBehaviour
 {
-    public float EXPANSION_SPEED = 30.0f;
-    public float MAX_RADIUS = 40.0f;
-    public float OPACITY = 0.9f;
+
+    public float RADIUS = 4.0f;
+    public float DURATION = 0.3f;
+    public float OPACITY = 0.5f;
 
     private SpriteRenderer spriteRenderer;
+    private float usedRadius;
+    private float usedDuration;
 
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         transform.localScale = Vector3.zero;
+        usedRadius = RADIUS;
+        usedDuration = DURATION;
+    }
+
+    public void SetMagnitude(float magnitude)
+    {
+        usedRadius = RADIUS * magnitude;
+        usedDuration = DURATION * magnitude;
     }
 
     void Update()
     {
-        Vector3 expansion = Vector3.one * EXPANSION_SPEED * Time.deltaTime;
+        Vector3 expansion = usedRadius / usedDuration * Vector3.one * Time.deltaTime;
         transform.localScale += expansion;
-        if (transform.localScale.magnitude > MAX_RADIUS)
+        if (transform.localScale.magnitude > usedRadius)
         {
             Destroy(gameObject);
         }
         Color curColor = spriteRenderer.color;
-        curColor.a = OPACITY * (1.0f - Mathf.Sqrt(transform.localScale.magnitude / MAX_RADIUS));
+        curColor.a = OPACITY * (1.0f - Mathf.Sqrt(transform.localScale.magnitude / usedRadius));
         spriteRenderer.color = curColor;
     }
 }

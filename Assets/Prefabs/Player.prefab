@@ -582,7 +582,7 @@ MonoBehaviour:
   GAS_DRAIN_TIME: 3
   BOOST_SPEED_MINIMUM: 20
   SPEED_MASS_MULTIPLIER: 0.5
-  TETHER_DISABLED_DURATION: 1
+  TETHER_DISABLED_DURATION: 0.7
 --- !u!114 &1017064400787661185
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -606,7 +606,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5594583912674202078}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7349305b4a1c91d4a8bd5d05e4e2bec0, type: 3}
+  m_Script: {fileID: 11500000, guid: af1a8994cf3542c41b217e66bb66a7c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   syncMode: 0

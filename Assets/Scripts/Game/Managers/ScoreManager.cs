@@ -94,7 +94,7 @@ public class ScoreManager : NetworkBehaviour
         }
         else
         {
-            NetworkedManager.instance.ResetState(ScoreFreezeTime);
+            NetcodeManager.instance.ResetState(ScoreFreezeTime);
             RpcTeamScored(teamName, teamColor);
         }
     }

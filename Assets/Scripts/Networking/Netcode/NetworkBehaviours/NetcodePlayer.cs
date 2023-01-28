@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 
 
 [RequireComponent(typeof(PlayerPlanetController))]
-public class NetworkedPlayer : NetworkedObject, IInputful
+public class NetcodePlayer : NetcodeObject, IInputful
 {
     private PlayerPlanetController playerController;
 
@@ -49,14 +49,14 @@ public class NetworkedPlayer : NetworkedObject, IInputful
     {
         playerController = GetComponent<PlayerPlanetController>();
         base.Start();
-        NetworkedManager.instance?.client.AddInputful(this, netId, isLocalPlayer);
-        NetworkedManager.instance?.server.AddInputful(this, netId);
+        NetcodeManager.instance?.client.AddInputful(this, netId, isLocalPlayer);
+        NetcodeManager.instance?.server.AddInputful(this, netId);
     }
 
     protected override void OnDestroy()
     {
         base.OnDestroy();
-        NetworkedManager.instance?.client.DeleteInputful(netId);
-        NetworkedManager.instance?.server.DeleteInputful(netId);
+        NetcodeManager.instance?.client.DeleteInputful(netId);
+        NetcodeManager.instance?.server.DeleteInputful(netId);
     }
 }

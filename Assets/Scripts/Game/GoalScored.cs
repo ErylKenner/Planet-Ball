@@ -18,7 +18,7 @@ public class GoalScored : NetworkBehaviour
         Ball ball = other.GetComponent<Ball>();
         if (ball != null)
         {
-            ScoreManager scoreManager = NetworkedManager.instance.GetComponent<ScoreManager>();
+            ScoreManager scoreManager = NetcodeManager.instance.GetComponent<ScoreManager>();
             scoreManager.TeamScored(TeamNumber, TeamColor, TeamName);
         }
     }
