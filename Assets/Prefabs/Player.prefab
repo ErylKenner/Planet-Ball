@@ -425,6 +425,7 @@ GameObject:
   - component: {fileID: 2735319212385618027}
   - component: {fileID: 8275665455161718903}
   - component: {fileID: 8462119869747602090}
+  - component: {fileID: 191716921385795966}
   m_Layer: 7
   m_Name: Player
   m_TagString: Player
@@ -547,8 +548,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  PlayerShockwavePrefab: {fileID: 4546592889820166119, guid: 086e210ef2233ac459dad667469dacb1, type: 3}
-  BallShockwavePrefab: {fileID: 4546592889820166119, guid: baece32decf48884dbbf366b0fbff04d, type: 3}
   playerState:
     InputIsTethered: 0
     InputIsWindTether: 0
@@ -582,7 +581,7 @@ MonoBehaviour:
   GAS_DRAIN_TIME: 3
   BOOST_SPEED_MINIMUM: 20
   SPEED_MASS_MULTIPLIER: 0.5
-  TETHER_DISABLED_DURATION: 1
+  TETHER_DISABLED_DURATION: 0.7
 --- !u!114 &1017064400787661185
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -606,7 +605,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5594583912674202078}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7349305b4a1c91d4a8bd5d05e4e2bec0, type: 3}
+  m_Script: {fileID: 11500000, guid: af1a8994cf3542c41b217e66bb66a7c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   syncMode: 0
@@ -652,6 +651,21 @@ MonoBehaviour:
   syncInterval: 0.1
   playerMesh: {fileID: 6237741050395970700}
   TeamNumber: -1
+--- !u!114 &191716921385795966
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5594583912674202078}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ecb0902e271e8f54faccb7074e2ec62d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PlayerShockwavePrefab: {fileID: 4546592889820166119, guid: 086e210ef2233ac459dad667469dacb1, type: 3}
+  BallShockwavePrefab: {fileID: 4546592889820166119, guid: baece32decf48884dbbf366b0fbff04d, type: 3}
+  SPEED_RADIUS_RATIO: 0.9
 --- !u!1 &5594583912770767460
 GameObject:
   m_ObjectHideFlags: 0

@@ -6,7 +6,7 @@ using ClientServerPrediction;
 
 [RequireComponent(typeof(Rigidbody2D))]
 
-public class NetworkedObject : NetworkBehaviour, IStateful
+public class NetcodeObject : NetworkBehaviour, IStateful
 {
     protected Rigidbody2D body;
     public GameObject model;
@@ -58,15 +58,15 @@ public class NetworkedObject : NetworkBehaviour, IStateful
     protected virtual void Start()
     {
         body = GetComponent<Rigidbody2D>();
-        NetworkedManager.instance?.client.AddStateful(this, netId);
-        NetworkedManager.instance?.server.AddStateful(this, netId);
+        NetcodeManager.instance?.client.AddStateful(this, netId);
+        NetcodeManager.instance?.server.AddStateful(this, netId);
     }
 
 
     protected virtual void OnDestroy()
     {
-        NetworkedManager.instance?.client.DeleteStateful(netId);
-        NetworkedManager.instance?.server.DeleteStateful(netId);
+        NetcodeManager.instance?.client.DeleteStateful(netId);
+        NetcodeManager.instance?.server.DeleteStateful(netId);
     }
 
 }

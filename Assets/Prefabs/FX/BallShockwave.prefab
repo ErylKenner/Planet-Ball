@@ -97,6 +97,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e6e29405eaf3e54bb309c41d55706e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  EXPANSION_SPEED: 5
-  MAX_RADIUS: 1.25
+  RADIUS: 1.25
+  DURATION: 0.3
   OPACITY: 0.9

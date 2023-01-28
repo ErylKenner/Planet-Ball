@@ -16,7 +16,7 @@ public class DisplayScore : MonoBehaviour
 
     void Update()
     {
-        ScoreManager scoreManager = NetworkedManager.instance?.GetComponent<ScoreManager>();
+        ScoreManager scoreManager = NetcodeManager.instance?.GetComponent<ScoreManager>();
         text.text = scoreManager?.GetTeamScore(TeamNumber).ToString();
     }
 }

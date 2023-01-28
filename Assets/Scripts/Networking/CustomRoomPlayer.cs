@@ -65,6 +65,9 @@ public class CustomRoomPlayer : NetworkRoomPlayer
         {
             CmdSetName(SteamFriends.GetPersonaName().ToString());
         }
+        GetComponent<PlayerInput>().enabled = true;
+        gameObject.AddComponent<FindUIInputModule>();
+
     }
 
     /// <summary>
@@ -88,18 +91,7 @@ public class CustomRoomPlayer : NetworkRoomPlayer
     /// This is a hook that is invoked on all player objects when entering the room.
     /// <para>Note: isLocalPlayer is not guaranteed to be set until OnStartLocalPlayer is called.</para>
     /// </summary>
-    public override void OnClientEnterRoom() {
-        if(isLocalPlayer)
-        {
-            GetComponent<PlayerInput>().enabled = true;
-            gameObject.AddComponent<FindUIInputModule>();
-            
-        } else
-        {
-            GetComponent<PlayerInput>().enabled = false;
-        }
-       
-    }
+    public override void OnClientEnterRoom() { }
 
     /// <summary>
     /// This is a hook that is invoked on all player objects when exiting the room.

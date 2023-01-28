@@ -4,17 +4,17 @@ using UnityEngine;
 using Mirror;
 using ClientServerPrediction;
 
-public class NetworkedManager : NetworkBehaviour
+public class NetcodeManager : NetworkBehaviour
 {
     public ClientState client = new ClientState();
     public ServerState server = new ServerState();
-    private NetworkedPhysics runner = new NetworkedPhysics();
+    private NetcodePhysics runner = new NetcodePhysics();
 
     public GameObject playerTrail;
     public GameObject playerServerTrail;
     public TMPro.TextMeshProUGUI text;
 
-    public static NetworkedManager instance = null;
+    public static NetcodeManager instance = null;
 
     public Ball ball;
 
@@ -36,7 +36,7 @@ public class NetworkedManager : NetworkBehaviour
         }
         else
         {
-            Debug.LogWarning("There can only be one NetworkedManager");
+            Debug.LogWarning("There can only be one NetcodeManager");
             Destroy(this.gameObject);
             return;
         }
@@ -89,7 +89,7 @@ public class NetworkedManager : NetworkBehaviour
                     serverTrail.AddComponent<Die>().ExpirationDate = TrailExpirationLength;
                 }
 
-                GameObject clientTrail = Instantiate(playerTrail, ((NetworkedPlayer)client.stateMap[(uint)client.localNetId]).transform.position, Quaternion.identity);
+                GameObject clientTrail = Instantiate(playerTrail, ((NetcodePlayer)client.stateMap[(uint)client.localNetId]).transform.position, Quaternion.identity);
                 clientTrail.name = $"Client {client.tick}";
                 clientTrail.transform.parent = TrailParent ? TrailParent : gameObject.transform;
                 clientTrail.AddComponent<Die>().ExpirationDate = TrailExpirationLength;
