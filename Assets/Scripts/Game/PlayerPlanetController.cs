@@ -9,8 +9,6 @@ using ClientServerPrediction;
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerPlanetController : NetworkBehaviour
 {
-    public GameObject PlayerShockwavePrefab;
-    public GameObject BallShockwavePrefab;
     public PlayerState playerState = new PlayerState();
 
     // Const attributes - not state
@@ -260,21 +258,13 @@ public class PlayerPlanetController : NetworkBehaviour
         if (collision.gameObject.tag == "Ball")
         {
             body.velocity = collision.relativeVelocity;
-            Vector3 contactPoint = new Vector3(collision.GetContact(0).point.x, collision.GetContact(0).point.y, 0);
-            GameObject shockwave = Instantiate(BallShockwavePrefab, contactPoint, Quaternion.identity);
-            float magnitude = 1 + 0.5f * Mathf.Pow((collision.relativeVelocity.magnitude - MIN_SPEED) / (MAX_SPEED - MIN_SPEED), 2);
-            shockwave.GetComponent<Shockwave>().SetMagnitude(magnitude);
-            return;
         }
+        else
         if (collision.gameObject.tag == "Player")
         {
-            Vector3 contactPoint = new Vector3(collision.GetContact(0).point.x, collision.GetContact(0).point.y, 0);
-            GameObject shockwave = Instantiate(PlayerShockwavePrefab, contactPoint, Quaternion.identity);
-            float magnitude = 1 + 0.5f * Mathf.Pow((collision.relativeVelocity.magnitude - MIN_SPEED) / (MAX_SPEED - MIN_SPEED), 2);
-            shockwave.GetComponent<Shockwave>().SetMagnitude(magnitude);
             playerState.TetherDisabledDuration = TETHER_DISABLED_DURATION;
-            return;
         }
+        else
         if (collision.gameObject.tag == "Wall" || collision.gameObject.tag == "Goal")
         {
             playerState.WallCollisionCount += 1;
@@ -296,7 +286,6 @@ public class PlayerPlanetController : NetworkBehaviour
                     playerState.OrbitRadius = 0.2f + Vector2.Distance(body.position, playerState.CenterPoint);
                 }
             }
-            return;
         }
     }
 
