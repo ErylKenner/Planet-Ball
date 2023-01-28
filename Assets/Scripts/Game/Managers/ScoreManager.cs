@@ -47,12 +47,15 @@ public class ScoreManager : NetworkBehaviour
         {
             float t = Mathf.Clamp(1f - (victoryTimer / WinFreezeTime), 0, 1);
             Time.timeScale = Mathf.Lerp(0.5f, 0.15f, t);
+
+            // TOOD: Decresing FDT significantly increases the number of server ticks per frame which can cause lag
             Time.fixedDeltaTime = originalFixedDeltaTime * Time.timeScale;
             victoryTimer -= Time.unscaledDeltaTime;
             if (victoryTimer <= 0)
             {
                 // Go back to main menu
                 Time.timeScale = 1;
+                Time.fixedDeltaTime = originalFixedDeltaTime;
                 CustomRoomManager customRoomManager = FindObjectOfType<CustomRoomManager>();
                 customRoomManager.ServerChangeScene(customRoomManager.RoomScene);
 

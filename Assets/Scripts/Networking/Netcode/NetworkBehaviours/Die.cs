@@ -5,6 +5,8 @@ using UnityEngine;
 public class Die : MonoBehaviour
 {
     float timer = 0;
+
+    public float ExpirationDate = 0.2f;
     // Start is called before the first frame update
     void Start()
     {
@@ -15,7 +17,7 @@ public class Die : MonoBehaviour
     void Update()
     {
         timer += Time.deltaTime;
-        if(timer > 0.2f)
+        if(timer > ExpirationDate)
         {
             Destroy(gameObject);
         }

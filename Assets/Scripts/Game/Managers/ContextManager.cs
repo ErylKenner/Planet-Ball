@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(TeamManager))]
+[RequireComponent(typeof(AdminManager))]
 public class ContextManager : MonoBehaviour
 {
     public static ContextManager instance = null;
     public TeamManager TeamManager;
+    public AdminManager AdminManager;
 
     void Start()
     {
@@ -17,6 +19,7 @@ public class ContextManager : MonoBehaviour
 
             // Add each manager here
             TeamManager = GetComponent<TeamManager>();
+            AdminManager = GetComponent<AdminManager>();
         }
         else
         {
