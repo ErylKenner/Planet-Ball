@@ -7,8 +7,7 @@ namespace ClientServerPrediction
     {
         public Vector2 movement = Vector2.zero;
         public bool AttachTether = false;
-        public bool WindTether = false;
-        public bool UnwindTether = false;
+        public float WindTether = 0f;
         public bool SpeedBoost = false;
         public bool Kick = false;
 
@@ -22,8 +21,7 @@ namespace ClientServerPrediction
             return new Inputs
             {
                 AttachTether = state.playerState.InputIsTethered,
-                WindTether = state.playerState.InputIsWindTether,
-                UnwindTether = state.playerState.InputIsUnwindTether,
+                WindTether = state.playerState.InputWindTether,
                 SpeedBoost = state.playerState.InputIsSpeedBoost,
                 Kick = state.playerState.InputIsKick,
             };
@@ -34,8 +32,7 @@ namespace ClientServerPrediction
     public class PlayerState
     {
         public bool InputIsTethered = false;
-        public bool InputIsWindTether = false;
-        public bool InputIsUnwindTether = false;
+        public float InputWindTether = 0f;
         public bool InputIsSpeedBoost = false;
         public bool InputIsKick = false;
         public float OrbitRadius = 0;
@@ -54,8 +51,7 @@ namespace ClientServerPrediction
         public PlayerState(PlayerState other)
         {
             InputIsTethered = other.InputIsTethered;
-            InputIsWindTether = other.InputIsWindTether;
-            InputIsUnwindTether = other.InputIsUnwindTether;
+            InputWindTether = other.InputWindTether;
             InputIsSpeedBoost = other.InputIsSpeedBoost;
             InputIsKick = other.InputIsKick;
             OrbitRadius = other.OrbitRadius;
@@ -90,8 +86,7 @@ namespace ClientServerPrediction
 
             return (
                 InputIsTethered == playerState.InputIsTethered &&
-                InputIsWindTether == playerState.InputIsWindTether &&
-                InputIsUnwindTether == playerState.InputIsUnwindTether &&
+                InputWindTether == playerState.InputWindTether &&
                 InputIsSpeedBoost == playerState.InputIsSpeedBoost &&
                 InputIsKick == playerState.InputIsKick &&
                 CenterPoint == playerState.CenterPoint &&
