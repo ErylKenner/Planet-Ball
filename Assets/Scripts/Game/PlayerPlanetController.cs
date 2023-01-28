@@ -32,8 +32,7 @@ public class PlayerPlanetController : NetworkBehaviour
 
     // For testing. Input system callbacks set these which are then read in FixedUpdate
     private bool _attachTether = false;
-    private bool _windTether = false;
-    private bool _unwindTether = false;
+    private float _windTether = 0f;
     private bool _speedBoost = false;
     private bool _kick = false;
 
@@ -46,7 +45,6 @@ public class PlayerPlanetController : NetworkBehaviour
         {
             AttachTether = _attachTether,
             WindTether = _windTether,
-            UnwindTether = _unwindTether,
             SpeedBoost = _speedBoost,
             Kick = _kick
         };
@@ -79,11 +77,13 @@ public class PlayerPlanetController : NetworkBehaviour
 
         bool wasInputTethered = playerState.InputIsTethered;
         bool wasInputSpeedBoost = playerState.InputIsSpeedBoost;
-        playerState.InputIsTethered = ((input == null && playerState.InputIsTethered) || (input != null && input.AttachTether)) && (playerState.TetherDisabledDuration <= 0f);
-        playerState.InputIsWindTether = (input == null && playerState.InputIsWindTether) || (input != null && input.WindTether);
-        playerState.InputIsUnwindTether = (input == null && playerState.InputIsUnwindTether) || (input != null && input.UnwindTether);
-        playerState.InputIsSpeedBoost = (input == null && playerState.InputIsSpeedBoost) || (input != null && input.SpeedBoost);
-        playerState.InputIsKick = (input == null && playerState.InputIsKick) || (input != null && input.Kick);
+        if (input != null)
+        {
+            playerState.InputIsTethered = input.AttachTether && (playerState.TetherDisabledDuration <= 0f);
+            playerState.InputWindTether = input.WindTether;
+            playerState.InputIsSpeedBoost = input.SpeedBoost;
+            playerState.InputIsKick = input.Kick;
+        }
 
 
         SetSpeedAndMass();
@@ -129,18 +129,21 @@ public class PlayerPlanetController : NetworkBehaviour
                     SetBounciness(0f);
                 }
             }
-            if (playerState.InputIsWindTether)
+
+            // Wind in the same orbit shape regardless of speed via exponential falloff of the radius
+            float windRatio = 0f;
+            if (playerState.InputWindTether < 0f)
             {
-                // Wind in the same orbit shape regardless of speed via exponential falloff of the radius
-                float windRate = WIND_TETHER_RATIO * playerState.OrbitRadius * playerState.Speed;
-                playerState.OrbitRadius -= windRate * dt;
+                windRatio = WIND_TETHER_RATIO;
             }
-            if (playerState.InputIsUnwindTether && playerState.WallCollisionCount == 0)
+            else
+            if (playerState.InputWindTether > 0f && playerState.WallCollisionCount == 0)
             {
-                // Unwind in the same orbit shape regardless of speed via exponential falloff of the radius
-                float windRate = UNWIND_TETHER_RATIO * playerState.OrbitRadius * playerState.Speed;
-                playerState.OrbitRadius += windRate * dt;
+                windRatio = UNWIND_TETHER_RATIO;
             }
+            float signedWindSpeed = Mathf.Sign(playerState.InputWindTether) * Mathf.Pow(Mathf.Abs(playerState.InputWindTether), 2);
+            float baseWindRate = windRatio * playerState.OrbitRadius * playerState.Speed;
+            playerState.OrbitRadius += signedWindSpeed * baseWindRate * dt;
         }
         else
         {
@@ -278,7 +281,7 @@ public class PlayerPlanetController : NetworkBehaviour
                 {
                     body.velocity = collision.relativeVelocity;
                 }
-                else if (playerState.InputIsUnwindTether)
+                else if (playerState.InputWindTether > 0f)
                 {
                     // Hard set radius to prevent the target radius differing too much from the rendered radius.
                     // Also add a small offset to the radius so that the collision exit trigger only happens once the player
@@ -307,11 +310,7 @@ public class PlayerPlanetController : NetworkBehaviour
 
     public void OnWindTether(InputValue input)
     {
-        _windTether = input.isPressed;
-    }
-    public void OnUnwindTether(InputValue input)
-    {
-        _unwindTether = input.isPressed;
+        _windTether = input.Get<float>();
     }
 
     public void OnSpeedBoost(InputValue input)
