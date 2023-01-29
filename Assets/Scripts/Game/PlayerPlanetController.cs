@@ -77,6 +77,7 @@ public class PlayerPlanetController : NetworkBehaviour
 
         bool wasInputTethered = playerState.InputIsTethered;
         bool wasInputSpeedBoost = playerState.InputIsSpeedBoost;
+        float previousWind = playerState.InputWindTether;
         if (input != null)
         {
             playerState.InputIsTethered = input.AttachTether && (playerState.TetherDisabledDuration <= 0f);
@@ -87,7 +88,7 @@ public class PlayerPlanetController : NetworkBehaviour
 
 
         SetSpeedAndMass();
-        HandleTether(wasInputTethered, dt);
+        HandleTether(wasInputTethered, previousWind, dt);
         HandleSpeedBoost(wasInputSpeedBoost, dt);
         //HandleKick(dt);
         playerState.CurPosition = body.position;
@@ -108,7 +109,7 @@ public class PlayerPlanetController : NetworkBehaviour
         coll.sharedMaterial = material;
     }
 
-    private void HandleTether(bool wasInputTethered, float dt)
+    private void HandleTether(bool wasInputTethered, float previousWind, float dt)
     {
         if (playerState.InputIsTethered)
         {
@@ -124,6 +125,19 @@ public class PlayerPlanetController : NetworkBehaviour
                 }
                 else
                 {
+                    ContextManager.instance.SoundManager.Play("Attach", 0.05f);
+
+                    // TODO: Clean up
+                    if(playerState.InputWindTether < 0f)
+                    {
+                        ContextManager.instance.SoundManager.Play("Wind", 0.03f);
+                    }
+
+                    if (playerState.InputWindTether > 0f && playerState.WallCollisionCount == 0)
+                    {
+                        ContextManager.instance.SoundManager.Play("Unwind", 0.03f);
+                    }
+
                     playerState.CenterPoint = nearestPlanet.transform.position;
                     playerState.OrbitRadius = Vector2.Distance(body.position, playerState.CenterPoint);
                     SetBounciness(0f);
@@ -134,19 +148,41 @@ public class PlayerPlanetController : NetworkBehaviour
             float windRatio = 0f;
             if (playerState.InputWindTether < 0f)
             {
+                if(previousWind >= 0)
+                {
+                    ContextManager.instance.SoundManager.Play("Wind", 0.03f);
+                }
                 windRatio = WIND_TETHER_RATIO;
             }
             else
             if (playerState.InputWindTether > 0f && playerState.WallCollisionCount == 0)
             {
+                if (previousWind <= 0)
+                {
+                    ContextManager.instance.SoundManager.Play("Unwind", 0.03f);
+                }
                 windRatio = UNWIND_TETHER_RATIO;
             }
+            
             float signedWindSpeed = Mathf.Sign(playerState.InputWindTether) * Mathf.Pow(Mathf.Abs(playerState.InputWindTether), 2);
             float baseWindRate = windRatio * playerState.OrbitRadius * playerState.Speed;
             playerState.OrbitRadius += signedWindSpeed * baseWindRate * dt;
+
+            if ((previousWind != 0 && playerState.InputWindTether == 0) || playerState.OrbitRadius <= MIN_RADIUS || playerState.OrbitRadius >= MAX_RADIUS)
+            {
+                ContextManager.instance.SoundManager.Stop("Wind", 0.1f);
+                ContextManager.instance.SoundManager.Stop("Unwind", 0.5f);
+            }
         }
         else
         {
+            if(wasInputTethered)
+            {
+                ContextManager.instance.SoundManager.Play("Detach", 0.05f);
+                // TODO: Figure out Wind and Unwind fade outs
+                ContextManager.instance.SoundManager.Stop("Wind", 0.1f);
+                ContextManager.instance.SoundManager.Stop("Unwind", 0.5f);
+            }
             playerState.CenterPoint = Vector2.zero;
             playerState.OrbitRadius = 0;
             SetBounciness(1f);
@@ -163,6 +199,7 @@ public class PlayerPlanetController : NetworkBehaviour
             if (playerState.Speed < BOOST_SPEED_MINIMUM)
             {
                 // This is the first frame of speed boost
+                ContextManager.instance.SoundManager.Play("Boost", 0.065f);
                 playerState.Speed = BOOST_SPEED_MINIMUM;
             }
 
@@ -176,6 +213,7 @@ public class PlayerPlanetController : NetworkBehaviour
             // Speed exponential falloff
             playerState.Speed -= SPEED_FALLOFF * (playerState.Speed - MIN_SPEED + 1) * dt;
             playerState.IsSpeedBoost = false;
+            ContextManager.instance.SoundManager.Stop("Boost", 0.5f);
             if (playerState.CurSpeedBoostCooldown <= 0)
             {
                 //Increase gas
@@ -256,20 +294,27 @@ public class PlayerPlanetController : NetworkBehaviour
         return closest;
     }
 
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.tag == "Ball")
         {
+            PlaySound(collision);
             body.velocity = collision.relativeVelocity;
         }
         else
         if (collision.gameObject.tag == "Player")
         {
+            if(isLocalPlayer)
+            {
+                PlaySound(collision);
+            }
             playerState.TetherDisabledDuration = TETHER_DISABLED_DURATION;
         }
         else
         if (collision.gameObject.tag == "Wall" || collision.gameObject.tag == "Goal")
         {
+            PlaySound(collision, "WallHit", 0.1f);
             playerState.WallCollisionCount += 1;
             if (playerState.InputIsTethered)
             {
@@ -290,6 +335,12 @@ public class PlayerPlanetController : NetworkBehaviour
                 }
             }
         }
+    }
+
+    private void PlaySound(Collision2D collision, string name="Kick", float gainQualifier=1.0f)
+    {
+        float volume = Mathf.Clamp01((collision.relativeVelocity.magnitude - MIN_SPEED) / (MAX_SPEED - MIN_SPEED) * gainQualifier);
+        ContextManager.instance.SoundManager.Play(name, 0.1f, volume);
     }
 
     private void OnCollisionExit2D(Collision2D collision)

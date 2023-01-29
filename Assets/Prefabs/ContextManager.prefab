@@ -1,5 +1,101 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &684142950
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 684142951}
+  - component: {fileID: 684142952}
+  m_Layer: 0
+  m_Name: SoundManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &684142951
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 684142950}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6065759129471074328}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &684142952
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 684142950}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acd6b32f51a46dd4c848f0573a999552, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Sounds:
+  - Name: Kick
+    Clip: {fileID: 8300000, guid: 56fd162a95e70734b92a43f09dbfa795, type: 3}
+    Volume: 0.2
+    Pitch: 1
+    source: {fileID: 0}
+  - Name: WallHit
+    Clip: {fileID: 8300000, guid: 56fd162a95e70734b92a43f09dbfa795, type: 3}
+    Volume: 0.07
+    Pitch: 1
+    source: {fileID: 0}
+  - Name: Attach
+    Clip: {fileID: 8300000, guid: 588ab7473917cae45becfcad325507c0, type: 3}
+    Volume: 0.05
+    Pitch: 1.1
+    source: {fileID: 0}
+  - Name: Detach
+    Clip: {fileID: 8300000, guid: 588ab7473917cae45becfcad325507c0, type: 3}
+    Volume: 0.05
+    Pitch: 1
+    source: {fileID: 0}
+  - Name: Wind
+    Clip: {fileID: 8300000, guid: c536eb6420be17a4cb9e9c69d2c58264, type: 3}
+    Volume: 0.2
+    Pitch: 1.1
+    source: {fileID: 0}
+  - Name: Unwind
+    Clip: {fileID: 8300000, guid: c536eb6420be17a4cb9e9c69d2c58264, type: 3}
+    Volume: 0.2
+    Pitch: 1
+    source: {fileID: 0}
+  - Name: Goal
+    Clip: {fileID: 8300000, guid: 49f63d1c1b7a89a46877f2f70e01fc0a, type: 3}
+    Volume: 0.8
+    Pitch: 1
+    source: {fileID: 0}
+  - Name: Fireworks
+    Clip: {fileID: 8300000, guid: e3f3c75b0af51714ba624404fb887d83, type: 3}
+    Volume: 0.8
+    Pitch: 1
+    source: {fileID: 0}
+  - Name: Victory
+    Clip: {fileID: 8300000, guid: f25ba39fd26029a4fbb6c6b66b437add, type: 3}
+    Volume: 0.8
+    Pitch: 1
+    source: {fileID: 0}
+  - Name: Boost
+    Clip: {fileID: 8300000, guid: 3249940386f870d4f9e52c57b8656814, type: 3}
+    Volume: 0.065
+    Pitch: 1.1
+    source: {fileID: 0}
+  AllowRepeatPlay: 0
 --- !u!1 &6065759129471074329
 GameObject:
   m_ObjectHideFlags: 0
@@ -30,7 +126,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 684142951}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -65,6 +162,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TeamManager: {fileID: 0}
   AdminManager: {fileID: 0}
+  SoundManager: {fileID: 0}
 --- !u!114 &988256559679732594
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -78,3 +176,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AutoWin: 0
+  AutoWinSpeed: 10

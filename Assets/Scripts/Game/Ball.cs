@@ -23,7 +23,7 @@ public class Ball : NetworkBehaviour
         bool serverFrozen = NetcodeManager.instance.server.frozen;
         if(isServer && autoWin && !serverFrozen)
         {
-            GetComponent<Rigidbody2D>().velocity = new Vector2(20, 0);
+            GetComponent<Rigidbody2D>().velocity = new Vector2(ContextManager.instance.AdminManager.AutoWinSpeed, 0);
         }
     }
 
