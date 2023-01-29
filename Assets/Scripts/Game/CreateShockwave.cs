@@ -21,8 +21,13 @@ public class CreateShockwave : MonoBehaviour
         float magnitude = 1 + SPEED_RADIUS_RATIO * Mathf.Pow(collisionSpeedRatio, 3);
 
         Vector3 contactPoint = new Vector3(collision.GetContact(0).point.x, collision.GetContact(0).point.y, 0);
-        GameObject shockwave = Instantiate(shockwavePrefab, contactPoint, Quaternion.identity);
-        shockwave.GetComponent<Shockwave>().SetMagnitude(magnitude);
+        GameObject shockwaveObject = Instantiate(shockwavePrefab, contactPoint, Quaternion.identity);
+        int teamNumber = GetComponent<PlayerTeam>().TeamNumber;
+        Color teamColor = ContextManager.instance.TeamManager.GetTeam(teamNumber).TeamColor;
+        
+        var shockwave = shockwaveObject.GetComponent<Shockwave>();
+        shockwave.SetMagnitude(magnitude);
+        shockwave.SetColor(teamColor);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

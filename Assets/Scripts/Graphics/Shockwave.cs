@@ -28,6 +28,11 @@ public class Shockwave : MonoBehaviour
         usedDuration = DURATION * magnitude;
     }
 
+    public void SetColor(Color color)
+    {
+        spriteRenderer.color = color;
+    }
+
     void Update()
     {
         Vector3 expansion = usedRadius / usedDuration * Vector3.one * Time.deltaTime;
