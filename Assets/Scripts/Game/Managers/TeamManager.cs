@@ -23,4 +23,9 @@ public class TeamManager : MonoBehaviour
             throw;
         }
     }
+
+    public int NumberOfTeams()
+    {
+        return teams.Length;
+    }
 }
