@@ -1500,6 +1500,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -75
       objectReference: {fileID: 0}
+    - target: {fileID: 3074756360497950031, guid: c8441de286e76434e9616c01ec7ea2a0, type: 3}
+      propertyPath: SteamAppID
+      value: 1456390
+      objectReference: {fileID: 0}
     - target: {fileID: 4363891016420618898, guid: c8441de286e76434e9616c01ec7ea2a0, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
