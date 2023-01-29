@@ -7,8 +7,12 @@ using UnityEngine;
 public class ContextManager : MonoBehaviour
 {
     public static ContextManager instance = null;
+    [HideInInspector]
     public TeamManager TeamManager;
+    [HideInInspector]
     public AdminManager AdminManager;
+    [HideInInspector]
+    public SoundManager SoundManager;
 
     void Start()
     {
@@ -20,6 +24,7 @@ public class ContextManager : MonoBehaviour
             // Add each manager here
             TeamManager = GetComponent<TeamManager>();
             AdminManager = GetComponent<AdminManager>();
+            SoundManager = transform.GetComponentInChildren<SoundManager>();
         }
         else
         {

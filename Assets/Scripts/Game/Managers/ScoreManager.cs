@@ -100,6 +100,9 @@ public class ScoreManager : NetworkBehaviour
     [ClientRpc]
     public void RpcTeamWon(string teamName, Color teamColor)
     {
+        ContextManager.instance.SoundManager.Play("Victory", 0.05f);
+        ContextManager.instance.SoundManager.Play("Goal");
+        ContextManager.instance.SoundManager.Play("Fireworks", 0.05f);
         string scoreText = teamName + " Team Victory!";
         Debug.Log(scoreText);
         scoredText.text = scoreText;
@@ -111,6 +114,8 @@ public class ScoreManager : NetworkBehaviour
     [ClientRpc]
     public void RpcTeamScored(string teamName, Color teamColor)
     {
+        ContextManager.instance.SoundManager.Play("Goal");
+        ContextManager.instance.SoundManager.Play("Fireworks", 0.05f);
         string scoreText = teamName + " Team Goal!";
         Debug.Log(scoreText);
         scoredText.text = scoreText;

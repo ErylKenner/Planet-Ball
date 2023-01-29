@@ -5,4 +5,5 @@ using UnityEngine;
 public class AdminManager : MonoBehaviour
 {
     public bool AutoWin = false;
+    public float AutoWinSpeed = 10f;
 }
