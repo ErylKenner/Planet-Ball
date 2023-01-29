@@ -10,11 +10,7 @@ public class ScoreManager : NetworkBehaviour
     public float ScoreFreezeTime = 3;
     public float WinFreezeTime = 3;
 
-    [SyncVar]
-    public int Team1Score = 0;
-
-    [SyncVar]
-    public int Team2Score = 0;
+    public readonly SyncList<int> TeamScores = new SyncList<int>();
 
     [SyncVar]
     public bool GameOver = false;
@@ -30,6 +26,14 @@ public class ScoreManager : NetworkBehaviour
         scoredText = accessor.ScoredText;
         scoredText.gameObject.SetActive(false);
         originalFixedDeltaTime = Time.fixedDeltaTime;
+
+        if (isServer)
+        {
+            for (int i = 0; i < ContextManager.instance.TeamManager.NumberOfTeams(); ++i)
+            {
+                TeamScores.Add(0);
+            }
+        }
     }
 
     void FixedUpdate()
@@ -65,55 +69,31 @@ public class ScoreManager : NetworkBehaviour
     }
 
     [Server]
-    public void TeamScored(int teamNumber, Color teamColor, string teamName)
+    public void TeamScored(int teamNumber)
     {
         if (GameOver)
         {
             return;
         }
 
-        // TODO: Lookup team info from TeamManager
+        Team team = ContextManager.instance.TeamManager.GetTeam(teamNumber);
+        TeamScores[teamNumber] += 1;
 
-        if (teamNumber == 0)
-        {
-            Team1Score += 1;
-        } else if(teamNumber == 1)
-        {
-            Team2Score += 1;
-        }
-        else
-        {
-            Debug.LogError("Invalid team number given: " + teamNumber);
-            return;
-        }
-
-        if (Team1Score >= WinningScore || Team2Score >= WinningScore)
+        if (TeamScores[teamNumber] >= WinningScore)
         {
             GameOver = true;
-            RpcTeamWon(teamName, teamColor);
+            RpcTeamWon(team.TeamName, team.TeamColor);
         }
         else
         {
             NetcodeManager.instance.ResetState(ScoreFreezeTime);
-            RpcTeamScored(teamName, teamColor);
+            RpcTeamScored(team.TeamName, team.TeamColor);
         }
     }
 
     public int GetTeamScore(int teamNumber)
     {
-        if (teamNumber == 0)
-        {
-            return Team1Score;
-        }
-        else if (teamNumber == 1)
-        {
-            return Team2Score;
-        }
-        else
-        {
-            Debug.Log("Invalid team number given: " + teamNumber);
-            return 0;
-        }
+        return TeamScores[teamNumber];
     }
 
 
