@@ -1786,6 +1786,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 684142952, guid: e1339084668b95b429a8fbd964309362, type: 3}
+      propertyPath: Sounds.Array.data[7].Clip
+      value: 
+      objectReference: {fileID: 8300000, guid: 3b020bf3a1fca0e4c800823b7ffcc39f, type: 3}
+    - target: {fileID: 988256559679732594, guid: e1339084668b95b429a8fbd964309362, type: 3}
+      propertyPath: AutoWin
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6065759129471074328, guid: e1339084668b95b429a8fbd964309362, type: 3}
       propertyPath: m_RootOrder
       value: 7
