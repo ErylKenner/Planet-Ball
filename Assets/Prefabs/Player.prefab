@@ -550,8 +550,7 @@ MonoBehaviour:
   syncInterval: 0.1
   playerState:
     InputIsTethered: 0
-    InputIsWindTether: 0
-    InputIsUnwindTether: 0
+    InputWindTether: 0
     InputIsSpeedBoost: 0
     InputIsKick: 0
     OrbitRadius: 0
@@ -820,7 +819,7 @@ MonoBehaviour:
   PLAYER_HANDLE_SIDEWAYS: 0
   PLANET_HANDLE_TOWARD: -0.61
   PLANET_HANDLE_SIDEWAYS: 0.01
-  LINE_Z: 1
+  LINE_Z: 0
 --- !u!1001 &7193966860788739861
 PrefabInstance:
   m_ObjectHideFlags: 0
