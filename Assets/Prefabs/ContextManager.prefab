@@ -81,7 +81,7 @@ MonoBehaviour:
     Pitch: 1
     source: {fileID: 0}
   - Name: Fireworks
-    Clip: {fileID: 8300000, guid: e3f3c75b0af51714ba624404fb887d83, type: 3}
+    Clip: {fileID: 8300000, guid: 3b020bf3a1fca0e4c800823b7ffcc39f, type: 3}
     Volume: 0.8
     Pitch: 1
     source: {fileID: 0}

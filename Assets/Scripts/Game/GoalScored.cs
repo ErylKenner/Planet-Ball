@@ -25,16 +25,22 @@ public class GoalScored : NetworkBehaviour
         if (ball != null)
         {
             // Play explosion
-            var explosion = Instantiate(GoalExplosion, ExplosionLocation.position, ExplosionLocation.rotation);
-            var particleSystem = explosion.GetComponent<ParticleSystem>();
-            var main = particleSystem.main;
-            main.startColor = team.TeamColor;
-            var trails = particleSystem.trails;
-            trails.colorOverTrail = team.TeamColor;
-            particleSystem.Play();
+            RPCCreateExplosion();
 
             ScoreManager scoreManager = NetcodeManager.instance.GetComponent<ScoreManager>();
             scoreManager.TeamScored(TeamNumber);
         }
+    }
+
+    [ClientRpc]
+    public void RPCCreateExplosion()
+    {
+        var explosion = Instantiate(GoalExplosion, ExplosionLocation.position, ExplosionLocation.rotation);
+        var particleSystem = explosion.GetComponent<ParticleSystem>();
+        var main = particleSystem.main;
+        main.startColor = team.TeamColor;
+        var trails = particleSystem.trails;
+        trails.colorOverTrail = team.TeamColor;
+        particleSystem.Play();
     }
 }
