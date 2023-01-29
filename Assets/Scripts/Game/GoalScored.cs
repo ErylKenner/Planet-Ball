@@ -5,9 +5,15 @@ using UnityEngine;
 
 public class GoalScored : NetworkBehaviour
 {
-    public string TeamName;
+    public GameObject GoalExplosion;
+    public Transform ExplosionLocation;
     public int TeamNumber;
-    public Color TeamColor;
+
+    private Team team;
+    private void Start()
+    {
+        team = ContextManager.instance.TeamManager.GetTeam(TeamNumber);
+    }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -18,8 +24,17 @@ public class GoalScored : NetworkBehaviour
         Ball ball = other.GetComponent<Ball>();
         if (ball != null)
         {
+            // Play explosion
+            var explosion = Instantiate(GoalExplosion, ExplosionLocation.position, ExplosionLocation.rotation);
+            var particleSystem = explosion.GetComponent<ParticleSystem>();
+            var main = particleSystem.main;
+            main.startColor = team.TeamColor;
+            var trails = particleSystem.trails;
+            trails.colorOverTrail = team.TeamColor;
+            particleSystem.Play();
+
             ScoreManager scoreManager = NetcodeManager.instance.GetComponent<ScoreManager>();
-            scoreManager.TeamScored(TeamNumber, TeamColor, TeamName);
+            scoreManager.TeamScored(TeamNumber);
         }
     }
 }
