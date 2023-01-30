@@ -79,11 +79,12 @@ namespace ClientServerPrediction
                         lastReceivedTick = lastestStateMessage.MessageClientTick((uint)localNetId);
 
                         frozen = lastestStateMessage.frozen;
-                    } else
+                    }
+                    else
                     {
                         lastServerMessage = lastestStateMessage.GetMap()[(uint)localNetId].state.position;
 
-                        
+
 
                         lastReceivedTick = ClientStateMachine.CorrectClient(
                             ref inputBufferMap,
@@ -101,6 +102,15 @@ namespace ClientServerPrediction
                          );
                     }
 
+                }
+            }
+            else
+            {
+                StateMessage lastestStateMessage = ClientStateMachine.GetLatestStateMessage(ref stateMessageQueue, (uint)localNetId);
+
+                if (lastestStateMessage != null)
+                {
+                    lastReceivedTick = lastestStateMessage.MessageClientTick((uint)localNetId) - 1;
                 }
             }
 
