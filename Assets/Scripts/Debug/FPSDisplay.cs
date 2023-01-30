@@ -13,9 +13,10 @@ public class FPSDisplay : MonoBehaviour {
 		accumulator += Time.unscaledDeltaTime;
 		frameCount++;
 		if (accumulator >= pollingTime) {
+			int frameRate = Mathf.RoundToInt((float)frameCount / accumulator);
 			accumulator = 0;
 			frameCount = 0;
-			int frameRate = Mathf.RoundToInt((float)frameCount / accumulator);
+
 			FpsText.text = "FPS: " + frameRate.ToString();
 		}
 	}
