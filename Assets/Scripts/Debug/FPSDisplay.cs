@@ -5,24 +5,18 @@ public class FPSDisplay : MonoBehaviour {
 	public TextMeshProUGUI FpsText;
 	
 	public float pollingTime = 0.5f;
-	private float time;
+
+	private float accumulator;
 	private int frameCount;
  
 	void Update() {
-		// Update time.
-		time += Time.deltaTime;
-
-		// Count this frame.
+		accumulator += Time.unscaledDeltaTime;
 		frameCount++;
-
-		if (time >= pollingTime) {
-			// Update frame rate.
-			int frameRate = Mathf.RoundToInt((float)frameCount / time);
-			FpsText.text = frameRate.ToString();
-
-			// Reset time and frame count.
-			time -= pollingTime;
+		if (accumulator >= pollingTime) {
+			accumulator = 0;
 			frameCount = 0;
+			int frameRate = Mathf.RoundToInt((float)frameCount / accumulator);
+			FpsText.text = "FPS: " + frameRate.ToString();
 		}
 	}
 }
