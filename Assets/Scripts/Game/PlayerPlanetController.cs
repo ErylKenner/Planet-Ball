@@ -12,10 +12,10 @@ public class PlayerPlanetController : NetworkBehaviour
     public PlayerState playerState = new PlayerState();
 
     // Const attributes - not state
-    public float WIND_TETHER_RATIO = 0.12f;
-    public float UNWIND_TETHER_RATIO = 0.29f;
-    public float MIN_RADIUS = 1f;
-    public float MAX_RADIUS = 9f;
+    public float WIND_TETHER_RATIO = 0.11f;
+    public float UNWIND_TETHER_RATIO = 0.22f;
+    public float MIN_RADIUS = 1.25f;
+    public float MAX_RADIUS = 7.5f;
     public float MIN_SPEED = 12f;
     public float MAX_SPEED = 35f;
     public float SPEED_FALLOFF = 0.85f;
@@ -28,12 +28,12 @@ public class PlayerPlanetController : NetworkBehaviour
     public float GAS_DRAIN_TIME = 3f;
     public float BOOST_SPEED_MINIMUM = 20f;
     public float SPEED_MASS_MULTIPLIER = 0.5f;
-    public float TETHER_DISABLED_DURATION = 1f;
+    public float TETHER_DISABLED_DURATION = 0.7f;
 
     public float kP = 0.1f;
     public float kI = 0f;
     public float kD = 0.01f;
-    float STEER_RATE = 1f;
+    public float STEER_RATE = 2f;
 
     // For testing. Input system callbacks set these which are then read in FixedUpdate
     private bool _attachTether = false;

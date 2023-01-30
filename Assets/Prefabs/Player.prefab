@@ -563,6 +563,7 @@ MonoBehaviour:
     IsKick: 0
     TetherDisabledDuration: 0
     CurPosition: {x: 0, y: 0}
+    RotatingClockwise: 1
   WIND_TETHER_RATIO: 0.11
   UNWIND_TETHER_RATIO: 0.22
   MIN_RADIUS: 1.25
@@ -583,7 +584,7 @@ MonoBehaviour:
   kP: 0
   kI: 0
   kD: 0
-  MAX_STEER_DEGREES: 20
+  STEER_RATE: 2
 --- !u!114 &1017064400787661185
 MonoBehaviour:
   m_ObjectHideFlags: 0
