@@ -30,6 +30,11 @@ public class PlayerPlanetController : NetworkBehaviour
     public float SPEED_MASS_MULTIPLIER = 0.5f;
     public float TETHER_DISABLED_DURATION = 1f;
 
+    public float kP = 0.1f;
+    public float kI = 0f;
+    public float kD = 0.01f;
+    float STEER_RATE = 1f;
+
     // For testing. Input system callbacks set these which are then read in FixedUpdate
     private bool _attachTether = false;
     private float _windTether = 0f;
@@ -50,10 +55,10 @@ public class PlayerPlanetController : NetworkBehaviour
         };
     }
 
-
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
+        //Physics.defaultMaxDepenetrationVelocity = 0.0001f;
     }
 
     public void Start()
@@ -68,7 +73,7 @@ public class PlayerPlanetController : NetworkBehaviour
     public void ApplyInput(Inputs input, float dt)
     {
         SetStateFromInput(input, dt);
-        SetRigidBodyVelocity(dt);
+        SetRigidBodyVelocity4(dt);
     }
 
     private void SetStateFromInput(Inputs input, float dt)
@@ -101,14 +106,6 @@ public class PlayerPlanetController : NetworkBehaviour
         body.mass = 1 + speedRatio * SPEED_MASS_MULTIPLIER;
     }
 
-    private void SetBounciness(float bounciness)
-    {
-        CircleCollider2D coll = GetComponent<CircleCollider2D>();
-        PhysicsMaterial2D material = coll.sharedMaterial;
-        material.bounciness = bounciness;
-        coll.sharedMaterial = material;
-    }
-
     private void HandleTether(bool wasInputTethered, float previousWind, float dt)
     {
         if (playerState.InputIsTethered)
@@ -133,14 +130,13 @@ public class PlayerPlanetController : NetworkBehaviour
                         ContextManager.instance.SoundManager.Play("Wind", 0.03f);
                     }
 
-                    if (playerState.InputWindTether > 0f && playerState.WallCollisionCount == 0)
+                    if (playerState.InputWindTether > 0f)
                     {
                         ContextManager.instance.SoundManager.Play("Unwind", 0.03f);
                     }
 
                     playerState.CenterPoint = nearestPlanet.transform.position;
                     playerState.OrbitRadius = Vector2.Distance(body.position, playerState.CenterPoint);
-                    SetBounciness(0f);
                 }
             }
 
@@ -155,7 +151,7 @@ public class PlayerPlanetController : NetworkBehaviour
                 windRatio = WIND_TETHER_RATIO;
             }
             else
-            if (playerState.InputWindTether > 0f && playerState.WallCollisionCount == 0)
+            if (playerState.InputWindTether > 0f)
             {
                 if (previousWind <= 0)
                 {
@@ -185,7 +181,6 @@ public class PlayerPlanetController : NetworkBehaviour
             }
             playerState.CenterPoint = Vector2.zero;
             playerState.OrbitRadius = 0;
-            SetBounciness(1f);
         }
         playerState.OrbitRadius = Mathf.Clamp(playerState.OrbitRadius, MIN_RADIUS, MAX_RADIUS);
     }
@@ -278,6 +273,121 @@ public class PlayerPlanetController : NetworkBehaviour
         }
     }
 
+    private void SetRigidBodyVelocity2(float dt)
+    {
+        // Based on force
+        if (!playerState.InputIsTethered)
+        {
+            body.velocity = playerState.Speed * body.velocity.normalized;
+            return;
+        }
+        Vector2 diff = body.position - playerState.CenterPoint;
+        Vector2 tangent = new Vector2(diff.y, -diff.x).normalized;
+        float rotatingClockwise = Mathf.Sign(Vector2.Dot(tangent, body.velocity)) < 0 ? -1 : 1;
+        Vector2 desiredTangent = tangent * rotatingClockwise * playerState.Speed;
+
+
+        float radialForce = body.mass * playerState.Speed * playerState.Speed / playerState.OrbitRadius;
+        Vector2 impulseRadial = -diff.normalized * radialForce * dt;
+        body.AddForce(impulseRadial, ForceMode2D.Impulse);
+
+        Vector2 impulseTangent = desiredTangent * dt;
+        body.AddForce(impulseTangent, ForceMode2D.Impulse);
+
+        Vector2 radialCorection = diff.normalized * (playerState.OrbitRadius - diff.magnitude);
+
+        body.velocity = body.velocity.normalized * playerState.Speed;
+        //body.velocity = playerState.Speed * (desiredTangent + desiredRadial).normalized;
+
+    }
+
+    private void SetRigidBodyVelocity3(float dt)
+    {
+        // Based on angular velocity
+        if (!playerState.InputIsTethered)
+        {
+            body.velocity = playerState.Speed * body.velocity.normalized;
+            return;
+        }
+        Vector2 diff = body.position - playerState.CenterPoint;
+        float curTheta = Mathf.Atan2(diff.y, diff.x);
+        float newTheta = curTheta + playerState.Speed * dt;
+        Vector2 newPos = playerState.CenterPoint + new Vector2(playerState.OrbitRadius * Mathf.Cos(newTheta), playerState.OrbitRadius * Mathf.Sin(newTheta));
+        body.velocity = (newPos - body.position).normalized * playerState.Speed;
+    }
+
+    private void SetRigidBodyVelocity4(float dt)
+    {
+        // Limit steer rate
+        if (!playerState.InputIsTethered)
+        {
+            body.velocity = playerState.Speed * body.velocity.normalized;
+            return;
+        }
+        Vector2 diff = body.position - playerState.CenterPoint;
+        Vector2 tangent = new Vector2(diff.y, -diff.x).normalized;
+        float rotatingClockwise = Mathf.Sign(Vector2.Dot(tangent, body.velocity)) < 0 ? -1 : 1;
+        float curTheta = Mathf.Atan2(body.velocity.y, body.velocity.x);
+
+        float futureTheta = Mathf.Atan2(diff.y, diff.x) + playerState.Speed / playerState.OrbitRadius * dt * -rotatingClockwise;
+        Vector2 futurePos = playerState.CenterPoint + new Vector2(playerState.OrbitRadius * Mathf.Cos(futureTheta), playerState.OrbitRadius * Mathf.Sin(futureTheta));
+        Vector2 desiredTangent = futurePos - body.position;
+
+        float desiredAngle = (Mathf.Atan2(desiredTangent.y, desiredTangent.x) + 2 * Mathf.PI) % (2 * Mathf.PI);
+        float steer = (desiredAngle - curTheta + 2 * Mathf.PI) % (2 * Mathf.PI);
+        if (steer >= Mathf.PI)
+        {
+            steer = steer - 2 * Mathf.PI;
+        }
+        float steerRate = STEER_RATE * playerState.Speed / MIN_RADIUS * dt;
+        steer = Mathf.Clamp(steer, -steerRate, steerRate);
+        float newDir = curTheta + steer;
+        body.velocity = new Vector2(playerState.Speed * Mathf.Cos(newDir), playerState.Speed * Mathf.Sin(newDir));
+        body.angularVelocity = steer;
+        Debug.Log("Current error: " + (playerState.OrbitRadius - diff.magnitude) + " Desired radius: " + playerState.OrbitRadius + ", Current Radius: " + diff.magnitude);
+    }
+
+
+    private void SetRigidBodyVelocity5(float dt)
+    {
+        // Use PID to try to follow orbit at set radius
+        if (!playerState.InputIsTethered)
+        {
+            body.velocity = playerState.Speed * body.velocity.normalized;
+            return;
+        }
+        Vector2 diff = body.position - playerState.CenterPoint;
+        Vector2 tangent = new Vector2(diff.y, -diff.x).normalized;
+        float rotatingClockwise = Mathf.Sign(Vector2.Dot(tangent, body.velocity)) < 0 ? -1 : 1;
+
+        float crossTrackError = playerState.OrbitRadius - diff.magnitude;
+        float crossTrackErrorRate = Vector2.Dot(body.velocity, diff) / diff.magnitude;
+
+        float curTheta = Mathf.Atan2(body.velocity.y, body.velocity.x);
+
+
+
+        float futureTheta = Mathf.Atan2(diff.y, diff.x) + playerState.Speed / playerState.OrbitRadius * dt * -rotatingClockwise;
+        Vector2 futurePos = playerState.CenterPoint + new Vector2(playerState.OrbitRadius * Mathf.Cos(futureTheta), playerState.OrbitRadius * Mathf.Sin(futureTheta));
+        Vector2 desiredTangent = futurePos - body.position;
+
+        //Vector2 desiredTangent = tangent * rotatingClockwise * playerState.Speed;
+        float desiredAngle = (Mathf.Atan2(desiredTangent.y, desiredTangent.x) + 2 * Mathf.PI) % (2 * Mathf.PI);
+        float feedforward = (desiredAngle - curTheta + 2 * Mathf.PI) % (2 * Mathf.PI);
+        if (feedforward >= Mathf.PI)
+        {
+            feedforward = feedforward - 2 * Mathf.PI;
+        }
+        //Debug.Log("Desired andle: " + desiredAngle * 180 / Mathf.PI + ", feed forward: " + feedforward * 180 / Mathf.PI);
+        feedforward = Mathf.Clamp(feedforward, -STEER_RATE * 20f / 180f * Mathf.PI, STEER_RATE * 20f / 180f * Mathf.PI);
+
+        float steer = feedforward + (kP * crossTrackError - kD * crossTrackErrorRate) * rotatingClockwise;
+        steer = Mathf.Clamp(steer, -STEER_RATE * 20f / 180f * Mathf.PI, STEER_RATE * 20f / 180f * Mathf.PI);
+        float newDir = curTheta + steer;
+        body.velocity = new Vector2(playerState.Speed * Mathf.Cos(newDir), playerState.Speed * Mathf.Sin(newDir));
+        Debug.Log("Current error: " + crossTrackError + "Desired radius: " + playerState.OrbitRadius + ", Current Radius: " + diff.magnitude);
+    }
+
     public Planet NearestPlanet()
     {
         float shortestDistance = Mathf.Infinity;
@@ -300,7 +410,17 @@ public class PlayerPlanetController : NetworkBehaviour
         if (collision.gameObject.tag == "Ball")
         {
             PlaySound(collision);
-            body.velocity = collision.relativeVelocity;
+
+            Vector2 normal = collision.GetContact(0).normal;
+            if (collision.contactCount == 1 && collision.relativeVelocity.magnitude >= MIN_SPEED / 2 && Vector2.Angle(normal, collision.relativeVelocity) <= 45)
+            {
+                // Head on collision
+                //body.velocity = collision.relativeVelocity;
+            }
+            else
+            {
+                // Shallow glancing collision
+            }
         }
         else
         if (collision.gameObject.tag == "Player")
@@ -315,24 +435,11 @@ public class PlayerPlanetController : NetworkBehaviour
         if (collision.gameObject.tag == "Wall" || collision.gameObject.tag == "Goal")
         {
             PlaySound(collision, "WallHit", 0.1f);
-            playerState.WallCollisionCount += 1;
             if (playerState.InputIsTethered)
             {
                 // Reset position to what we set it in ApplyInput since there's no way to customize Unity's depenetration function
                 body.position = playerState.CurPosition;
-
-                // Only bounce backward if this is the only wall collision
-                if (playerState.WallCollisionCount == 1)
-                {
-                    body.velocity = collision.relativeVelocity;
-                }
-                else if (playerState.InputWindTether > 0f)
-                {
-                    // Hard set radius to prevent the target radius differing too much from the rendered radius.
-                    // Also add a small offset to the radius so that the collision exit trigger only happens once the player
-                    // intentionally stops tetering or winds the tether, and not because of Unity collision detection precision.
-                    playerState.OrbitRadius = 0.2f + Vector2.Distance(body.position, playerState.CenterPoint);
-                }
+                body.velocity = collision.relativeVelocity;
             }
         }
     }
@@ -341,17 +448,6 @@ public class PlayerPlanetController : NetworkBehaviour
     {
         float volume = Mathf.Clamp01((collision.relativeVelocity.magnitude - MIN_SPEED) / (MAX_SPEED - MIN_SPEED) * gainQualifier);
         ContextManager.instance.SoundManager.Play(name, 0.1f, volume);
-    }
-
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-        if (collision.gameObject.tag == "Wall" || collision.gameObject.tag == "Goal")
-        {
-            // Set bounciness to 1 to handle the case where we collided with 2+ walls at once and never got to bounce backward
-            SetBounciness(1f);
-            playerState.WallCollisionCount -= 1;
-            return;
-        }
     }
 
     public void OnAttachTether(InputValue input)
