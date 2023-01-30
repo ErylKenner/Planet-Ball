@@ -29,9 +29,9 @@ namespace ClientServerPrediction
                     uint newestTick = inputMessage.startTick + (uint)inputContext.inputs.Count - 1;
                     uint firstTick = inputMessage.startTick;
 
-                    if (!inputBufferMap[inputContext.netId].IsEmpty && inputBufferMap[inputContext.netId].LastRecieved().clientTick > firstTick)
+                    if (inputBufferMap[inputContext.netId].HasRecieved && inputBufferMap[inputContext.netId].LastRecieved().clientTick > firstTick)
                     {
-                        firstTick = inputBufferMap[inputContext.netId].LastRecieved().clientTick;
+                        firstTick = inputBufferMap[inputContext.netId].LastRecieved().clientTick + 1;
                     }
 
                     for (int index = (int)firstTick; index <= newestTick; index++)

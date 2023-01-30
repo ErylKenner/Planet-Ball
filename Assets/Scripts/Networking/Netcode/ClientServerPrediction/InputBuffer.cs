@@ -29,6 +29,14 @@ public class InputBuffer<T>
         }
     }
 
+    public bool HasRecieved
+    {
+        get
+        {
+            return lastRecievedTick != -1;
+        }
+    }
+
     public InputBuffer(uint size)
     {
         bufferSize = size;
