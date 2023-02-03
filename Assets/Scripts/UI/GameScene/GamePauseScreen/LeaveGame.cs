@@ -7,6 +7,6 @@ public class LeaveGame : MonoBehaviour
     public void Leave()
     {
         CustomRoomManager customRoomManager = FindObjectOfType<CustomRoomManager>();
-        customRoomManager.ServerChangeScene(customRoomManager.RoomScene);
+        customRoomManager.ExitGame();
     }
 }

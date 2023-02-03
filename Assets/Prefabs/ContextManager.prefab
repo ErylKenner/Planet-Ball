@@ -176,4 +176,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AutoWin: 0
-  AutoWinSpeed: 10
+  AutoWinSpeed: 30

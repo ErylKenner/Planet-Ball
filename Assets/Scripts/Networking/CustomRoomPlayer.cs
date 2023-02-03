@@ -66,8 +66,7 @@ public class CustomRoomPlayer : NetworkRoomPlayer
             CmdSetName(SteamFriends.GetPersonaName().ToString());
         }
         GetComponent<PlayerInput>().enabled = true;
-        gameObject.AddComponent<FindUIInputModule>();
-
+        FindUIInputModule.GrabUIInput(GetComponent<PlayerInput>());
     }
 
     /// <summary>

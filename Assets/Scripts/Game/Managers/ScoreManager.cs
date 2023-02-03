@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 
 public class ScoreManager : NetworkBehaviour
 {
@@ -61,7 +62,7 @@ public class ScoreManager : NetworkBehaviour
                 Time.timeScale = 1;
                 Time.fixedDeltaTime = originalFixedDeltaTime;
                 CustomRoomManager customRoomManager = FindObjectOfType<CustomRoomManager>();
-                customRoomManager.ServerChangeScene(customRoomManager.RoomScene);
+                customRoomManager.ExitGame();
 
                 Debug.Log("Go back to lobby");
             }

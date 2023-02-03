@@ -5,6 +5,8 @@ using Mirror.FizzySteam;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
+using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 /*
 	Documentation: https://mirror-networking.gitbook.io/docs/components/network-room-manager
@@ -25,9 +27,13 @@ public class CustomRoomManager : NetworkRoomManager
 {
     public GameObject MainMenuGui;
     public GameObject RoomSceneGui;
+    public Selectable MainMenuDefaultSelection;
+    public Selectable RoomSceneDefaultSelection;
 
     [Scene]
     public string MainMenuScene;
+
+    public PlayerInput MainMenuInput;
 
     private HashSet<Transform> takenStartPositions = new HashSet<Transform>();
 
@@ -303,18 +309,60 @@ public class CustomRoomManager : NetworkRoomManager
         {
             MainMenuGui.SetActive(true);
             RoomSceneGui.SetActive(false);
+
+            MainMenuDefaultSelection.Select();
+
+            MainMenuInput.enabled = true;
+            FindUIInputModule.GrabUIInput(MainMenuInput);
         }
         else if (scene.Contains(RoomScene))
         {
             MainMenuGui.SetActive(false);
             RoomSceneGui.SetActive(true);
+
+            RoomSceneDefaultSelection.Select();
+
+            MainMenuInput.enabled = false;
+
+            // For room re-entry
+            PlayerInput playerInput = NetworkClient.localPlayer?.GetComponent<PlayerInput>();
+            if(playerInput != null)
+            {
+                FindUIInputModule.GrabUIInput(playerInput);
+            }
         }
         else if (scene.Contains(GameplayScene))
         {
             MainMenuGui.SetActive(false);
             RoomSceneGui.SetActive(false);
 
+            MainMenuInput.enabled = false;        }
+    }
+
+    public void ExitGame()
+    {
+        if(networkSceneName != GameplayScene)
+        {
+            Debug.LogError($"{networkSceneName} is not the GameplayScene {GameplayScene}");
+            return;
         }
+
+        Destroy(NetworkClient.localPlayer.GetComponent<PlayerInput>());
+
+        if(!NetworkClient.isHostClient)
+        {
+            Disconnect();
+        } else
+        {
+            ServerChangeScene(RoomScene);
+        }
+    }
+
+    public void Disconnect()
+    {
+        StopClient();
+        StopHost();
+        SetSceneGui(MainMenuScene);
     }
 
 
