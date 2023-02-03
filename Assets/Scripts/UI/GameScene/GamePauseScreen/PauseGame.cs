@@ -5,9 +5,19 @@ using UnityEngine.InputSystem;
 
 public class PauseGame : MonoBehaviour
 {
+    private UIAccessor accessor;
+    private void Start()
+    {
+        accessor = FindObjectOfType<UIAccessor>();
+        if(accessor == null)
+        {
+            Debug.LogWarning("PauseGame cannot find UIAccessor");
+            return;
+        }
+    }
+
     public void FlipFlopPause()
     {
-        UIAccessor accessor = FindObjectOfType<UIAccessor>();
         var playerInput = GetComponent<PlayerInput>();
         if (accessor.PauseScreen.activeSelf)
         {
@@ -27,5 +37,17 @@ public class PauseGame : MonoBehaviour
     public void OnPause(InputValue input)
     {
         FlipFlopPause();
+    }
+
+    public void OnCancel(InputValue input)
+    {
+        if(accessor.Options.activeSelf)
+        {
+            accessor.Options.SetActive(false);
+            accessor.Pause.SetActive(true);
+        } else
+        {
+            FlipFlopPause();
+        }
     }
 }
