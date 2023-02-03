@@ -17,7 +17,7 @@ public class FPSDisplay : MonoBehaviour {
 			accumulator = 0;
 			frameCount = 0;
 
-			FpsText.text = frameRate.ToString();
+			FpsText.text = $"FPS: {frameRate}";
 		}
 	}
 }
