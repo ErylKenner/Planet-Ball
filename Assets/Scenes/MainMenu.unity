@@ -1499,6 +1499,10 @@ PrefabInstance:
       propertyPath: AllowRepeatPlay
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 988256559679732594, guid: e1339084668b95b429a8fbd964309362, type: 3}
+      propertyPath: AutoWin
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6065759129471074328, guid: e1339084668b95b429a8fbd964309362, type: 3}
       propertyPath: m_RootOrder
       value: 2
