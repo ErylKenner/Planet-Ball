@@ -45,7 +45,6 @@ namespace ClientServerPrediction
         public bool IsKick = false;
         public float TetherDisabledDuration = 0f;
         public Vector2 CurPosition = Vector2.zero;
-        public int WallCollisionCount = 0;
 
         public PlayerState() { }
         public PlayerState(PlayerState other)
@@ -64,7 +63,6 @@ namespace ClientServerPrediction
             IsKick = other.IsKick;
             TetherDisabledDuration = other.TetherDisabledDuration;
             CurPosition = other.CurPosition;
-            WallCollisionCount = other.WallCollisionCount;
         }
 
         public bool Equals(PlayerState playerState)
@@ -90,8 +88,7 @@ namespace ClientServerPrediction
                 InputIsSpeedBoost == playerState.InputIsSpeedBoost &&
                 InputIsKick == playerState.InputIsKick &&
                 CenterPoint == playerState.CenterPoint &&
-                CurPosition == playerState.CurPosition &&
-                WallCollisionCount == playerState.WallCollisionCount
+                CurPosition == playerState.CurPosition
             );
         }
     }

@@ -95,7 +95,7 @@ MonoBehaviour:
     Volume: 0.065
     Pitch: 1.1
     source: {fileID: 0}
-  AllowRepeatPlay: 0
+  AllowRepeatPlay: 1
 --- !u!1 &6065759129471074329
 GameObject:
   m_ObjectHideFlags: 0

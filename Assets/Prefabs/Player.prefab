@@ -563,7 +563,6 @@ MonoBehaviour:
     IsKick: 0
     TetherDisabledDuration: 0
     CurPosition: {x: 0, y: 0}
-    WallCollisionCount: 0
   WIND_TETHER_RATIO: 0.11
   UNWIND_TETHER_RATIO: 0.22
   MIN_RADIUS: 1.25
@@ -581,6 +580,7 @@ MonoBehaviour:
   BOOST_SPEED_MINIMUM: 20
   SPEED_MASS_MULTIPLIER: 0.5
   TETHER_DISABLED_DURATION: 0.7
+  STEER_RATE: 2
 --- !u!114 &1017064400787661185
 MonoBehaviour:
   m_ObjectHideFlags: 0
