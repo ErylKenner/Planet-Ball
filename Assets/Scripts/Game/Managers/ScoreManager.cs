@@ -62,7 +62,7 @@ public class ScoreManager : NetworkBehaviour
                 Time.timeScale = 1;
                 Time.fixedDeltaTime = originalFixedDeltaTime;
                 CustomRoomManager customRoomManager = FindObjectOfType<CustomRoomManager>();
-                customRoomManager.ExitGame();
+                customRoomManager.ExitGame(true);
 
                 Debug.Log("Go back to lobby");
             }

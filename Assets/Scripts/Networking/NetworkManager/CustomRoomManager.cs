@@ -339,7 +339,7 @@ public class CustomRoomManager : NetworkRoomManager
             MainMenuInput.enabled = false;        }
     }
 
-    public void ExitGame()
+    public void ExitGame(bool gameEnd=false)
     {
         if(networkSceneName != GameplayScene)
         {
@@ -351,6 +351,10 @@ public class CustomRoomManager : NetworkRoomManager
 
         if(!NetworkClient.isHostClient)
         {
+            if(gameEnd)
+            {
+                return;
+            }
             Disconnect();
         } else
         {
