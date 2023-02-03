@@ -7,10 +7,12 @@ using UnityEngine.InputSystem.UI;
 
 public class FindUIInputModule : NetworkBehaviour
 {
-    private void Awake()
+    private void Start()
     {
+        Debug.Log("Hello");
         if(isLocalPlayer)
         {
+            Debug.Log("There");
             GrabUIInput(GetComponent<PlayerInput>());
         }
     }
