@@ -9,10 +9,8 @@ public class FindUIInputModule : NetworkBehaviour
 {
     private void Start()
     {
-        Debug.Log("Hello");
         if(isLocalPlayer)
         {
-            Debug.Log("There");
             GrabUIInput(GetComponent<PlayerInput>());
         }
     }
