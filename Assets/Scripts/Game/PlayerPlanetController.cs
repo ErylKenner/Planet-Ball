@@ -12,10 +12,10 @@ public class PlayerPlanetController : NetworkBehaviour
     public PlayerState playerState = new PlayerState();
 
     // Const attributes - not state
-    public float WIND_TETHER_RATIO = 0.12f;
-    public float UNWIND_TETHER_RATIO = 0.29f;
-    public float MIN_RADIUS = 1f;
-    public float MAX_RADIUS = 9f;
+    public float WIND_TETHER_RATIO = 0.11f;
+    public float UNWIND_TETHER_RATIO = 0.22f;
+    public float MIN_RADIUS = 1.25f;
+    public float MAX_RADIUS = 7.5f;
     public float MIN_SPEED = 12f;
     public float MAX_SPEED = 35f;
     public float SPEED_FALLOFF = 0.85f;
@@ -28,9 +28,9 @@ public class PlayerPlanetController : NetworkBehaviour
     public float GAS_DRAIN_TIME = 3f;
     public float BOOST_SPEED_MINIMUM = 20f;
     public float SPEED_MASS_MULTIPLIER = 0.5f;
-    public float TETHER_DISABLED_DURATION = 1f;
+    public float TETHER_DISABLED_DURATION = 0.7f;
+    public float STEER_RATE = 2f;
 
-    // For testing. Input system callbacks set these which are then read in FixedUpdate
     private bool _attachTether = false;
     private float _windTether = 0f;
     private bool _speedBoost = false;
@@ -49,7 +49,6 @@ public class PlayerPlanetController : NetworkBehaviour
             Kick = _kick
         };
     }
-
 
     private void Awake()
     {
@@ -101,14 +100,6 @@ public class PlayerPlanetController : NetworkBehaviour
         body.mass = 1 + speedRatio * SPEED_MASS_MULTIPLIER;
     }
 
-    private void SetBounciness(float bounciness)
-    {
-        CircleCollider2D coll = GetComponent<CircleCollider2D>();
-        PhysicsMaterial2D material = coll.sharedMaterial;
-        material.bounciness = bounciness;
-        coll.sharedMaterial = material;
-    }
-
     private void HandleTether(bool wasInputTethered, float previousWind, float dt)
     {
         if (playerState.InputIsTethered)
@@ -133,14 +124,13 @@ public class PlayerPlanetController : NetworkBehaviour
                         ContextManager.instance.SoundManager.Play("Wind", 0.03f);
                     }
 
-                    if (playerState.InputWindTether > 0f && playerState.WallCollisionCount == 0)
+                    if (playerState.InputWindTether > 0f)
                     {
                         ContextManager.instance.SoundManager.Play("Unwind", 0.03f);
                     }
 
                     playerState.CenterPoint = nearestPlanet.transform.position;
                     playerState.OrbitRadius = Vector2.Distance(body.position, playerState.CenterPoint);
-                    SetBounciness(0f);
                 }
             }
 
@@ -155,7 +145,7 @@ public class PlayerPlanetController : NetworkBehaviour
                 windRatio = WIND_TETHER_RATIO;
             }
             else
-            if (playerState.InputWindTether > 0f && playerState.WallCollisionCount == 0)
+            if (playerState.InputWindTether > 0f)
             {
                 if (previousWind <= 0)
                 {
@@ -185,7 +175,6 @@ public class PlayerPlanetController : NetworkBehaviour
             }
             playerState.CenterPoint = Vector2.zero;
             playerState.OrbitRadius = 0;
-            SetBounciness(1f);
         }
         playerState.OrbitRadius = Mathf.Clamp(playerState.OrbitRadius, MIN_RADIUS, MAX_RADIUS);
     }
@@ -253,30 +242,35 @@ public class PlayerPlanetController : NetworkBehaviour
             body.velocity = playerState.Speed * body.velocity.normalized;
             return;
         }
+        // Current state of the body
         Vector2 diff = body.position - playerState.CenterPoint;
-        float rotationDirection = Mathf.Sign(Vector2.Dot(new Vector2(diff.y, -diff.x), body.velocity));
-        if (rotationDirection == 0)
+        Vector2 tangent = new Vector2(diff.y, -diff.x).normalized;
+        float rotatingClockwise = Mathf.Sign(Vector2.Dot(tangent, body.velocity)) < 0 ? -1 : 1;
+        float curTheta = Mathf.Atan2(body.velocity.y, body.velocity.x);
+
+        // Calculate where player would end up next frame if turning rate was unlimited
+        float futureTheta = Mathf.Atan2(diff.y, diff.x) + playerState.Speed / playerState.OrbitRadius * dt * -rotatingClockwise;
+        Vector2 unitFuturePosLocal = new Vector2(Mathf.Cos(futureTheta), Mathf.Sin(futureTheta));
+        Vector2 futurePos = playerState.CenterPoint + playerState.OrbitRadius * unitFuturePosLocal;
+
+        // Calculate a steering angle to apply to the current velocity
+        Vector2 desiredDir = futurePos - body.position;
+        float desiredAngle = (Mathf.Atan2(desiredDir.y, desiredDir.x) + 2 * Mathf.PI) % (2 * Mathf.PI);
+        float steer = (desiredAngle - curTheta + 2 * Mathf.PI) % (2 * Mathf.PI);
+        if (steer >= Mathf.PI)
         {
-            rotationDirection = 1;
+            steer -= 2 * Mathf.PI;  // Normalize to [-pi, pi]
         }
-        if (Mathf.Abs(diff.magnitude - playerState.OrbitRadius) > playerState.Speed * dt * 0.75f)
-        {
-            //Too large a distance to make in one step. Go towards new radius at 45 deg angle
-            Vector2 tangentUnit = new Vector2(diff.y, -diff.x).normalized * rotationDirection;
-            Vector2 radialChangeUnit = (diff.normalized * playerState.OrbitRadius - diff).normalized; // TODO: Could this just be -diff.normalized ?
-            body.velocity = playerState.Speed * (tangentUnit + radialChangeUnit).normalized;
-        }
-        else
-        {
-            //Can make the radius change. So, solve for the new angle
-            float currentAngle = Mathf.Atan2(diff.y, diff.x);
-            float deltaAngle = (diff.magnitude * diff.magnitude + playerState.OrbitRadius * playerState.OrbitRadius - Mathf.Pow(playerState.Speed * dt, 2)) / (2 * diff.magnitude * playerState.OrbitRadius);
-            deltaAngle = Mathf.Acos(deltaAngle);
-            float newAngle = currentAngle + deltaAngle * -rotationDirection;
-            Vector2 newPosition = playerState.CenterPoint + playerState.OrbitRadius * new Vector2(Mathf.Cos(newAngle), Mathf.Sin(newAngle));
-            body.velocity = playerState.Speed * (newPosition - body.position).normalized;
-        }
+        float maxSteer = STEER_RATE * playerState.Speed / MIN_RADIUS * dt;
+        steer = Mathf.Clamp(steer, -maxSteer, maxSteer);
+
+        // Apply steer to body
+        float newTheta = curTheta + steer;
+        Vector2 newDir = new Vector2(Mathf.Cos(newTheta), Mathf.Sin(newTheta));
+        body.velocity = playerState.Speed * newDir;
+        body.angularVelocity = steer;
     }
+
 
     public Planet NearestPlanet()
     {
@@ -300,7 +294,6 @@ public class PlayerPlanetController : NetworkBehaviour
         if (collision.gameObject.tag == "Ball")
         {
             PlaySound(collision);
-            body.velocity = collision.relativeVelocity;
         }
         else
         if (collision.gameObject.tag == "Player")
@@ -315,24 +308,10 @@ public class PlayerPlanetController : NetworkBehaviour
         if (collision.gameObject.tag == "Wall" || collision.gameObject.tag == "Goal")
         {
             PlaySound(collision, "WallHit", 0.1f);
-            playerState.WallCollisionCount += 1;
             if (playerState.InputIsTethered)
             {
-                // Reset position to what we set it in ApplyInput since there's no way to customize Unity's depenetration function
                 body.position = playerState.CurPosition;
-
-                // Only bounce backward if this is the only wall collision
-                if (playerState.WallCollisionCount == 1)
-                {
-                    body.velocity = collision.relativeVelocity;
-                }
-                else if (playerState.InputWindTether > 0f)
-                {
-                    // Hard set radius to prevent the target radius differing too much from the rendered radius.
-                    // Also add a small offset to the radius so that the collision exit trigger only happens once the player
-                    // intentionally stops tetering or winds the tether, and not because of Unity collision detection precision.
-                    playerState.OrbitRadius = 0.2f + Vector2.Distance(body.position, playerState.CenterPoint);
-                }
+                body.velocity = collision.relativeVelocity;
             }
         }
     }
@@ -341,17 +320,6 @@ public class PlayerPlanetController : NetworkBehaviour
     {
         float volume = Mathf.Clamp01((collision.relativeVelocity.magnitude - MIN_SPEED) / (MAX_SPEED - MIN_SPEED) * gainQualifier);
         ContextManager.instance.SoundManager.Play(name, 0.1f, volume);
-    }
-
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-        if (collision.gameObject.tag == "Wall" || collision.gameObject.tag == "Goal")
-        {
-            // Set bounciness to 1 to handle the case where we collided with 2+ walls at once and never got to bounce backward
-            SetBounciness(1f);
-            playerState.WallCollisionCount -= 1;
-            return;
-        }
     }
 
     public void OnAttachTether(InputValue input)
