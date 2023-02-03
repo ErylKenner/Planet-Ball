@@ -6,7 +6,7 @@ public class ExitRoom : MonoBehaviour
 {
     public CustomRoomManager CustomRoomManager;
 
-    private void Awake()
+    private void Start()
     {
         if(CustomRoomManager == null)
         {

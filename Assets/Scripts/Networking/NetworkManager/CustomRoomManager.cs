@@ -336,9 +336,7 @@ public class CustomRoomManager : NetworkRoomManager
             MainMenuGui.SetActive(false);
             RoomSceneGui.SetActive(false);
 
-            MainMenuInput.enabled = false;
-            //FindUIInputModule.GrabUIInput(NetworkClient.localPlayer?.GetComponent<PlayerInput>());
-        }
+            MainMenuInput.enabled = false;        }
     }
 
     public void ExitGame()
