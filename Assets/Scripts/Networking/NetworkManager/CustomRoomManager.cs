@@ -341,9 +341,11 @@ public class CustomRoomManager : NetworkRoomManager
 
     public void ExitGame(bool gameEnd=false)
     {
-        if(networkSceneName != GameplayScene)
+        // Ignore gameEnd case because server has already changed the scene.
+        // We still want to destroy the PlayerInput
+        if(networkSceneName != GameplayScene && !gameEnd)
         {
-            Debug.LogError($"{networkSceneName} is not the GameplayScene {GameplayScene}");
+            Debug.LogWarning($"{networkSceneName} is not the GameplayScene {GameplayScene}");
             return;
         }
 
