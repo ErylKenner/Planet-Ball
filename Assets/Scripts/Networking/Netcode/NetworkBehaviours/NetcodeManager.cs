@@ -1,8 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Mirror;
 using ClientServerPrediction;
+using Mirror;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 public class NetcodeManager : NetworkBehaviour
 {
@@ -27,7 +27,6 @@ public class NetcodeManager : NetworkBehaviour
     float frozenTimer = 0;
 
 
-    // Start is called before the first frame update
     void Start()
     {
         if (instance == null)
@@ -94,8 +93,6 @@ public class NetcodeManager : NetworkBehaviour
                 clientTrail.transform.parent = TrailParent ? TrailParent : gameObject.transform;
                 clientTrail.AddComponent<Die>().ExpirationDate = TrailExpirationLength;
 
-                text.text = $"{client.tick - client.lastReceivedTick}";
-
                 if (inputMessage != null && NetworkClient.ready)
                 {
                     CmdSendInputMessage(inputMessage);
@@ -112,7 +109,7 @@ public class NetcodeManager : NetworkBehaviour
             }
         }
 
-        //Debug.Log(tickCount);
+        SetDebugText(text);
     }
 
     [ClientRpc]
@@ -125,6 +122,35 @@ public class NetcodeManager : NetworkBehaviour
     void CmdSendInputMessage(InputMessage inputMessage)
     {
         server.inputMessageQueue.Enqueue(inputMessage);
+    }
+
+    public void SetDebugText(TMPro.TextMeshProUGUI debugText)
+    {
+        if(!debugText.gameObject.activeInHierarchy)
+        {
+            return;
+        }
+
+        List<string> debugStrings = new List<string>();
+
+        if(isServer)
+        {
+            List<uint> serverNetIds = new List<uint>(server.serverStateMap.Keys);
+            string serverNetIdsString = string.Join(' ', serverNetIds.Select(netId => netId.ToString()));
+            debugStrings.Add($"Server NIDs: {serverNetIdsString}");
+        }
+
+        if(isClient)
+        {
+            List<uint> clientNetIds = new List<uint>(server.serverStateMap.Keys);
+            string clientNetIdsString = string.Join(' ', clientNetIds.Select(netId => netId.ToString()));
+            debugStrings.Add($"Client NIDs: {clientNetIdsString}");
+        }
+
+
+
+        debugText.text = string.Join('\n', debugStrings);
+
     }
 
     public void ResetState(float freezeTime)

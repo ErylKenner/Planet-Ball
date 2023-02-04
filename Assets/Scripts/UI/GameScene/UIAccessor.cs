@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIAccessor : MonoBehaviour
 {
@@ -8,4 +9,5 @@ public class UIAccessor : MonoBehaviour
     public GameObject PauseScreen;
     public GameObject Pause;
     public GameObject Options;
+    public Selectable DefaultPauseSelection;
 }
