@@ -30,6 +30,7 @@ public class PauseGame : MonoBehaviour
             accessor.PauseScreen.SetActive(true);
             accessor.Pause.SetActive(true);
             accessor.Options.SetActive(false);
+            accessor.DefaultPauseSelection.Select();
             playerInput.currentActionMap = playerInput.actions.FindActionMap("UI");
         }
     }
