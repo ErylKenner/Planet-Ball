@@ -5,11 +5,12 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
 
-public class FindUIInputModule : NetworkBehaviour
+public class FindUIInputModule : MonoBehaviour
 {
     private void Start()
     {
-        if(isLocalPlayer)
+        NetworkIdentity netId = GetComponent<NetworkIdentity>();
+        if (netId != null && netId.isLocalPlayer)
         {
             GrabUIInput(GetComponent<PlayerInput>());
         }
