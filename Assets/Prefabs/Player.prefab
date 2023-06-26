@@ -578,22 +578,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  TurningAlgorithm: TurnTowardRadius
   playerState:
-    InputIsTethered: 0
-    InputWindTether: 0
-    InputIsSpeedBoost: 0
-    InputIsKick: 0
     OrbitRadius: 0
     CenterPoint: {x: 0, y: 0}
-    Speed: 12
-    CurSpeedBoostCooldown: 0
-    CurKickCooldown: 0
-    CurGas: 0
-    IsSpeedBoost: 0
-    IsKick: 0
     TetherDisabledDuration: 0
+    IsTethered: 0
+    IsWinding: 0
+    IsUnwinding: 0
+    Speed: 12
+    CurGas: 0
+    CurSpeedBoostCooldown: 0
+    IsSpeedBoost: 0
+    CurKickCooldown: 0
+    IsKick: 0
     CurPosition: {x: 0, y: 0}
-  playerControllerData: {fileID: 11400000, guid: 6d5798bf534e761469898b08b9bc47b7, type: 2}
+  settings: {fileID: 11400000, guid: 6d5798bf534e761469898b08b9bc47b7, type: 2}
 --- !u!114 &1017064400787661185
 MonoBehaviour:
   m_ObjectHideFlags: 0
