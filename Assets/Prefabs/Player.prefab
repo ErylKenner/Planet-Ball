@@ -259,14 +259,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Version: 1
+  m_Version: 3
   m_UsePipelineSettings: 1
   m_AdditionalLightsShadowResolutionTier: 2
   m_LightLayerMask: 1
+  m_RenderingLayers: 1
   m_CustomShadowLayers: 0
   m_ShadowLayerMask: 1
+  m_ShadowRenderingLayers: 1
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 1
 --- !u!1 &2660555798011782860
 GameObject:
   m_ObjectHideFlags: 0
@@ -324,7 +327,9 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 0
+  m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
@@ -477,6 +482,25 @@ CircleCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 6200000, guid: 55fd3c7176a575b408658616a7579c99, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
@@ -500,6 +524,12 @@ Rigidbody2D:
   m_AngularDrag: 1.35
   m_GravityScale: 0
   m_Material: {fileID: 6200000, guid: 55fd3c7176a575b408658616a7579c99, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 1
@@ -563,24 +593,7 @@ MonoBehaviour:
     IsKick: 0
     TetherDisabledDuration: 0
     CurPosition: {x: 0, y: 0}
-  WIND_TETHER_RATIO: 0.11
-  UNWIND_TETHER_RATIO: 0.22
-  MIN_RADIUS: 1.25
-  MAX_RADIUS: 7.5
-  MIN_SPEED: 12
-  MAX_SPEED: 35
-  SPEED_FALLOFF: 0.85
-  SPEED_BOOST_RAMP: 0.4
-  SPEED_BOOST_COOLDOWN: 2
-  HEAVY_COOLDOWN: 0.5
-  HEAVY_DURATION: 1
-  HEAVY_MASS: 10
-  GAS_INCREASE_TIME: 20
-  GAS_DRAIN_TIME: 3
-  BOOST_SPEED_MINIMUM: 20
-  SPEED_MASS_MULTIPLIER: 0.5
-  TETHER_DISABLED_DURATION: 0.7
-  STEER_RATE: 2
+  playerControllerData: {fileID: 11400000, guid: 6d5798bf534e761469898b08b9bc47b7, type: 2}
 --- !u!114 &1017064400787661185
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -702,6 +715,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!120 &4101798185480953454
 LineRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -789,16 +803,20 @@ LineRenderer:
       atime6: 0
       atime7: 0
       m_Mode: 0
+      m_ColorSpace: -1
       m_NumColorKeys: 2
       m_NumAlphaKeys: 2
     numCornerVertices: 0
     numCapVertices: 0
     alignment: 0
     textureMode: 0
+    textureScale: {x: 1, y: 1}
     shadowBias: 0.5
     generateLightingData: 0
+  m_MaskInteraction: 0
   m_UseWorldSpace: 1
   m_Loop: 0
+  m_ApplyActiveColorSpace: 0
 --- !u!114 &6625698636843384361
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -825,6 +843,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 5594583912770767461}
     m_Modifications:
     - target: {fileID: 2942051580892192243, guid: d57d6419728ca4fa486055a9b54eb326, type: 3}
@@ -892,6 +911,9 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d57d6419728ca4fa486055a9b54eb326, type: 3}
 --- !u!4 &436313081554747052 stripped
 Transform:
