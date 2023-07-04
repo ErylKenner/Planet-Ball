@@ -360,7 +360,6 @@ public class PlayerPlanetController : NetworkBehaviour
         if (collision.gameObject.tag == "Ball")
         {
             PlaySound(collision);
-            playerState.TetherDisabledDuration = settings.TETHER_DISABLED_BALL_DURATION;
         }
         else
         if (collision.gameObject.tag == "Player")
@@ -369,7 +368,7 @@ public class PlayerPlanetController : NetworkBehaviour
             {
                 PlaySound(collision);
             }
-            playerState.TetherDisabledDuration = settings.TETHER_DISABLED_PLAYER_DURATION;
+            playerState.TetherDisabledDuration = settings.COLLISION_TETHER_DISABLED_DURATION;
         }
         else
         if (collision.gameObject.tag == "Wall" || collision.gameObject.tag == "Goal")
@@ -385,7 +384,10 @@ public class PlayerPlanetController : NetworkBehaviour
 
     private void PlaySound(Collision2D collision, string name = "Kick", float gainQualifier = 1.0f)
     {
-        float volume = Mathf.Clamp01((collision.relativeVelocity.magnitude - settings.SPEED[0]) / (settings.SPEED[1] - settings.SPEED[0]) * gainQualifier);
+        // Quadratic volume
+        float t = (collision.relativeVelocity.magnitude - settings.SPEED[0]) / (settings.SPEED[1] - settings.SPEED[0]);
+        float volume = gainQualifier * t * t;
+
         ContextManager.instance.SoundManager.Play(name, 0.1f, volume);
     }
 

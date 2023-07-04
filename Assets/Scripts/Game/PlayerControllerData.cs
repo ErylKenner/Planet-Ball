@@ -33,8 +33,7 @@ public class PlayerControllerData : ScriptableObject
     [Range(1f, 10f)] public float STEER_RATE;
 
     [Header("Collision")]
-    [Range(0f, 5f)] public float TETHER_DISABLED_PLAYER_DURATION;
-    [Range(0f, 1f)] public float TETHER_DISABLED_BALL_DURATION;
+    [Range(0f, 5f)] public float COLLISION_TETHER_DISABLED_DURATION;
 
     private void Reset()
     {
@@ -53,7 +52,6 @@ public class PlayerControllerData : ScriptableObject
         HEAVY_DURATION = 1f;
         HEAVY_MASS = 10f;
         STEER_RATE = 2f;
-        TETHER_DISABLED_PLAYER_DURATION = 0.7f;
-        TETHER_DISABLED_BALL_DURATION = 0.1f;
+        COLLISION_TETHER_DISABLED_DURATION = 0.7f;
     }
 }
