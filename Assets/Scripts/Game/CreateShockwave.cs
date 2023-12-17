@@ -17,7 +17,7 @@ public class CreateShockwave : MonoBehaviour
 
     private void CreateShockwaveAtCollision(Collision2D collision, GameObject shockwavePrefab)
     {
-        float collisionSpeedRatio = Mathf.Clamp01((collision.relativeVelocity.magnitude - PlayerPlanetController.MIN_SPEED) / (PlayerPlanetController.MAX_SPEED - PlayerPlanetController.MIN_SPEED));
+        float collisionSpeedRatio = Mathf.Clamp01((collision.relativeVelocity.magnitude - PlayerPlanetController.settings.SPEED[0]) / (PlayerPlanetController.settings.SPEED[1] - PlayerPlanetController.settings.SPEED[0]));
         float magnitude = 1 + SPEED_RADIUS_RATIO * Mathf.Pow(collisionSpeedRatio, 3);
 
         Vector3 contactPoint = new Vector3(collision.GetContact(0).point.x, collision.GetContact(0).point.y, 0);

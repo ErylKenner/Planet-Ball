@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Playables;
 
 namespace ClientServerPrediction
 {
@@ -13,17 +14,17 @@ namespace ClientServerPrediction
 
         public static Inputs FromState(State state)
         {
-            if(state.playerState == null)
+            if (state.playerState == null)
             {
                 return null;
             }
 
             return new Inputs
             {
-                AttachTether = state.playerState.InputIsTethered,
-                WindTether = state.playerState.InputWindTether,
-                SpeedBoost = state.playerState.InputIsSpeedBoost,
-                Kick = state.playerState.InputIsKick,
+                AttachTether = state.playerState.IsTethered,
+                WindTether = state.playerState.IsWinding ? 1f : (state.playerState.IsUnwinding ? -1f : 0f),
+                SpeedBoost = state.playerState.IsSpeedBoost,
+                Kick = state.playerState.IsKick,
             };
         }
     }
@@ -31,37 +32,44 @@ namespace ClientServerPrediction
     [System.Serializable]
     public class PlayerState
     {
-        public bool InputIsTethered = false;
-        public float InputWindTether = 0f;
-        public bool InputIsSpeedBoost = false;
-        public bool InputIsKick = false;
-        public float OrbitRadius = 0;
+        // Tethering
+        public float OrbitRadius = 0f;
         public Vector2 CenterPoint = Vector2.zero;
-        public float Speed = 12.0f;
-        public float CurSpeedBoostCooldown = 0f;
-        public float CurKickCooldown = 0f;
-        public float CurGas = 0f;
-        public bool IsSpeedBoost = false;
-        public bool IsKick = false;
         public float TetherDisabledDuration = 0f;
+        public bool IsTethered = false;
+        public bool IsWinding = false;
+        public bool IsUnwinding = false;
+
+        // Speed boost
+        public float Speed = 0f;
+        public float CurGas = 0f;
+        public float CurSpeedBoostCooldown = 0f;
+        public bool IsSpeedBoost = false;
+
+        // Kick
+        public float CurKickCooldown = 0f;
+        public bool IsKick = false;
+
         public Vector2 CurPosition = Vector2.zero;
 
         public PlayerState() { }
         public PlayerState(PlayerState other)
         {
-            InputIsTethered = other.InputIsTethered;
-            InputWindTether = other.InputWindTether;
-            InputIsSpeedBoost = other.InputIsSpeedBoost;
-            InputIsKick = other.InputIsKick;
             OrbitRadius = other.OrbitRadius;
             CenterPoint = other.CenterPoint;
-            Speed = other.Speed;
-            CurSpeedBoostCooldown = other.CurSpeedBoostCooldown;
-            CurKickCooldown = other.CurKickCooldown;
-            CurGas = other.CurGas;
-            IsSpeedBoost = other.IsSpeedBoost;
-            IsKick = other.IsKick;
             TetherDisabledDuration = other.TetherDisabledDuration;
+            IsTethered = other.IsTethered;
+            IsWinding = other.IsWinding;
+            IsUnwinding = other.IsUnwinding;
+
+            Speed = other.Speed;
+            CurGas = other.CurGas;
+            CurSpeedBoostCooldown = other.CurSpeedBoostCooldown;
+            IsSpeedBoost = other.IsSpeedBoost;
+
+            CurKickCooldown = other.CurKickCooldown;
+            IsKick = other.IsKick;
+
             CurPosition = other.CurPosition;
         }
 
@@ -83,12 +91,19 @@ namespace ClientServerPrediction
             }
 
             return (
-                InputIsTethered == playerState.InputIsTethered &&
-                InputWindTether == playerState.InputWindTether &&
-                InputIsSpeedBoost == playerState.InputIsSpeedBoost &&
-                InputIsKick == playerState.InputIsKick &&
+                IsTethered == playerState.IsTethered &&
+                IsWinding == playerState.IsWinding &&
+                IsUnwinding == playerState.IsUnwinding &&
+                IsSpeedBoost == playerState.IsSpeedBoost &&
+                IsKick == playerState.IsKick &&
+                CurPosition == playerState.CurPosition &&
                 CenterPoint == playerState.CenterPoint &&
-                CurPosition == playerState.CurPosition
+                Mathf.Approximately(OrbitRadius, playerState.OrbitRadius) &&
+                Mathf.Approximately(TetherDisabledDuration, playerState.TetherDisabledDuration) &&
+                Mathf.Approximately(Speed, playerState.Speed) &&
+                Mathf.Approximately(CurGas, playerState.CurGas) &&
+                Mathf.Approximately(CurSpeedBoostCooldown, playerState.CurSpeedBoostCooldown) &&
+                Mathf.Approximately(CurKickCooldown, playerState.CurKickCooldown)
             );
         }
     }
@@ -119,15 +134,15 @@ namespace ClientServerPrediction
                     return true;
                 }
 
-                if (currentState.playerState.InputIsTethered && desiredState.playerState.InputIsTethered)
+                if (currentState.playerState.IsTethered && desiredState.playerState.IsTethered)
                 {
                     float radiusDifference = Mathf.Abs(desiredState.playerState.OrbitRadius - currentState.playerState.OrbitRadius);
-                    if(radiusDifference > allowedRadiusDiff)
+                    if (radiusDifference > allowedRadiusDiff)
                     {
                         return true;
                     }
                 }
-                
+
             }
 
             float positionDifference = Vector2.Distance(currentState.position, desiredState.position);
@@ -190,7 +205,7 @@ namespace ClientServerPrediction
         public Dictionary<uint, StateContext> GetMap()
         {
             Dictionary<uint, StateContext> map = new Dictionary<uint, StateContext>();
-            foreach(StateContext stateContext in stateContexts)
+            foreach (StateContext stateContext in stateContexts)
             {
                 map.Add(stateContext.netId, stateContext);
             }
